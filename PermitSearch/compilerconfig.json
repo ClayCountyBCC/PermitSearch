@@ -1,0 +1,14 @@
+﻿[
+  {
+    "outputFile": "css/bulma.css",
+    "inputFile": "bower_components/bulma/myBulma.sass"
+  },
+  {
+    "outputFile": "css/Main.css",
+    "inputFile": "css/Main.scss"
+  },
+  {
+    "outputFile": "css/Utilities.css",
+    "inputFile": "css/Utilities.scss"
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "name": "asp.net",
+  "private": true,
+  "dependencies": {
+    "bulma": "0.7.2"
+  },
+  "resolutions": {
+    "bulma": "0.7.2"
+  }
+}
