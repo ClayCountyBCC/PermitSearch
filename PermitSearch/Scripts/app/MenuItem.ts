@@ -1,13 +1,6 @@
-﻿namespace PermitSearch
+﻿namespace Utilities
 {
-
-  //let target = document.getElementById("test");
-
-  //export function MenuItem
-
-  //import { html } from 'lit-html'
-
-  //const temp = (firstname, lastname) => html`<div>Heyyyyyyyyyyyyyyy ${firstname + ' ' + lastname}</div>`;
+  "use strict";
 
   interface IMenuItem
   {
@@ -17,6 +10,7 @@
     icon: string;
     label: string;
     selected: boolean;
+    autofocusId: string;
   }
   export class MenuItem implements IMenuItem
   {
@@ -26,6 +20,7 @@
     public icon: string;
     public label: string;
     public selected: boolean;
+    public autofocusId: string;
 
     constructor() { }
   }

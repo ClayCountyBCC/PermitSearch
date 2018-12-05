@@ -89,15 +89,13 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bower_components\bulma\bulma.css">
-      <DependentUpon>bulma.sass</DependentUpon>
-    </Content>
-    <Content Include="bower_components\bulma\bulma.min.css">
-      <DependentUpon>bulma.css</DependentUpon>
-    </Content>
     <Content Include="css\bulma.css" />
     <Content Include="css\bulma.min.css">
       <DependentUpon>bulma.css</DependentUpon>
+    </Content>
+    <Content Include="css\darkergreenBulma.css" />
+    <Content Include="css\darkergreenBulma.min.css">
+      <DependentUpon>darkergreenBulma.css</DependentUpon>
     </Content>
     <Content Include="css\Fontawesome\css\fa-brands.css" />
     <Content Include="css\Fontawesome\css\fa-brands.min.css" />
@@ -117,6 +115,10 @@
     </Content>
     <Content Include="css\Main.min.css">
       <DependentUpon>Main.css</DependentUpon>
+    </Content>
+    <Content Include="css\mybulma.css" />
+    <Content Include="css\mybulma.min.css">
+      <DependentUpon>mybulma.css</DependentUpon>
     </Content>
     <Content Include="css\Utilities.css">
       <DependentUpon>Utilities.scss</DependentUpon>
@@ -195,6 +197,7 @@
     <Content Include="bower_components\bulma\yarn.lock" />
     <Content Include="package.json" />
     <Content Include="bower_components\bulma\myBulma.sass" />
+    <Content Include="bower_components\bulma\darkergreenBulma.sass" />
     <None Include="compilerconfig.json" />
     <None Include="compilerconfig.json.defaults">
       <DependentUpon>compilerconfig.json</DependentUpon>
@@ -234,6 +237,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\app\app.ts" />
+    <TypeScriptCompile Include="Scripts\app\LocationHash.ts" />
     <TypeScriptCompile Include="Scripts\app\MenuItem.ts" />
     <TypeScriptCompile Include="Scripts\app\Utilities.ts" />
   </ItemGroup>

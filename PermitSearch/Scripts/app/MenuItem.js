@@ -1,11 +1,11 @@
-var PermitSearch;
-(function (PermitSearch) {
-    //let target = document.getElementById("test");
+var Utilities;
+(function (Utilities) {
+    "use strict";
     var MenuItem = /** @class */ (function () {
         function MenuItem() {
         }
         return MenuItem;
     }());
-    PermitSearch.MenuItem = MenuItem;
-})(PermitSearch || (PermitSearch = {}));
+    Utilities.MenuItem = MenuItem;
+})(Utilities || (Utilities = {}));
 //# sourceMappingURL=menuitem.js.map

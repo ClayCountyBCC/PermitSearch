@@ -1,7 +1,15 @@
 ﻿[
   {
-    "outputFile": "css/bulma.css",
+    "outputFile": "css/mybulma.css",
     "inputFile": "bower_components/bulma/myBulma.sass"
+  },
+  {
+    "outputFile": "css/bulma.css",
+    "inputFile": "bower_components/bulma/Bulma.sass"
+  },
+  {
+    "outputFile": "css/darkergreenBulma.css",
+    "inputFile": "bower_components/bulma/darkergreenBulma.sass"
   },
   {
     "outputFile": "css/Main.css",

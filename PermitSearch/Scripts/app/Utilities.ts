@@ -1,4 +1,5 @@
-﻿
+﻿/// <reference path="menuitem.ts" />
+
 namespace Utilities
 {
   export function Hide(e: string)
@@ -313,15 +314,7 @@ namespace Utilities
     b.classList.toggle("is-loading", disabled);
   }
 
-  export function Create_Menu_Element(
-    menuItem: {
-      id: string,
-      title: string,
-      subTitle: string,
-      icon: string,
-      label: string,
-      selected: boolean
-    }): HTMLLIElement
+  export function Create_Menu_Element(menuItem: MenuItem): HTMLLIElement
   {
     let li = document.createElement("li");
     if (menuItem.selected) li.classList.add("is-active");
@@ -360,20 +353,24 @@ namespace Utilities
     return li;
   }
 
-  export function Update_Menu(
-    menuItem: {
-    id: string,
-    title: string,
-    subTitle: string,
-    icon: string,
-    label: string,
-    selected: boolean
-  }):void
+  export function Update_Menu(menuItem: MenuItem):void
   {
     Set_Text("menuTitle", menuItem.title);
     Set_Text("menuSubTitle", menuItem.subTitle);
     Show_Menu(menuItem.id);
+    document.getElementById(menuItem.autofocusId).focus();
   }
+
+  export function Build_Menu_Elements(target: string, Menus: Array<MenuItem>): void
+  {
+    let menu = document.getElementById(target);
+    for (let menuItem of Menus)
+    {
+      menu.appendChild(Utilities.Create_Menu_Element(menuItem));
+    }
+  }
+
+
   export function CheckBrowser()
   {
     let browser: string = "";

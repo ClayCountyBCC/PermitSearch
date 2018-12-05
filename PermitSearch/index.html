@@ -5,7 +5,8 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=11">
   <title>Clay County Building Permit Search</title>
-  <link href="css/bulma.min.css" rel="stylesheet" />
+  <link href="css/darkergreenBulma.min.css" rel="stylesheet" />
+  <!--<link href="css/bulma.min.css" rel="stylesheet" />-->
   <link href="css/Utilities.min.css" rel="stylesheet" />
   <link href="css/Fontawesome/css/fontawesome-all.min.css" rel="stylesheet" />
 </head>
@@ -47,38 +48,336 @@
       </div>
     </div>
   </section>
+  <div id="views"
+       style="margin-top: 1em;"
+       class="container">
+
+    <div id="advancedSearchOptions"
+         style="margin-bottom: .75em;">
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label">Filter By Permit Status</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <div class="select is-medium">
+                <select id="permitStatus">
+                  <option value="all">Show All</option>
+                  <option value="closed">Open Only</option>
+                  <option value="open">Closed Only</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <section id="permitSearchOptions">
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label">Permit Number</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-grouped">
+            <div class="control">
+              <input id="permitSearch"
+                     class="input is-medium"
+                     type="number"
+                     maxlength="8"
+                     value=""
+                     tabindex="1"
+                     autofocus
+                     placeholder="18000001" />
+            </div>
+            <div class="control">
+              <button id="permitSearchButton"
+                      type="button"
+                      tabindex="2"
+                      class="button is-primary is-medium">
+                Search
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column is-offset-1">
+          <div class="hide"
+               id="permitSearchError">
+
+          </div>
+        </div>
+        <div class="column">
+
+        </div>
+      </div>
+    </section>
+
+    <section class="hide"
+             id="addressSearchOptions">
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label">Street Number</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input id="streetNumberSearch"
+                     class="input is-medium"
+                     type="text"
+                     maxlength="10"
+                     tabindex="1"
+                     autofocus
+                     placeholder="Street Number" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label">Street Name</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input id="streetNameSearch"
+                     class="input is-medium"
+                     type="text"
+                     maxlength="25"
+                     tabindex="2"
+                     placeholder="Street Name" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column is-offset-1">
+          <div class="hide"
+               id="addressSearchError">
+          </div>
+        </div>
+        <div class="column">
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label"></label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <button id="addressSearchButton"
+                      type="button"
+                      tabindex="4"
+                      class="button is-primary is-medium">
+                Search
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
+    </section>
+
+    <section class="hide"
+             id="contractorSearchOptions">
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label">Contractor Number</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input id="contractorNumberSearch"
+                     class="input is-medium"
+                     type="text"
+                     autofocus
+                     maxlength="18"
+                     tabindex="1"
+                     placeholder="Contractor Number" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label">Contractor Name</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input id="contractorNameSearch"
+                     class="input is-medium"
+                     type="text"
+                     maxlength="40"
+                     tabindex="2"
+                     placeholder="Contractor Name" />
+            </div>
+          </div>
+        </div>
+      </div>
 
 
-  <!--
-
-  Show header
-    allow search by:
-      address
-        street #
-        street name
-        city
-    contractor
-      Contractor #
-      contractor name
-      company name
-    owner
-      owner name
-    parcel
-      parcel #
-    permit #
-
-
-    search button
-
-    search results
-
-    When permit is selected, show permit details
-
-    -->
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label">Company Name</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input id="companyNameSearch"
+                     class="input is-medium"
+                     maxlength="60"
+                     type="text"
+                     tabindex="3"
+                     placeholder="Company Name" />
+            </div>
+          </div>
+        </div>
+      </div>
 
 
+      <div class="columns">
+        <div class="column is-offset-1">
+          <div class="hide"
+               id="contractorSearchError">
+          </div>
+        </div>
+        <div class="column">
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label"></label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <button id="contractorSearchButton"
+                      type="button"
+                      tabindex="4"
+                      class="button is-primary is-medium">
+                Search
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="hide"
+             id="ownerSearchOptions">
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label">Owner Name</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-grouped">
+            <div class="control">
+              <input id="ownerSearch"
+                     class="input is-medium"
+                     type="text"
+                     maxlength="50"
+                     tabindex="1"
+                     autofocus
+                     value=""
+                     placeholder="Owner Name" />
+            </div>
+            <div class="control">
+              <button id="ownerSearchButton"
+                      type="button"
+                      tabindex="2"
+                      class="button is-primary is-medium">
+                Search
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column is-offset-1">
+          <div class="hide"
+               id="ownerSearchError">
+
+          </div>
+        </div>
+        <div class="column">
+
+        </div>
+      </div>
+
+    </section>
+
+    <section class="hide"
+             id="parcelSearchOptions">
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label">Parcel Number</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-grouped">
+            <div class="control">
+              <input id="parcelSearch"
+                     class="input is-medium"
+                     type="text"
+                     maxlength="13"
+                     tabindex="1"
+                     autofocus
+                     value=""
+                     placeholder="000000-000-00" />
+            </div>
+            <div class="control">
+              <button id="parcelSearchButton"
+                      type="button"
+                      tabindex="2"
+                      class="button is-primary is-medium">
+                Search
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column is-offset-1">
+          <div class="hide"
+               id="ownerSearchError">
+
+          </div>
+        </div>
+        <div class="column">
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script src="Scripts/app/Utilities.js"></script>
   <script src="Scripts/app/app.js"></script>
+
+
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function (event)
+    {
+      PermitSearch.Start();
+    });
+  </script>
 </body>
 </html>

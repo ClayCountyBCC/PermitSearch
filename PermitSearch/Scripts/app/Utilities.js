@@ -1,3 +1,4 @@
+/// <reference path="menuitem.ts" />
 var Utilities;
 (function (Utilities) {
     function Hide(e) {
@@ -265,8 +266,17 @@ var Utilities;
         Set_Text("menuTitle", menuItem.title);
         Set_Text("menuSubTitle", menuItem.subTitle);
         Show_Menu(menuItem.id);
+        document.getElementById(menuItem.autofocusId).focus();
     }
     Utilities.Update_Menu = Update_Menu;
+    function Build_Menu_Elements(target, Menus) {
+        var menu = document.getElementById(target);
+        for (var _i = 0, Menus_1 = Menus; _i < Menus_1.length; _i++) {
+            var menuItem = Menus_1[_i];
+            menu.appendChild(Utilities.Create_Menu_Element(menuItem));
+        }
+    }
+    Utilities.Build_Menu_Elements = Build_Menu_Elements;
     function CheckBrowser() {
         var browser = "";
         if ((navigator.userAgent.indexOf("Opera") || navigator.userAgent.indexOf('OPR')) != -1) {
@@ -292,4 +302,4 @@ var Utilities;
     }
     Utilities.CheckBrowser = CheckBrowser;
 })(Utilities || (Utilities = {}));
-//# sourceMappingURL=Utilities.js.map
+//# sourceMappingURL=utilities.js.map
