@@ -60,7 +60,6 @@
           case "parcel":
             this.parcel_number = k[1];
             break;
-
         }
       }
 

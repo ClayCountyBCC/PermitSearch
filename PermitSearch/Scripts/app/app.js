@@ -1,5 +1,10 @@
-/// <reference path="menuitem.ts" />
-/// <reference path="utilities.ts" />
+/// <reference path="../utilities/menuitem.ts" />
+/// <reference path="../utilities/utilities.ts" />
+/// <reference path="charge.ts" />
+/// <reference path="document.ts" />
+/// <reference path="hold.ts" />
+/// <reference path="locationhash.ts" />
+/// <reference path="permit.ts" />
 var PermitSearch;
 (function (PermitSearch) {
     "use strict";

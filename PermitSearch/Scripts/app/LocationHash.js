@@ -73,4 +73,4 @@ var PermitSearch;
     }());
     PermitSearch.LocationHash = LocationHash;
 })(PermitSearch || (PermitSearch = {}));
-//# sourceMappingURL=LocationHash.js.map
+//# sourceMappingURL=locationhash.js.map

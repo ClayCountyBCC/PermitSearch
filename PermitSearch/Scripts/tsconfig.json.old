@@ -9,6 +9,6 @@
     "target": "es5"
   },
   "compileOnSave": true,  
-  "include": ["Scripts/app/*.ts"],
+  //"include": ["Scripts/app/*.ts"],
   "exclude": []
 }
