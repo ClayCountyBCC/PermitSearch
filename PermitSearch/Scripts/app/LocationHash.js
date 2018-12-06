@@ -1,7 +1,8 @@
+/// <reference path="app.ts" />
 var PermitSearch;
 (function (PermitSearch) {
-    var LocationHash = /** @class */ (function () {
-        function LocationHash(locationHash) {
+    class LocationHash {
+        constructor(locationHash) {
             this.permit_number = "";
             this.permit_status = "all";
             this.contractor_number = "";
@@ -11,9 +12,9 @@ var PermitSearch;
             this.street_name = "";
             this.parcel_number = "";
             this.owner_name = "";
-            var ha = locationHash.split("&");
-            for (var i = 0; i < ha.length; i++) {
-                var k = ha[i].split("=");
+            let ha = locationHash.split("&");
+            for (let i = 0; i < ha.length; i++) {
+                let k = ha[i].split("=");
                 switch (k[0].toLowerCase()) {
                     case "permit":
                         this.permit_number = k[1];
@@ -45,8 +46,8 @@ var PermitSearch;
                 }
             }
         }
-        LocationHash.prototype.ToHash = function () {
-            var h = "";
+        ToHash() {
+            let h = "";
             if (this.permit_status.length > 0)
                 h += "&status=" + this.permit_status;
             if (this.permit_number.length > 0)
@@ -68,9 +69,8 @@ var PermitSearch;
             if (h.length > 0)
                 h = "#" + h.substring(1);
             return h;
-        };
-        return LocationHash;
-    }());
+        }
+    }
     PermitSearch.LocationHash = LocationHash;
 })(PermitSearch || (PermitSearch = {}));
 //# sourceMappingURL=locationhash.js.map

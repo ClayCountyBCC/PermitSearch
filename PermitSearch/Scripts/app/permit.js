@@ -1,8 +1,9 @@
+/// <reference path="app.ts" />
 var PermitSearch;
 (function (PermitSearch) {
     "use strict";
-    var Permit = /** @class */ (function () {
-        function Permit() {
+    class Permit {
+        constructor() {
             this.permit_number = 0;
             this.address = "";
             this.issue_date = new Date();
@@ -20,8 +21,7 @@ var PermitSearch;
             this.owner_name = "";
             this.parcel_number = "";
         }
-        return Permit;
-    }());
+    }
     PermitSearch.Permit = Permit;
 })(PermitSearch || (PermitSearch = {}));
 //# sourceMappingURL=permit.js.map

@@ -1,11 +1,6 @@
 ﻿/// <reference path="../utilities/menuitem.ts" />
 /// <reference path="../utilities/utilities.ts" />
-/// <reference path="charge.ts" />
-/// <reference path="document.ts" />
-/// <reference path="hold.ts" />
 /// <reference path="locationhash.ts" />
-/// <reference path="permit.ts" />
-
 
 namespace PermitSearch
 {
@@ -67,12 +62,13 @@ namespace PermitSearch
     window.onhashchange = HandleHash;
   }
 
+  // Need to 
 
 
   export function HandleHash()
   {
-    //let hash = location.hash;
-    //let currentHash = new LocationHash(location.hash.substring(1));
+    let hash = location.hash;
+    let currentHash = new LocationHash(location.hash.substring(1));
     //if (currentHash.Permit.length > 0)
     //{
     //  Utilities.Update_Menu(UI.Menus[1]);

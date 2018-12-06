@@ -1,4 +1,6 @@
-﻿namespace PermitSearch
+﻿/// <reference path="app.ts" />
+
+namespace PermitSearch
 {
   interface ILocationHash
   {
