@@ -1,9 +1,11 @@
 var Utilities;
 (function (Utilities) {
     "use strict";
-    class MenuItem {
-        constructor() { }
-    }
+    var MenuItem = /** @class */ (function () {
+        function MenuItem() {
+        }
+        return MenuItem;
+    }());
     Utilities.MenuItem = MenuItem;
 })(Utilities || (Utilities = {}));
 //# sourceMappingURL=menuitem.js.map

@@ -34,7 +34,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <TypeScriptTarget>ES2015</TypeScriptTarget>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
     <TypeScriptModuleKind>None</TypeScriptModuleKind>
     <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
@@ -79,6 +79,7 @@
     <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -103,6 +104,16 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bower_components\fetch\fetch.js" />
+    <Content Include="bower_components\fetch\prettier.config.js" />
+    <Content Include="bower_components\fetch\rollup.config.js" />
+    <Content Include="bower_components\promise-polyfill\dist\polyfill.js" />
+    <Content Include="bower_components\promise-polyfill\dist\polyfill.min.js" />
+    <Content Include="bower_components\promise-polyfill\karma.conf.js" />
+    <Content Include="bower_components\promise-polyfill\rollup.umd.config.js" />
+    <Content Include="bower_components\promise-polyfill\src\finally.js" />
+    <Content Include="bower_components\promise-polyfill\src\index.js" />
+    <Content Include="bower_components\promise-polyfill\src\polyfill.js" />
     <Content Include="css\bulma.css" />
     <Content Include="css\bulma.min.css">
       <DependentUpon>bulma.css</DependentUpon>
@@ -146,11 +157,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\PermitController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
+    <Compile Include="Controllers\TimingController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\charge.cs" />
+    <Compile Include="Models\Constants.cs" />
     <Compile Include="Models\document.cs" />
+    <Compile Include="Models\ErrorLog.cs" />
     <Compile Include="Models\hold.cs" />
     <Compile Include="Models\permit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -216,6 +232,16 @@
     <Content Include="package.json" />
     <Content Include="bower_components\bulma\myBulma.sass" />
     <Content Include="bower_components\bulma\darkergreenBulma.sass" />
+    <Content Include="bower_components\fetch\.bower.json" />
+    <Content Include="bower_components\fetch\bower.json" />
+    <Content Include="bower_components\fetch\fetch.js.flow" />
+    <Content Include="bower_components\fetch\LICENSE" />
+    <Content Include="bower_components\promise-polyfill\.bower.json" />
+    <Content Include="bower_components\promise-polyfill\bower.json" />
+    <Content Include="bower_components\promise-polyfill\CHANGELOG.md" />
+    <Content Include="bower_components\promise-polyfill\LICENSE" />
+    <Content Include="bower_components\promise-polyfill\package.json" />
+    <Content Include="bower_components\promise-polyfill\README.md" />
     <None Include="compilerconfig.json" />
     <None Include="compilerconfig.json.defaults">
       <DependentUpon>compilerconfig.json</DependentUpon>
@@ -234,6 +260,9 @@
     <Content Include="css\Fontawesome\webfonts\fa-solid-900.woff2" />
     <Content Include="css\Main.scss" />
     <Content Include="css\Utilities.scss" />
+    <Content Include="ConnectionStrings.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -244,7 +273,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Controllers\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\tsconfig.json.old" />
@@ -256,6 +284,7 @@
     <TypeScriptCompile Include="Scripts\app\app.ts" />
     <TypeScriptCompile Include="Scripts\app\charge.ts" />
     <TypeScriptCompile Include="Scripts\app\document.ts" />
+    <TypeScriptCompile Include="Scripts\app\string.ts" />
     <TypeScriptCompile Include="Scripts\app\hold.ts" />
     <TypeScriptCompile Include="Scripts\app\LocationHash.ts" />
     <TypeScriptCompile Include="Scripts\utilities\MenuItem.ts" />

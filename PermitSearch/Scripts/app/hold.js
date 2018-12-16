@@ -2,9 +2,11 @@
 var PermitSearch;
 (function (PermitSearch) {
     "use strict";
-    class Hold {
-        constructor() { }
-    }
+    var Hold = /** @class */ (function () {
+        function Hold() {
+        }
+        return Hold;
+    }());
     PermitSearch.Hold = Hold;
 })(PermitSearch || (PermitSearch = {}));
 //# sourceMappingURL=hold.js.map

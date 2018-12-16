@@ -9,6 +9,10 @@
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
+ConnectionStrings.config
+[Pp]ermit[Ss]earch/[Cc]onnection[Ss]trings.config
+PermitSearch/ConnectionStrings.config
+[Pp]roperties/
 
 # Build results
 [Dd]ebug/

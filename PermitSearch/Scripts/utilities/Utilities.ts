@@ -272,7 +272,7 @@ namespace Utilities
     {
       return date.toLocaleDateString('en-us');
     }
-    return new Date(date).toLocaleString('en-US');
+    return new Date(date).toLocaleDateString('en-US');
   }
 
   export function Validate_Text(e: string, errorElementId: string, errorText: string): string

@@ -2,7 +2,9 @@
   "name": "asp.net",
   "private": true,
   "dependencies": {
-    "bulma": "0.7.2"
+    "bulma": "0.7.2",
+    "promise-polyfill": "8.1.0",
+    "fetch": "v2.0.4"
   },
   "resolutions": {
     "bulma": "0.7.2"
