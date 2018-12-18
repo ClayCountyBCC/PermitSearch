@@ -110,6 +110,7 @@ namespace PermitSearch
         .then(function (permitCount: number)
         {
           permit_count = permitCount;
+          HandlePagination(permit_count, parseInt(currentHash.page), 20);
           // update pagination here
           console.log("count", permitCount);
 
@@ -157,6 +158,117 @@ namespace PermitSearch
     if (className.length > 0) td.classList.add(className);
     td.appendChild(document.createTextNode(value));
     return td;
+  }
+
+  function HandlePagination(totalCount: number, currentPage: number, pageSize: number)
+  {
+    // we'll need to enable/disable the previous / next buttons based on 
+    // if we're on the first/last page
+    let totalPages = Math.ceil(totalCount / pageSize);
+    let previousPage = <HTMLAnchorElement>document.getElementById("resultsPreviousPage");
+    let nextPage = <HTMLAnchorElement>document.getElementById("resultsNextPage");
+    if (currentPage === 1)
+    {
+      previousPage.setAttribute("disabled", "");
+    }
+    else
+    {
+      previousPage.removeAttribute("disabled");
+    }
+
+    if (currentPage === totalPages)
+    {
+      nextPage.setAttribute("disabled", "");
+    }
+    else
+    {
+      nextPage.removeAttribute("disabled");
+    }
+
+    let pageList = document.getElementById("resultsPaginationList");
+    Utilities.Clear_Element(pageList);
+    pageList.appendChild(CreatePaginationLinks(totalPages, currentPage, pageSize));    
+  }
+
+  function CreatePaginationLinks(totalPages: number, currentPage: number, pageSize: number):DocumentFragment
+  {
+    // Scenarios
+    // if the number of pages is 7 or less
+    //    create a link for every page
+    //    nothing else to worry about
+    // if the number of pages is > 7 
+    //    if the current page is 3 or less or total pages - 3 or more
+    //    show pages 1 through 3 an ellipsis, and then last page - 3 to last page
+    // Otherwise
+    //    show page 1 then an ellipsis then currentpage - 1 through current page + 1 then last page
+    let df = document.createDocumentFragment();
+
+    
+    if (currentPage < 1) currentPage = 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (totalPages < 8)
+    {
+      // add a link to every page
+      for (let i = 1; i <= totalPages; i++)
+      {
+        df.appendChild(CreatePaginationLink(i, i === currentPage));
+      }
+      return df;
+    }
+
+    if (currentPage < 4 || currentPage > totalPages - 4)
+    {
+      // add links to the first 3 pages and last 3 pages
+      for (let i = 1; i <= 3; i++)
+      {
+        df.appendChild(CreatePaginationLink(i, i === currentPage));
+      }
+      df.appendChild(CreatePaginationEllipsis());
+      for (let i = totalPages - 2; i <= totalPages; i++)
+      {
+        df.appendChild(CreatePaginationLink(i, i === currentPage));
+      }
+      return df;
+    }
+
+    // add links to the first page, currentpage -1 through currentpage + 1, and last page
+    df.appendChild(CreatePaginationLink(1, false));
+    df.appendChild(CreatePaginationEllipsis());
+    for (let i = currentPage - 1; i <= currentPage + 1; i++)
+    {
+      df.appendChild(CreatePaginationLink(i, i === currentPage));
+    }
+    df.appendChild(CreatePaginationEllipsis());
+    df.appendChild(CreatePaginationLink(totalPages, false));
+
+    return df;
+  }
+
+  function CreatePaginationLink(page: number, isSelected: boolean):HTMLLIElement
+  {
+    // scroll back up to the top when a page is clicked
+    let li = document.createElement("li");
+    let a = document.createElement("a");
+    a.classList.add("pagination-link");
+    a.setAttribute("aria-label", "Goto page " + page.toString());
+    if (isSelected)
+    {
+      a.classList.add("is-current");
+      a.setAttribute("aria-current", "page");
+    }
+    a.appendChild(document.createTextNode(page.toString()));
+    li.appendChild(a);
+    return li;
+  }
+
+  function CreatePaginationEllipsis(): HTMLLIElement
+  {
+    let li = document.createElement("li");
+    let span = document.createElement("span");
+    span.classList.add("pagination-ellipsis");
+    span.innerHTML = "&hellip;";
+    li.appendChild(span);
+    return li;
   }
 
 

@@ -402,8 +402,94 @@
         </thead>
         <tbody id="resultsBody"></tbody>
       </table>
+      <nav class="pagination is-medium" role="navigation" aria-label="pagination">
+        <a id="resultsPreviousPage"
+           class="pagination-previous">Previous</a>
+        <a id="resultsNextPage"
+           class="pagination-next">Next</a>
+        <ul id="resultsPaginationList"
+            class="pagination-list">
 
+        </ul>
+      </nav>
     </div>
+
+    <div id="selectedPermit">
+      <div class="level">
+        <div style="flex-grow: 3;"
+             class="level-item has-text-centered">
+          <div>
+            <p class="heading">
+              PERMIT #
+            </p>
+            <p class="title">
+              31434225
+            </p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">
+              ISSUE DATE
+            </p>
+            <p class="title">
+              11/15/2018
+            </p>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <p class="heading">
+              CO DATE
+            </p>
+            <p class="title">
+              12/1/2018
+            </p>
+          </div>
+        </div>
+      </div>
+      This modal will need to show:
+
+      Permit #
+      Address
+      Issue Date
+      Co Date
+      Void Date (only if it is present)
+      Whether or not the permit is closed
+      Whether or not the permit has passed it's final inspection
+      Owner Name
+      Parcel #
+      Contractor #
+      Contractor Name
+      Company name
+      A link to the Permit Card
+      A dropdown listing the related permit numbers.
+      
+      We will also need to figure out how to link back to the Inspection scheduler.  Could just be a button in the tabbed interface.
+
+      Tabbed interfaces:
+        Holds
+        All Charges
+          Unpaid will include a link to claypay
+          Paid will link to Claypay via the receipt number.
+            This means we will need to give them some way to view the receipt number
+        Documents
+          The documents will need to link back to the original way to download them
+          There should be an indicator that someone clicked on the link to download it.
+            We can accomplish this just by switching the image on click.
+
+
+      <nav aria-label="tabs"
+           class="tabs is-centered is-medium is-boxed is-fullwidth">
+        <ul>
+          <li class="is-active"><a>Documents</a></li>
+          <li><a>Charges</a></li>
+          <li><a>Holds</a></li>
+        </ul>
+
+      </nav>
+    </div>
+
   </div>
   <script src="bower_components/promise-polyfill/dist/polyfill.min.js"></script>
 
