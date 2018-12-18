@@ -85,14 +85,20 @@ var PermitSearch;
                 .then(function (permits) {
                 console.log("permits", permits);
                 PermitSearch.search_results = permits;
-                CreateResultsTable(PermitSearch.search_results);
+                if (PermitSearch.search_results.length > 0) {
+                    Utilities.Show("searchResults");
+                    CreateResultsTable(PermitSearch.search_results);
+                }
+                else {
+                    Utilities.Hide("searchResults");
+                }
             }, function (e) {
                 console.log('error getting permits', e);
             });
             Utilities.Get(path + "API/Search/Count" + searchHash)
                 .then(function (permitCount) {
                 PermitSearch.permit_count = permitCount;
-                HandlePagination(PermitSearch.permit_count, parseInt(currentHash.page), 20);
+                HandlePagination(PermitSearch.permit_count, parseInt(currentHash.page), 20, currentHash);
                 // update pagination here
                 console.log("count", permitCount);
             }, function (e) {
@@ -120,7 +126,7 @@ var PermitSearch;
         tr.appendChild(CreateResultsCell(Utilities.Format_Date(p.issue_date)));
         tr.appendChild(CreateResultsCell(p.address, "has-text-left"));
         tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges - p.paid_charges), "has-text-right"));
-        tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges), "has-text-right"));
+        //tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges), "has-text-right"));
         tr.appendChild(CreateResultsCell(p.document_count.toString()));
         tr.appendChild(CreateResultsCell(p.passed_final_inspection ? "Completed" : "View"));
         return tr;
@@ -133,7 +139,7 @@ var PermitSearch;
         td.appendChild(document.createTextNode(value));
         return td;
     }
-    function HandlePagination(totalCount, currentPage, pageSize) {
+    function HandlePagination(totalCount, currentPage, pageSize, currentHash) {
         // we'll need to enable/disable the previous / next buttons based on 
         // if we're on the first/last page
         var totalPages = Math.ceil(totalCount / pageSize);
@@ -153,9 +159,9 @@ var PermitSearch;
         }
         var pageList = document.getElementById("resultsPaginationList");
         Utilities.Clear_Element(pageList);
-        pageList.appendChild(CreatePaginationLinks(totalPages, currentPage, pageSize));
+        pageList.appendChild(CreatePaginationLinks(totalPages, currentPage, currentHash));
     }
-    function CreatePaginationLinks(totalPages, currentPage, pageSize) {
+    function CreatePaginationLinks(totalPages, currentPage, currentHash) {
         // Scenarios
         // if the number of pages is 7 or less
         //    create a link for every page
@@ -173,42 +179,44 @@ var PermitSearch;
         if (totalPages < 8) {
             // add a link to every page
             for (var i = 1; i <= totalPages; i++) {
-                df.appendChild(CreatePaginationLink(i, i === currentPage));
+                df.appendChild(CreatePaginationLink(i, i === currentPage, currentHash));
             }
             return df;
         }
         if (currentPage < 4 || currentPage > totalPages - 4) {
             // add links to the first 3 pages and last 3 pages
             for (var i = 1; i <= 3; i++) {
-                df.appendChild(CreatePaginationLink(i, i === currentPage));
+                df.appendChild(CreatePaginationLink(i, i === currentPage, currentHash));
             }
             df.appendChild(CreatePaginationEllipsis());
             for (var i = totalPages - 2; i <= totalPages; i++) {
-                df.appendChild(CreatePaginationLink(i, i === currentPage));
+                df.appendChild(CreatePaginationLink(i, i === currentPage, currentHash));
             }
             return df;
         }
         // add links to the first page, currentpage -1 through currentpage + 1, and last page
-        df.appendChild(CreatePaginationLink(1, false));
+        df.appendChild(CreatePaginationLink(1, false, currentHash));
         df.appendChild(CreatePaginationEllipsis());
         for (var i = currentPage - 1; i <= currentPage + 1; i++) {
-            df.appendChild(CreatePaginationLink(i, i === currentPage));
+            df.appendChild(CreatePaginationLink(i, i === currentPage, currentHash));
         }
         df.appendChild(CreatePaginationEllipsis());
-        df.appendChild(CreatePaginationLink(totalPages, false));
+        df.appendChild(CreatePaginationLink(totalPages, false, currentHash));
         return df;
     }
-    function CreatePaginationLink(page, isSelected) {
+    function CreatePaginationLink(page, isSelected, currentHash) {
         // scroll back up to the top when a page is clicked
+        currentHash.page = page.toString();
         var li = document.createElement("li");
         var a = document.createElement("a");
         a.classList.add("pagination-link");
-        a.setAttribute("aria-label", "Goto page " + page.toString());
+        a.setAttribute("aria-label", "Goto page " + currentHash.page);
+        a.href = currentHash.ToHash();
         if (isSelected) {
             a.classList.add("is-current");
             a.setAttribute("aria-current", "page");
         }
-        a.appendChild(document.createTextNode(page.toString()));
+        a.appendChild(document.createTextNode(currentHash.page));
         li.appendChild(a);
         return li;
     }

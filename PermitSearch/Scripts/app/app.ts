@@ -100,7 +100,16 @@ namespace PermitSearch
         {
           console.log("permits", permits);
           search_results = permits;
-          CreateResultsTable(search_results);
+          if (search_results.length > 0)
+          {
+            Utilities.Show("searchResults");
+            CreateResultsTable(search_results);
+          }
+          else
+          {
+            Utilities.Hide("searchResults");
+          }
+
         }, function (e)
           {
             console.log('error getting permits', e);
@@ -110,7 +119,7 @@ namespace PermitSearch
         .then(function (permitCount: number)
         {
           permit_count = permitCount;
-          HandlePagination(permit_count, parseInt(currentHash.page), 20);
+          HandlePagination(permit_count, parseInt(currentHash.page), 20, currentHash);
           // update pagination here
           console.log("count", permitCount);
 
@@ -146,7 +155,7 @@ namespace PermitSearch
     tr.appendChild(CreateResultsCell(Utilities.Format_Date(p.issue_date)));
     tr.appendChild(CreateResultsCell(p.address, "has-text-left"));
     tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges - p.paid_charges), "has-text-right"));
-    tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges), "has-text-right"));
+    //tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges), "has-text-right"));
     tr.appendChild(CreateResultsCell(p.document_count.toString()));
     tr.appendChild(CreateResultsCell(p.passed_final_inspection ? "Completed" : "View"));
     return tr;
@@ -160,7 +169,7 @@ namespace PermitSearch
     return td;
   }
 
-  function HandlePagination(totalCount: number, currentPage: number, pageSize: number)
+  function HandlePagination(totalCount: number, currentPage: number, pageSize: number, currentHash: LocationHash)
   {
     // we'll need to enable/disable the previous / next buttons based on 
     // if we're on the first/last page
@@ -187,10 +196,10 @@ namespace PermitSearch
 
     let pageList = document.getElementById("resultsPaginationList");
     Utilities.Clear_Element(pageList);
-    pageList.appendChild(CreatePaginationLinks(totalPages, currentPage, pageSize));    
+    pageList.appendChild(CreatePaginationLinks(totalPages, currentPage, currentHash));
   }
 
-  function CreatePaginationLinks(totalPages: number, currentPage: number, pageSize: number):DocumentFragment
+  function CreatePaginationLinks(totalPages: number, currentPage: number, currentHash: LocationHash):DocumentFragment
   {
     // Scenarios
     // if the number of pages is 7 or less
@@ -201,9 +210,7 @@ namespace PermitSearch
     //    show pages 1 through 3 an ellipsis, and then last page - 3 to last page
     // Otherwise
     //    show page 1 then an ellipsis then currentpage - 1 through current page + 1 then last page
-    let df = document.createDocumentFragment();
-
-    
+    let df = document.createDocumentFragment();    
     if (currentPage < 1) currentPage = 1;
     if (currentPage > totalPages) currentPage = totalPages;
     if (totalPages < 8)
@@ -211,7 +218,7 @@ namespace PermitSearch
       // add a link to every page
       for (let i = 1; i <= totalPages; i++)
       {
-        df.appendChild(CreatePaginationLink(i, i === currentPage));
+        df.appendChild(CreatePaginationLink(i, i === currentPage, currentHash));
       }
       return df;
     }
@@ -221,42 +228,44 @@ namespace PermitSearch
       // add links to the first 3 pages and last 3 pages
       for (let i = 1; i <= 3; i++)
       {
-        df.appendChild(CreatePaginationLink(i, i === currentPage));
+        df.appendChild(CreatePaginationLink(i, i === currentPage, currentHash));
       }
       df.appendChild(CreatePaginationEllipsis());
       for (let i = totalPages - 2; i <= totalPages; i++)
       {
-        df.appendChild(CreatePaginationLink(i, i === currentPage));
+        df.appendChild(CreatePaginationLink(i, i === currentPage, currentHash));
       }
       return df;
     }
 
     // add links to the first page, currentpage -1 through currentpage + 1, and last page
-    df.appendChild(CreatePaginationLink(1, false));
+    df.appendChild(CreatePaginationLink(1, false, currentHash));
     df.appendChild(CreatePaginationEllipsis());
     for (let i = currentPage - 1; i <= currentPage + 1; i++)
     {
-      df.appendChild(CreatePaginationLink(i, i === currentPage));
+      df.appendChild(CreatePaginationLink(i, i === currentPage, currentHash));
     }
     df.appendChild(CreatePaginationEllipsis());
-    df.appendChild(CreatePaginationLink(totalPages, false));
+    df.appendChild(CreatePaginationLink(totalPages, false, currentHash));
 
     return df;
   }
 
-  function CreatePaginationLink(page: number, isSelected: boolean):HTMLLIElement
+  function CreatePaginationLink(page: number, isSelected: boolean, currentHash: LocationHash):HTMLLIElement
   {
     // scroll back up to the top when a page is clicked
+    currentHash.page = page.toString();
     let li = document.createElement("li");
     let a = document.createElement("a");
     a.classList.add("pagination-link");
-    a.setAttribute("aria-label", "Goto page " + page.toString());
+    a.setAttribute("aria-label", "Goto page " + currentHash.page);    
+    a.href = currentHash.ToHash();
     if (isSelected)
     {
       a.classList.add("is-current");
       a.setAttribute("aria-current", "page");
     }
-    a.appendChild(document.createTextNode(page.toString()));
+    a.appendChild(document.createTextNode(currentHash.page));
     li.appendChild(a);
     return li;
   }
