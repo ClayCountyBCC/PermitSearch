@@ -412,85 +412,216 @@
       </nav>
     </div>
 
-    <div id="selectedPermit">
-      <div class="level">
-        <div style="flex-grow: 3;"
-             class="level-item has-text-centered">
-          <div>
-            <p class="heading">
-              PERMIT #
-            </p>
-            <p class="title">
-              31434225
-            </p>
+    <div class="modal is-active"
+         id="selectedPermit">
+      <div onclick="PermitSearch.CloseModals();"
+           class="modal-background"></div>
+      <div class="modal-card container">
+        <!--<header class="modal-card-head">
+          <p class="modal-card-title">
+            Permit Information
+          </p>
+          <button onclick="PermitSearch.CloseModals();"
+                  type="button"
+                  class="delete"
+                  aria-label="close"></button>
+        </header>-->
+
+        <section class="modal-card-body">
+          <div class="level">
+            <div style="flex-grow: 3;"
+                 class="level-item has-text-centered">
+              <div>
+                <p class="heading">
+                  PERMIT #
+                </p>
+                <p class="title">
+                  31434225
+                </p>
+              </div>
+            </div>
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">
+                  ISSUE DATE
+                </p>
+                <p class="title">
+                  11/15/2018
+                </p>
+              </div>
+            </div>
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">
+                  CO DATE
+                </p>
+                <p class="title">
+                  12/1/2018
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="level-item has-text-centered">
-          <div>
-            <p class="heading">
-              ISSUE DATE
-            </p>
-            <p class="title">
-              11/15/2018
-            </p>
-          </div>
-        </div>
-        <div class="level-item has-text-centered">
-          <div>
-            <p class="heading">
-              CO DATE
-            </p>
-            <p class="title">
-              12/1/2018
-            </p>
-          </div>
-        </div>
+          <nav id="permitTabs"
+               style="margin-top: .5em; margin-left: -20px; margin-right: -20px;"
+               aria-label="tabs"
+               class="tabs is-centered is-medium is-boxed is-fullwidth">
+            <ul>
+              <li id="nav-permitInformation"
+                  class="is-active">
+                <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitInformation');">Permit Information</a>
+              </li>
+              <li id="nav-permitDocuments">
+              <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitDocuments');"
+                 >Documents</a>
+              </li>
+              <li id="nav-permitCharges">
+              <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitCharges');"
+                 >Charges</a>
+              </li>
+              <li id="nav-permitHolds">
+              <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitHolds');">Holds</a>
+              </li>
+            </ul>
+          </nav>
+          <section id="permitInformation">
+            <fieldset style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;">
+              <legend class="label">Permit Status</legend>
+              <div class="columns">
+                <div class="field column">
+                  <label class="label is-medium">Is the Permit Completed?</label>
+                  <div class="control">
+                    <input class="input is-medium" type="text" disabled value="Yes" />
+                  </div>
+                </div>
+                <div class="column field">
+                  <label class="label is-medium">Final Inspection Passed?</label>
+                  <div class="field is-grouped">
+                    <div class="control">
+                      <input class="input is-medium" type="text" maxlength="3" disabled value="Yes" />
+                    </div>
+                    <div class="control">
+                      <button type="button"
+                              class="button is-primary is-medium">
+                        View
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field column">
+                  <label class="label is-medium">&nbsp;</label>
+                  <div style="display: flex; justify-content: center;"
+                       class="control">
+                    <button class="button is-warning is-medium">Printable Permit View</button>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;">
+              <legend class="label">Property Information</legend>
+              <div class="columns">
+                <div class="field column is-half">
+                  <label class="label is-medium">Address</label>
+                  <div class="control">
+                    <input class="input is-medium" type="text" disabled value="999 BLANDING BLVD UNIT 7, ORANGE PARK" />
+                  </div>
+                </div>
+                <div class="field column">
+                  <label class="label is-medium">Owner Name</label>
+                  <div class="control">
+                    <input class="input is-medium" type="text" disabled value="Jim Bob" />
+                  </div>
+                </div>
+                <div class="field column">
+                  <label class="label is-medium">Parcel Number</label>
+                  <div class="control">
+                    <input class="input is-medium" type="text" disabled value="000001-001-01" />
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;">
+              <legend class="label">Contractor Information</legend>
+              <div class="columns">
+                <div class="field column">
+                  <label class="label is-medium">Contractor Number</label>
+                  <div class="control">
+                    <input class="input is-medium" type="text" disabled value="WG3344" />
+                  </div>
+                </div>
+                <div class="field column">
+                  <label class="label is-medium">Contractor Name</label>
+                  <div class="control">
+                    <input class="input is-medium" type="text" disabled value="Billy Hisself" />
+                  </div>
+                </div>
+                <div class="field column">
+                  <label class="label is-medium">Company Name</label>
+                  <div class="control">
+                    <input class="input is-medium" type="text" disabled value="Billy Bob Enterprises" />
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </section>
+
+          <section class="hide"
+                   id="permitDocuments">
+
+          </section>
+
+          <section class="hide"
+                   id="permitCharges">
+
+          </section>
+
+          <section class="hide"
+                   id="permitHolds">
+
+          </section>
+
+        </section>
+        <footer style="justify-content: flex-end;"
+                class="modal-card-foot">
+          <button type="button"
+                  onclick="PermitSearch.CloseModals();"
+                  class="button is-success">
+            Close
+          </button>
+        </footer>
       </div>
-      This modal will need to show:
+      <!---
+  This modal will need to show:
 
-      Permit #
-      Address
-      Issue Date
-      Co Date
-      Void Date (only if it is present)
-      Whether or not the permit is closed
-      Whether or not the permit has passed it's final inspection
-      Owner Name
-      Parcel #
-      Contractor #
-      Contractor Name
-      Company name
-      A link to the Permit Card
-      A dropdown listing the related permit numbers.
-      
-      We will also need to figure out how to link back to the Inspection scheduler.  Could just be a button in the tabbed interface.
+  Void Date (only if it is present), takes the place of any CoDate
+        Make Parcel Number a link to the CCPAO website if possible.
+  Whether or not the permit is closed
+  Whether or not the permit has passed it's final inspection
 
-      Tabbed interfaces:
-        Holds
-        All Charges
-          Unpaid will include a link to claypay
-          Paid will link to Claypay via the receipt number.
-            This means we will need to give them some way to view the receipt number
-        Documents
-          The documents will need to link back to the original way to download them
-          There should be an indicator that someone clicked on the link to download it.
-            We can accomplish this just by switching the image on click.
+  A link to the Permit Card
+  A dropdown listing the related permit numbers.
+
+  We will also need to figure out how to link back to the Inspection scheduler.  Could just be a button in the tabbed interface.
+
+  Tabbed interfaces:
+  Holds
+  All Charges
+  Unpaid will include a link to claypay
+  Paid will link to Claypay via the receipt number.
+  This means we will need to give them some way to view the receipt number
+  Documents
+  The documents will need to link back to the original way to download them
+  There should be an indicator that someone clicked on the link to download it.
+  We can accomplish this just by switching the image on click.
+    -->
 
 
-      <nav aria-label="tabs"
-           class="tabs is-centered is-medium is-boxed is-fullwidth">
-        <ul>
-          <li class="is-active"><a>Documents</a></li>
-          <li><a>Charges</a></li>
-          <li><a>Holds</a></li>
-        </ul>
-
-      </nav>
     </div>
 
   </div>
   <script src="bower_components/promise-polyfill/dist/polyfill.min.js"></script>
-
   <script src="bower_components/fetch/fetch.js"></script>
   <script src="Scripts/app/string.js"></script>
   <script src="Scripts/utilities/Utilities.js"></script>

@@ -19,9 +19,31 @@ namespace PermitSearch.Controllers
   {
     // GET: api/Permit
     [HttpGet]
-    public IHttpActionResult Get(int permitnumber)
+    [Route("PermitCard")]
+    public IHttpActionResult GetPermitCard(int permitnumber)
     {
       return Ok(permit.GetSpecific(permitnumber));
+    }
+
+    [HttpGet]
+    [Route("Documents")]
+    public IHttpActionResult GetDocuments(int permitnumber)
+    {
+      return Ok(document.GetDocuments(permitnumber));
+    }
+
+    [HttpGet]
+    [Route("Holds")]
+    public IHttpActionResult GetHolds(int permitnumber)
+    {
+      return Ok(hold.GetHolds(permitnumber));
+    }
+
+    [HttpGet]
+    [Route("Charges")]
+    public IHttpActionResult GetCharges(int permitnumber)
+    {
+      return Ok(charge.GetCharges(permitnumber));
     }
 
 

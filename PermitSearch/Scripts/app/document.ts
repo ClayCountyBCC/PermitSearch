@@ -21,7 +21,12 @@ namespace PermitSearch
     public page_count: number = 0;
     public created_on: Date = new Date();
 
-    constructor() {}
+    constructor() { }
+
+    //public static GetDocuments(permit_number: number): Array<Document>
+    //{
+
+    //}
   }
 
 

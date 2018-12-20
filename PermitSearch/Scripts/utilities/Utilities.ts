@@ -195,6 +195,32 @@ namespace Utilities
     Show_Hide_Selector("#views > section", id);
   }
 
+  export function Handle_Tabs(tabSelector: string, containerSelector: string, id: string)
+  {
+    Activate_Inactivate_Selector(tabSelector, "nav-" + id);
+    Show_Hide_Selector(containerSelector, id);
+  }
+
+  export function Activate_Inactivate_Selector(selector: string, id: string)
+  {
+    let sections = <NodeListOf<HTMLElement>>document.querySelectorAll(selector);
+    if (sections.length > 0)
+    {
+      for (let i = 0; i < sections.length; i++)
+      {
+        let item = sections.item(i);
+        if (item.id === id)
+        {
+          item.classList.add("is-active");
+        }
+        else
+        {
+          item.classList.remove("is-active");
+        }
+      }
+    }
+  }
+
   export function Show_Hide_Selector(selector: string, id: string)
   {
     let sections = <NodeListOf<HTMLElement>>document.querySelectorAll(selector);

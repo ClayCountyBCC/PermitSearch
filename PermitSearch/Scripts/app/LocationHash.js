@@ -4,6 +4,7 @@ var PermitSearch;
     var LocationHash = /** @class */ (function () {
         function LocationHash(locationHash) {
             this.permit_number = "";
+            this.permit_display = "";
             this.permit_status = "all";
             this.contractor_number = "";
             this.contractor_name = "";
@@ -20,6 +21,9 @@ var PermitSearch;
                     switch (k[0].toLowerCase()) {
                         case "permitnumber":
                             this.permit_number = k[1];
+                            break;
+                        case "displaypermit":
+                            this.permit_display = k[1];
                             break;
                         case "status":
                             this.permit_status = k[1];
@@ -57,6 +61,7 @@ var PermitSearch;
             }
         }
         LocationHash.prototype.UpdateInputs = function () {
+            Utilities.Set_Value("permitStatus", this.permit_status);
             Utilities.Set_Value("permitSearch", this.permit_number);
             Utilities.Set_Value("streetNumberSearch", this.street_number);
             Utilities.Set_Value("streetNameSearch", this.street_name);
@@ -65,11 +70,12 @@ var PermitSearch;
             Utilities.Set_Value("contractorNumberSearch", this.contractor_number);
             Utilities.Set_Value("contractorNameSearch", this.contractor_name);
             Utilities.Set_Value("companyNameSearch", this.company_name);
-            Utilities.Set_Value("permitStatus", this.permit_status);
         };
         LocationHash.prototype.ReadInputs = function () {
             this.permit_status = Utilities.Get_Value("permitStatus").trim();
             this.permit_number = Utilities.Get_Value("permitSearch").trim();
+            if (this.permit_number.length > 0)
+                this.permit_display = this.permit_number;
             this.street_number = Utilities.Get_Value("streetNumberSearch").trim();
             this.street_name = Utilities.Get_Value("streetNameSearch").trim();
             this.parcel_number = Utilities.Get_Value("parcelSearch").trim();
@@ -90,29 +96,36 @@ var PermitSearch;
         };
         LocationHash.prototype.ToHash = function () {
             var h = "";
-            if (this.permit_status.length > 0)
-                h += "&status=" + this.permit_status;
-            if (this.permit_number.length > 0)
-                h += "&permitnumber=" + this.permit_number;
-            if (this.street_number.length > 0)
-                h += "&streetnumber=" + this.street_number;
-            if (this.street_name.length > 0)
-                h += "&streetname=" + this.street_name;
-            if (this.contractor_number.length > 0)
-                h += "&contractorid=" + this.contractor_number;
-            if (this.contractor_name.length > 0)
-                h += "&contractorname=" + this.contractor_name;
-            if (this.company_name.length > 0)
-                h += "&companyname=" + this.company_name;
-            if (this.owner_name.length > 0)
-                h += "&owner=" + this.owner_name;
-            if (this.parcel_number.length > 0)
-                h += "&parcel=" + this.parcel_number;
-            if (this.page.length > 0)
-                h += "&page=" + this.page;
+            h += LocationHash.AddToHash(this.permit_status, "status");
+            h += LocationHash.AddToHash(this.permit_number, "permitnumber");
+            h += LocationHash.AddToHash(this.permit_display, "permitdisplay");
+            h += LocationHash.AddToHash(this.street_number, "streetnumber");
+            h += LocationHash.AddToHash(this.street_name, "streetname");
+            h += LocationHash.AddToHash(this.contractor_number, "contrctorid");
+            h += LocationHash.AddToHash(this.contractor_name, "contractorname");
+            h += LocationHash.AddToHash(this.company_name, "companyname");
+            h += LocationHash.AddToHash(this.owner_name, "owner");
+            h += LocationHash.AddToHash(this.parcel_number, "parcel");
+            h += LocationHash.AddToHash(this.page, "page");
+            //if (this.permit_status.length > 0) h += "&status=" + this.permit_status;
+            //if (this.permit_number.length > 0) h += "&permitnumber=" + this.permit_number;      
+            //if (this.permit_display.length > 0) h += "&permitdisplay=" + this.permit_display;
+            //if (this.street_number.length > 0) h += "&streetnumber=" + this.street_number;
+            //if (this.street_name.length > 0) h += "&streetname=" + this.street_name;
+            //if (this.contractor_number.length > 0) h += "&contractorid=" + this.contractor_number;
+            //if (this.contractor_name.length > 0) h += "&contractorname=" + this.contractor_name;
+            //if (this.company_name.length > 0) h += "&companyname=" + this.company_name;
+            //if (this.owner_name.length > 0) h += "&owner=" + this.owner_name;
+            //if (this.parcel_number.length > 0) h += "&parcel=" + this.parcel_number;
+            //if (this.page.length > 0) h += "&page=" + this.page;
             if (h.length > 0)
                 h = "#" + h.substring(1);
             return h;
+        };
+        LocationHash.AddToHash = function (field, arg) {
+            if (field.length > 0)
+                return "&" + arg + "=" + field;
+            return "";
         };
         return LocationHash;
     }());

@@ -139,6 +139,26 @@ var Utilities;
         Show_Hide_Selector("#views > section", id);
     }
     Utilities.Show_Menu = Show_Menu;
+    function Handle_Tabs(tabSelector, containerSelector, id) {
+        Activate_Inactivate_Selector(tabSelector, "nav-" + id);
+        Show_Hide_Selector(containerSelector, id);
+    }
+    Utilities.Handle_Tabs = Handle_Tabs;
+    function Activate_Inactivate_Selector(selector, id) {
+        var sections = document.querySelectorAll(selector);
+        if (sections.length > 0) {
+            for (var i = 0; i < sections.length; i++) {
+                var item = sections.item(i);
+                if (item.id === id) {
+                    item.classList.add("is-active");
+                }
+                else {
+                    item.classList.remove("is-active");
+                }
+            }
+        }
+    }
+    Utilities.Activate_Inactivate_Selector = Activate_Inactivate_Selector;
     function Show_Hide_Selector(selector, id) {
         var sections = document.querySelectorAll(selector);
         if (sections.length > 0) {

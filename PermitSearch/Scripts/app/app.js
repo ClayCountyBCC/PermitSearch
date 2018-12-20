@@ -126,7 +126,6 @@ var PermitSearch;
         tr.appendChild(CreateResultsCell(Utilities.Format_Date(p.issue_date)));
         tr.appendChild(CreateResultsCell(p.address, "has-text-left"));
         tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges - p.paid_charges), "has-text-right"));
-        //tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges), "has-text-right"));
         tr.appendChild(CreateResultsCell(p.document_count.toString()));
         tr.appendChild(CreateResultsCell(p.passed_final_inspection ? "Completed" : "View"));
         return tr;
@@ -228,5 +227,15 @@ var PermitSearch;
         li.appendChild(span);
         return li;
     }
+    function CloseModals() {
+        var modals = document.querySelectorAll(".modal");
+        if (modals.length > 0) {
+            for (var i = 0; i < modals.length; i++) {
+                var modal = modals.item(i);
+                modal.classList.remove("is-active");
+            }
+        }
+    }
+    PermitSearch.CloseModals = CloseModals;
 })(PermitSearch || (PermitSearch = {}));
 //# sourceMappingURL=app.js.map

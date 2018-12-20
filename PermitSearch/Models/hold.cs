@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Dapper;
 
 namespace PermitSearch.Models
 {
@@ -12,7 +13,23 @@ namespace PermitSearch.Models
 
     public hold()
     {
+    }
 
+    public static List<hold> GetHolds(int permit_number)
+    {
+      var dp = new DynamicParameters();
+      dp.Add("@permit_number", permit_number);
+      string sql = @"
+        USE PermitSearch;
+
+        SELECT
+          hold_id,
+          permit_number,
+          description
+        FROM hold
+        WHERE permit_number=@permit_number
+        ORDER BY hold_id DESC";
+      return Constants.Get_Data<hold>("Production", sql, dp);
     }
   }
 }
