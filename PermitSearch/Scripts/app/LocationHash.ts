@@ -44,7 +44,7 @@ namespace PermitSearch
             case "permitnumber":
               this.permit_number = k[1];
               break;
-            case "displaypermit":
+            case "permitdisplay":
               this.permit_display = k[1];
               break;
             case "status":
@@ -137,7 +137,7 @@ namespace PermitSearch
       h += LocationHash.AddToHash(this.company_name, "companyname");
       h += LocationHash.AddToHash(this.owner_name, "owner");
       h += LocationHash.AddToHash(this.parcel_number, "parcel");
-      h += LocationHash.AddToHash(this.page, "page");
+      h += LocationHash.AddToHash(this.page, "page");      
       //if (this.permit_status.length > 0) h += "&status=" + this.permit_status;
       //if (this.permit_number.length > 0) h += "&permitnumber=" + this.permit_number;      
       //if (this.permit_display.length > 0) h += "&permitdisplay=" + this.permit_display;
@@ -149,8 +149,33 @@ namespace PermitSearch
       //if (this.owner_name.length > 0) h += "&owner=" + this.owner_name;
       //if (this.parcel_number.length > 0) h += "&parcel=" + this.parcel_number;
       //if (this.page.length > 0) h += "&page=" + this.page;
-      if (h.length > 0) h = "#" + h.substring(1);      
+      if (h.length > 0)
+      {
+        h = "#" + h.substring(1) + "&v=" + new Date().getMilliseconds().toString();
+
+      }
       return h;
+    }
+
+    ReadyToTogglePermit(oldHash: LocationHash): boolean
+    {
+      if (oldHash === null) return false;
+
+      if ((this.permit_display.length > 0 && oldHash.permit_display.length === 0)
+        || this.permit_display.length === 0 && oldHash.permit_display.length > 0)
+      {
+        return this.permit_number === oldHash.permit_number && 
+          this.company_name === oldHash.company_name &&
+          this.contractor_name === oldHash.contractor_name &&
+          this.contractor_number === oldHash.contractor_number &&
+          this.owner_name === oldHash.owner_name &&
+          this.page === oldHash.page &&
+          this.parcel_number === oldHash.parcel_number &&
+          this.permit_status === oldHash.permit_status &&
+          this.street_name === oldHash.street_name &&
+          this.street_number === oldHash.street_number
+      }
+      return false;
     }
 
     static AddToHash(field: string, arg: string):string

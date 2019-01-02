@@ -253,7 +253,6 @@ var Utilities;
             li.classList.add("is-active");
         var a = document.createElement("a");
         a.id = menuItem.id;
-        a.href = "#";
         a.onclick = function () {
             Update_Menu(menuItem);
             //let title = document.getElementById("menuTitle");

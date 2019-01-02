@@ -348,7 +348,6 @@ namespace Utilities
 
     let a = document.createElement("a");
     a.id = menuItem.id;
-    a.href = "#";
     a.onclick = function ()
     {
       Update_Menu(menuItem);

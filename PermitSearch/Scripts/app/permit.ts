@@ -8,8 +8,9 @@ namespace PermitSearch
   {
     permit_number: number;
     address: string;
-    issue_date: Date;
-    co_date: Date;
+    issue_date: any;
+    void_date: any;
+    co_date: any;
     is_closed: boolean;
     passed_final_inspection: boolean;
     outstanding_hold_count: number;
@@ -27,8 +28,9 @@ namespace PermitSearch
   {
     public permit_number: number = 0;
     public address: string = "";
-    public issue_date: Date = new Date();
-    public co_date: Date = new Date();
+    public issue_date: any = new Date();
+    public void_date: any;
+    public co_date: any = new Date();
     public is_closed: boolean = false;
     public passed_final_inspection: boolean = false;
     public outstanding_hold_count: number = 0;

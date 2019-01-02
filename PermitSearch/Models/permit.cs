@@ -13,6 +13,7 @@ namespace PermitSearch.Models
     public int permit_number { get; set; }
     public string address { get; set; }
     public DateTime issue_date { get; set; }
+    public DateTime void_date { get; set; } = DateTime.MinValue;
     public DateTime co_date { get; set; }
     public bool is_closed { get; set; }
     public bool passed_final_inspection { get; set; }
@@ -41,6 +42,7 @@ namespace PermitSearch.Models
          P.permit_number,
          P.address,
          P.issue_date,
+         P.void_date,
          P.co_date,
          P.is_closed,
          P.passed_final_inspection,
@@ -50,7 +52,7 @@ namespace PermitSearch.Models
          P.has_related_permits,
          PA.parcel_number,
          O.owner_name,
-         C.contractor_number,
+         ISNULL(P.contractor_number, '') contractor_number,
          C.contractor_name,
          C.company_name
         FROM permit P
@@ -231,6 +233,7 @@ namespace PermitSearch.Models
           P.permit_number,
           P.address,
           P.issue_date,
+          P.void_date,
           P.co_date,
           P.is_closed,
           P.passed_final_inspection,
@@ -240,7 +243,7 @@ namespace PermitSearch.Models
           P.has_related_permits,
           ISNULL(PA.parcel_number, '') parcel_number,
           ISNULL(O.owner_name, '') owner_name,
-          ISNULL(C.contractor_number, '') contractor_number,
+          ISNULL(P.contractor_number, '') contractor_number,
           ISNULL(C.contractor_name, '') contractor_name,
           ISNULL(C.company_name, '') company_name
         FROM permit P

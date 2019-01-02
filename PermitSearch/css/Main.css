@@ -1,4 +1,7 @@
-﻿#searchResults article.tile.is-child.box {
+﻿body {
+  margin-bottom: 1rem; }
+
+#searchResults article.tile.is-child.box {
   display: flex;
   padding-top: 10px;
   padding-bottom: 10px;

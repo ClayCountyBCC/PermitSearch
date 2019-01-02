@@ -66,8 +66,8 @@
               <div class="select is-medium">
                 <select id="permitStatus">
                   <option value="all">Show All</option>
-                  <option value="closed">Open Only</option>
-                  <option value="open">Closed Only</option>
+                  <option value="open">Open Only</option>
+                  <option value="closed">Closed Only</option>
                 </select>
               </div>
             </div>
@@ -412,24 +412,16 @@
       </nav>
     </div>
 
-    <div class="modal is-active"
+    <div class="modal"
          id="selectedPermit">
-      <div onclick="PermitSearch.CloseModals();"
+      <div onclick="PermitSearch.ClosePermitModal();"
            class="modal-background"></div>
       <div class="modal-card container">
-        <!--<header class="modal-card-head">
-          <p class="modal-card-title">
-            Permit Information
-          </p>
-          <button onclick="PermitSearch.CloseModals();"
-                  type="button"
-                  class="delete"
-                  aria-label="close"></button>
-        </header>-->
 
         <section class="modal-card-body">
-          <div class="level">
-            <div style="flex-grow: 3;"
+          <div id="permitHeading"
+               class="level">
+            <!--<div style="flex-grow: 3;"
                  class="level-item has-text-centered">
               <div>
                 <p class="heading">
@@ -459,7 +451,7 @@
                   12/1/2018
                 </p>
               </div>
-            </div>
+            </div>-->
           </div>
           <nav id="permitTabs"
                style="margin-top: .5em; margin-left: -20px; margin-right: -20px;"
@@ -490,17 +482,20 @@
                 <div class="field column">
                   <label class="label is-medium">Is the Permit Completed?</label>
                   <div class="control">
-                    <input class="input is-medium" type="text" disabled value="Yes" />
+                    <input id="permitCompleted"
+                           class="input is-medium" type="text" disabled value="" />
                   </div>
                 </div>
                 <div class="column field">
                   <label class="label is-medium">Final Inspection Passed?</label>
                   <div class="field is-grouped">
                     <div class="control">
-                      <input class="input is-medium" type="text" maxlength="3" disabled value="Yes" />
+                      <input id="permitFinalInspection"
+                             class="input is-medium" type="text" maxlength="3" disabled value="" />
                     </div>
                     <div class="control">
-                      <button type="button"
+                      <button id="permitInspectionSchedulerLink"
+                              type="button"
                               class="button is-primary is-medium">
                         View
                       </button>
@@ -524,19 +519,22 @@
                 <div class="field column is-half">
                   <label class="label is-medium">Address</label>
                   <div class="control">
-                    <input class="input is-medium" type="text" disabled value="999 BLANDING BLVD UNIT 7, ORANGE PARK" />
+                    <input id="permitAddress"
+                           class="input is-medium" type="text" disabled value="" />
                   </div>
                 </div>
                 <div class="field column">
                   <label class="label is-medium">Owner Name</label>
                   <div class="control">
-                    <input class="input is-medium" type="text" disabled value="Jim Bob" />
+                    <input id="permitOwner"
+                           class="input is-medium" type="text" disabled value="" />
                   </div>
                 </div>
                 <div class="field column">
                   <label class="label is-medium">Parcel Number</label>
                   <div class="control">
-                    <input class="input is-medium" type="text" disabled value="000001-001-01" />
+                    <input id="permitParcel"
+                           class="input is-medium" type="text" disabled value="" />
                   </div>
                 </div>
               </div>
@@ -548,19 +546,22 @@
                 <div class="field column">
                   <label class="label is-medium">Contractor Number</label>
                   <div class="control">
-                    <input class="input is-medium" type="text" disabled value="WG3344" />
+                    <input id="permitContractorNumber"
+                           class="input is-medium" type="text" disabled value="" />
                   </div>
                 </div>
                 <div class="field column">
                   <label class="label is-medium">Contractor Name</label>
                   <div class="control">
-                    <input class="input is-medium" type="text" disabled value="Billy Hisself" />
+                    <input id="permitContractorName"
+                           class="input is-medium" type="text" disabled value="" />
                   </div>
                 </div>
                 <div class="field column">
                   <label class="label is-medium">Company Name</label>
                   <div class="control">
-                    <input class="input is-medium" type="text" disabled value="Billy Bob Enterprises" />
+                    <input id="permitCompanyName"
+                           class="input is-medium" type="text" disabled value="" />
                   </div>
                 </div>
               </div>
@@ -586,7 +587,7 @@
         <footer style="justify-content: flex-end;"
                 class="modal-card-foot">
           <button type="button"
-                  onclick="PermitSearch.CloseModals();"
+                  onclick="PermitSearch.ClosePermitModal();"
                   class="button is-success">
             Close
           </button>
