@@ -20,7 +20,7 @@ namespace PermitSearch.Controllers
     [HttpGet]
     public IHttpActionResult Get()
     {
-      return Ok();
+      return Ok(Models.Constants.GetCachedDateUpdated());
     }
 
   }

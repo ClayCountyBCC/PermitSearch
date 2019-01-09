@@ -20,6 +20,7 @@ var PermitSearch;
             this.company_name = "";
             this.owner_name = "";
             this.parcel_number = "";
+            this.pin_complete = "";
         }
         return Permit;
     }());

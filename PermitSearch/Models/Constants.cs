@@ -13,6 +13,21 @@ namespace PermitSearch.Models
   {
     public const int appId = 20005;
 
+    public static DateTime GetCachedDateUpdated()
+    {
+      return MyCache.GetDate("dateupdated");
+    }
+
+    public static DateTime GetDateUpdated()
+    {
+      string sql = @"
+        SELECT TOP 1
+          updated_on
+        FROM PermitSearch.dbo.updated_last";
+      return Exec_Scalar<DateTime>("Production", sql);
+
+    }
+
     public static string GetCS(string cs)
     {
       return ConfigurationManager.ConnectionStrings[cs].ConnectionString;
@@ -56,6 +71,10 @@ namespace PermitSearch.Models
       {
         using (IDbConnection db = new SqlConnection(GetCS(cs)))
         {
+          if(dbA == null)
+          {
+            return db.ExecuteScalar<T>(query);
+          }
           return db.ExecuteScalar<T>(query, dbA);
         }
       }
@@ -65,6 +84,8 @@ namespace PermitSearch.Models
         return default(T);
       }
     }
+
+
 
   }
 }

@@ -10,6 +10,8 @@
   <link href="css/Utilities.min.css" rel="stylesheet" />
   <link href="css/Fontawesome/css/fontawesome-all.min.css" rel="stylesheet" />
   <link href="css/Main.css" rel="stylesheet" />
+  <link rel="icon" type="image/png" sizes="32x32" href="content/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="content/favicon-16x16.png">
 </head>
 <body>
 
@@ -49,6 +51,7 @@
       </div>
     </div>
   </section>
+
   <div id="views"
        style="margin-top: 1em;"
        class="container">
@@ -89,11 +92,13 @@
               <input id="permitSearch"
                      class="input is-medium"
                      type="number"
+                     max="99999999"
+                     min="100000"
                      maxlength="8"
                      value=""
                      tabindex="1"
                      autofocus
-                     placeholder="18000001" />
+                     placeholder="11800001" />
             </div>
             <div class="control">
               <button id="permitSearchButton"
@@ -103,19 +108,12 @@
                       class="button is-primary is-medium">
                 Search
               </button>
+              <button type="button"
+                      class="button is-medium is-warning is-reset">
+                Reset
+              </button>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="columns">
-        <div class="column is-offset-1">
-          <div class="hide"
-               id="permitSearchError">
-
-          </div>
-        </div>
-        <div class="column">
-
         </div>
       </div>
     </section>
@@ -161,16 +159,6 @@
         </div>
       </div>
 
-      <div class="columns">
-        <div class="column is-offset-1">
-          <div class="hide"
-               id="addressSearchError">
-          </div>
-        </div>
-        <div class="column">
-        </div>
-      </div>
-
       <div class="field is-horizontal">
         <div class="field-label is-medium">
           <label class="label"></label>
@@ -185,12 +173,14 @@
                       class="button is-primary is-medium">
                 Search
               </button>
+              <button type="button"
+                      class="button is-medium is-warning is-reset">
+                Reset
+              </button>
             </div>
           </div>
         </div>
       </div>
-
-
     </section>
 
     <section class="hide"
@@ -233,7 +223,6 @@
         </div>
       </div>
 
-
       <div class="field is-horizontal">
         <div class="field-label is-medium">
           <label class="label">Company Name</label>
@@ -259,28 +248,16 @@
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <div id="contractorSearchError">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-
-      <div class="field is-horizontal">
-        <div class="field-label is-medium">
-          <label class="label"></label>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
               <button id="contractorSearchButton"
                       type="button"
                       tabindex="4"
                       onclick="PermitSearch.Search(); return false;"
                       class="button is-primary is-medium">
                 Search
+              </button>
+              <button type="button"
+                      class="button is-medium is-warning is-reset">
+                Reset
               </button>
             </div>
           </div>
@@ -316,22 +293,14 @@
                       class="button is-primary is-medium">
                 Search
               </button>
+              <button type="button"
+                      class="button is-medium is-warning is-reset">
+                Reset
+              </button>
             </div>
           </div>
         </div>
       </div>
-      <div class="columns">
-        <div class="column is-offset-1">
-          <div class="hide"
-               id="ownerSearchError">
-
-          </div>
-        </div>
-        <div class="column">
-
-        </div>
-      </div>
-
     </section>
 
     <section class="hide"
@@ -361,24 +330,20 @@
                       class="button is-primary is-medium">
                 Search
               </button>
+              <button type="button"
+                      class="button is-medium is-warning is-reset">
+                Reset
+              </button>
             </div>
           </div>
         </div>
       </div>
-      <div class="columns">
-        <div class="column is-offset-1">
-          <div class="hide"
-               id="ownerSearchError">
-
-          </div>
-        </div>
-        <div class="column">
-
-        </div>
-      </div>
-
     </section>
 
+    <div id="permitSearchError"
+         style="margin-bottom: .75em; margin-top: .75em;">
+
+    </div>
 
     <div style="margin-top: 1em;"
          class="hide"
@@ -406,9 +371,7 @@
         <a id="resultsNextPage"
            class="pagination-next">Next</a>
         <ul id="resultsPaginationList"
-            class="pagination-list">
-
-        </ul>
+            class="pagination-list"></ul>
       </nav>
     </div>
 
@@ -421,37 +384,6 @@
         <section class="modal-card-body">
           <div id="permitHeading"
                class="level">
-            <!--<div style="flex-grow: 3;"
-                 class="level-item has-text-centered">
-              <div>
-                <p class="heading">
-                  PERMIT #
-                </p>
-                <p class="title">
-                  31434225
-                </p>
-              </div>
-            </div>
-            <div class="level-item has-text-centered">
-              <div>
-                <p class="heading">
-                  ISSUE DATE
-                </p>
-                <p class="title">
-                  11/15/2018
-                </p>
-              </div>
-            </div>
-            <div class="level-item has-text-centered">
-              <div>
-                <p class="heading">
-                  CO DATE
-                </p>
-                <p class="title">
-                  12/1/2018
-                </p>
-              </div>
-            </div>-->
           </div>
           <nav id="permitTabs"
                style="margin-top: .5em; margin-left: -20px; margin-right: -20px;"
@@ -463,15 +395,16 @@
                 <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitInformation');">Permit Information</a>
               </li>
               <li id="nav-permitDocuments">
-              <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitDocuments');"
-                 >Documents</a>
+                <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitDocuments');">Documents</a>
               </li>
               <li id="nav-permitCharges">
-              <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitCharges');"
-                 >Charges</a>
+                <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitCharges');">
+                  Charges
+                </a>
+
               </li>
               <li id="nav-permitHolds">
-              <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitHolds');">Holds</a>
+                <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitHolds');">Holds</a>
               </li>
             </ul>
           </nav>
@@ -494,11 +427,13 @@
                              class="input is-medium" type="text" maxlength="3" disabled value="" />
                     </div>
                     <div class="control">
-                      <button id="permitInspectionSchedulerLink"
-                              type="button"
-                              class="button is-primary is-medium">
+                      <a href=""
+                         target="_blank"
+                         rel="noopener"
+                         id="permitInspectionSchedulerLink"
+                         class="button is-primary is-medium">
                         View
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -513,74 +448,68 @@
               </div>
             </fieldset>
 
-            <fieldset style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;">
-              <legend class="label">Property Information</legend>
-              <div class="columns">
-                <div class="field column is-half">
-                  <label class="label is-medium">Address</label>
-                  <div class="control">
-                    <input id="permitAddress"
-                           class="input is-medium" type="text" disabled value="" />
-                  </div>
-                </div>
-                <div class="field column">
-                  <label class="label is-medium">Owner Name</label>
-                  <div class="control">
-                    <input id="permitOwner"
-                           class="input is-medium" type="text" disabled value="" />
-                  </div>
-                </div>
-                <div class="field column">
-                  <label class="label is-medium">Parcel Number</label>
-                  <div class="control">
-                    <input id="permitParcel"
-                           class="input is-medium" type="text" disabled value="" />
-                  </div>
-                </div>
-              </div>
-            </fieldset>
+            <fieldset id="propertyFieldset"
+                      style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;"></fieldset>
 
-            <fieldset style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;">
-              <legend class="label">Contractor Information</legend>
-              <div class="columns">
-                <div class="field column">
-                  <label class="label is-medium">Contractor Number</label>
-                  <div class="control">
-                    <input id="permitContractorNumber"
-                           class="input is-medium" type="text" disabled value="" />
-                  </div>
-                </div>
-                <div class="field column">
-                  <label class="label is-medium">Contractor Name</label>
-                  <div class="control">
-                    <input id="permitContractorName"
-                           class="input is-medium" type="text" disabled value="" />
-                  </div>
-                </div>
-                <div class="field column">
-                  <label class="label is-medium">Company Name</label>
-                  <div class="control">
-                    <input id="permitCompanyName"
-                           class="input is-medium" type="text" disabled value="" />
-                  </div>
-                </div>
-              </div>
-            </fieldset>
+            <fieldset id="contractorFieldset"
+                      style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;"></fieldset>
           </section>
 
           <section class="hide"
                    id="permitDocuments">
 
+            <div style="margin-bottom: .75em; display: flex; justify-content: center;">
+
+              <div class="field">
+                <label class="label">Filter By Document Type</label>
+                <div class="control">
+                  <div class="select is-medium">
+                    <select onchange="PermitSearch.Document.FilterDocuments();"
+                            id="documentTypeFilter"></select>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <table class="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th style="width: 10%;"></th>
+                  <th style="width: 50%;">Document Type</th>
+                  <th style="width: 20%;"># Pages</th>
+                  <th style="width: 20%;">Created On</th>
+                </tr>
+              </thead>
+              <tbody id="documentContainer"></tbody>
+            </table>
           </section>
 
           <section class="hide"
                    id="permitCharges">
-
+            <table class="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th style="width: 30%;">Charge Description</th>
+                  <th style="width: 30%;">Narrative</th>
+                  <th style="width: 20%; text-align: right;">Amount</th>
+                  <th style="width: 20%; text-align: center;">View</th>
+                </tr>
+              </thead>
+              <tbody id="chargeContainer"></tbody>
+            </table>
           </section>
 
           <section class="hide"
                    id="permitHolds">
-
+            <table class="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th style="width: 100%;">Hold Description</th>
+                </tr>
+              </thead>
+              <tbody id="holdContainer"></tbody>
+            </table>
           </section>
 
         </section>
@@ -593,35 +522,49 @@
           </button>
         </footer>
       </div>
-      <!---
-  This modal will need to show:
+    </div>
 
-  Void Date (only if it is present), takes the place of any CoDate
-        Make Parcel Number a link to the CCPAO website if possible.
-  Whether or not the permit is closed
-  Whether or not the permit has passed it's final inspection
-
-  A link to the Permit Card
-  A dropdown listing the related permit numbers.
-
-  We will also need to figure out how to link back to the Inspection scheduler.  Could just be a button in the tabbed interface.
-
-  Tabbed interfaces:
-  Holds
-  All Charges
-  Unpaid will include a link to claypay
-  Paid will link to Claypay via the receipt number.
-  This means we will need to give them some way to view the receipt number
-  Documents
-  The documents will need to link back to the original way to download them
-  There should be an indicator that someone clicked on the link to download it.
-  We can accomplish this just by switching the image on click.
-    -->
-
-
+    <div class="modal"
+         id="selectedPermitError">
+      <div onclick="PermitSearch.ClosePermitModal();"
+           class="modal-background"></div>
+      <div class="modal-card container">
+        <header class="modal-card-head">
+          <p class="modal-card-title">
+            Permit Number Not Found
+          </p>
+          <button onclick="PermitSearch.ClosePermitModal();"
+                  type="button"
+                  class="delete"
+                  aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+          <h1 class="is-large" id="permitNumberError"></h1>
+          <p>
+            This permit number was not found in the search results.  Please try your search again.
+          </p>
+        </section>
+        <footer style="justify-content: flex-end;"
+                class="modal-card-foot">
+          <button type="button"
+                  onclick="PermitSearch.ClosePermitModal();"
+                  class="button is-success">
+            Close
+          </button>
+        </footer>
+      </div>
     </div>
 
   </div>
+  <footer style="margin: auto auto 0 auto; padding: 3rem 1.5rem 3rem;"
+          class="has-text-right">
+    <div id="updateTimeContainer"
+         class="container hide">
+      <p>This application's data is updated every 10 minutes.</p>
+      <p>The last update time was: <span id="updateTime"></span></p>
+    </div>
+
+  </footer>
   <script src="bower_components/promise-polyfill/dist/polyfill.min.js"></script>
   <script src="bower_components/fetch/fetch.js"></script>
   <script src="Scripts/app/string.js"></script>

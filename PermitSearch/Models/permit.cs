@@ -26,6 +26,7 @@ namespace PermitSearch.Models
     public string company_name { get; set; }
     public string owner_name { get; set; }
     public string parcel_number { get; set; }
+    public string pin_complete { get; set; }
 
     public permit()
     {
@@ -51,6 +52,7 @@ namespace PermitSearch.Models
          P.document_count,
          P.has_related_permits,
          PA.parcel_number,
+         ISNULL(PA.pin_complete, '') pin_complete,
          O.owner_name,
          ISNULL(P.contractor_number, '') contractor_number,
          C.contractor_name,
@@ -242,6 +244,7 @@ namespace PermitSearch.Models
           P.document_count,
           P.has_related_permits,
           ISNULL(PA.parcel_number, '') parcel_number,
+          ISNULL(PA.pin_complete, '') pin_complete,
           ISNULL(O.owner_name, '') owner_name,
           ISNULL(P.contractor_number, '') contractor_number,
           ISNULL(C.contractor_name, '') contractor_name,

@@ -8,6 +8,8 @@ var PermitSearch;
     PermitSearch.permit_count = 0;
     PermitSearch.search_results = [];
     PermitSearch.permit_documents = [];
+    PermitSearch.permit_holds = [];
+    PermitSearch.permit_charges = [];
     PermitSearch.Menus = [
         {
             id: "nav-permitSearchOptions",
@@ -61,8 +63,51 @@ var PermitSearch;
         if (location.hash.length > 1) {
             HandleHash(null);
         }
+        GetDateUpdated();
+        setInterval(function () { GetDateUpdated(); }, 60000);
+        HandleInputs();
+        HandleResetButtons();
     }
     PermitSearch.Start = Start;
+    function HandleInputs() {
+        var sections = document.querySelectorAll("#views > section input");
+        if (sections.length > 0) {
+            for (var i = 0; i < sections.length; i++) {
+                var item = sections.item(i);
+                item.onkeydown = function (event) {
+                    var e = event || window.event;
+                    if (event.keyCode == 13) {
+                        Search();
+                    }
+                };
+            }
+        }
+    }
+    function HandleResetButtons() {
+        var sections = document.querySelectorAll("#views > section button.is-reset");
+        if (sections.length > 0) {
+            for (var i = 0; i < sections.length; i++) {
+                var item = sections.item(i);
+                item.onclick = function () { return ResetSearch(); };
+            }
+        }
+    }
+    function GetDateUpdated() {
+        var path = GetPath();
+        Utilities.Get(path + "API/Timing")
+            .then(function (dateUpdated) {
+            // update pagination here
+            console.log("date Updated", dateUpdated, new Date());
+            PermitSearch.date_updated = dateUpdated;
+            var timeContainer = document.getElementById("updateTimeContainer");
+            var time = document.getElementById("updateTime");
+            Utilities.Clear_Element(time);
+            time.appendChild(document.createTextNode(new Date(PermitSearch.date_updated).toLocaleString('en-us')));
+            Utilities.Show(timeContainer);
+        }, function (e) {
+            console.log('error getting date updated', e);
+        });
+    }
     function Search() {
         Toggle_Loading_Search_Buttons(true);
         var newHash = new PermitSearch.LocationHash("");
@@ -79,6 +124,7 @@ var PermitSearch;
         }
     }
     function HandleHash(event) {
+        Utilities.Clear_Element(document.getElementById("permitSearchError"));
         var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
         var newHash = new PermitSearch.LocationHash(location.hash.substring(1));
         var oldHash = null;
@@ -89,29 +135,41 @@ var PermitSearch;
             }
         }
         if (newHash.ReadyToTogglePermit(oldHash)) {
-            var permitModal = document.getElementById("selectedPermit");
-            if (newHash.permit_display.length > 0) {
-                permitModal.classList.add("is-active");
-                // let's find the permit in the search_results variable
-                var permit = PermitSearch.search_results.filter(function (j) {
-                    return j.permit_number.toString() === newHash.permit_display;
-                });
-                if (permit.length === 1) {
-                    ViewPermitDetail(permit[0]);
-                }
-            }
-            else {
-                permitModal.classList.remove("is-active");
-            }
+            TogglePermitDisplay(newHash.permit_display);
             Toggle_Loading_Search_Buttons(false);
         }
         else {
             if (currentHash.ReadyToSearch()) {
                 Query(currentHash);
             }
+            else {
+                Toggle_Loading_Search_Buttons(false);
+            }
         }
     }
     PermitSearch.HandleHash = HandleHash;
+    function TogglePermitDisplay(permit_number) {
+        // this function will either hide or show the the permit modals
+        // based on if the permit number has a length or not.
+        var permitModal = document.getElementById("selectedPermit");
+        var permitErrorModal = document.getElementById("selectedPermitError");
+        if (permit_number.length === 0) {
+            permitErrorModal.classList.remove("is-active");
+            permitModal.classList.remove("is-active");
+            return;
+        }
+        var permit = PermitSearch.search_results.filter(function (j) {
+            return j.permit_number.toString() === permit_number;
+        });
+        if (permit.length > 0) {
+            ViewPermitDetail(permit[0]);
+            permitModal.classList.add("is-active");
+        }
+        else {
+            Utilities.Set_Text("permitNumberError", permit_number);
+            permitErrorModal.classList.add("is-active");
+        }
+    }
     function Query(currentHash) {
         var path = GetPath();
         var newHash = currentHash.ToHash();
@@ -122,13 +180,20 @@ var PermitSearch;
             console.log("permits", permits);
             PermitSearch.search_results = permits;
             if (PermitSearch.search_results.length > 0) {
+                console.log('permits found');
                 Utilities.Show("searchResults");
                 CreateResultsTable(PermitSearch.search_results);
-                Toggle_Loading_Search_Buttons(false);
+                if (currentHash.permit_display.length > 0) {
+                    TogglePermitDisplay(currentHash.permit_display);
+                }
             }
             else {
+                console.log('no permits found');
                 Utilities.Hide("searchResults");
+                Utilities.Error_Show("permitSearchError", "No permits found for this search.", true);
+                // Show that we got no search results
             }
+            Toggle_Loading_Search_Buttons(false);
         }, function (e) {
             console.log('error getting permits', e);
             Toggle_Loading_Search_Buttons(false);
@@ -157,6 +222,8 @@ var PermitSearch;
         var tbody = document.getElementById("resultsBody");
         Utilities.Clear_Element(tbody);
         tbody.appendChild(df);
+        var results = document.getElementById("searchResults");
+        results.scrollIntoView();
     }
     function CreateResultsRow(p, currentHash) {
         currentHash.permit_display = p.permit_number.toString();
@@ -164,11 +231,16 @@ var PermitSearch;
         var tr = document.createElement("tr");
         tr.appendChild(CreateResultsCellLink(p.permit_number.toString().padStart(8, "0"), "", currentHash.ToHash()));
         tr.appendChild(CreateResultsCell(p.is_closed ? "Yes" : "No"));
-        tr.appendChild(CreateResultsCell(Utilities.Format_Date(p.issue_date)));
+        if (new Date(p.issue_date).getFullYear() !== 1) {
+            tr.appendChild(CreateResultsCell(Utilities.Format_Date(p.issue_date)));
+        }
+        else {
+            tr.appendChild(CreateResultsCell("Not Issued"));
+        }
         tr.appendChild(CreateResultsCell(p.address, "has-text-left"));
         tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges - p.paid_charges), "has-text-right"));
         tr.appendChild(CreateResultsCell(p.document_count.toString()));
-        tr.appendChild(CreateResultsCellLink(p.passed_final_inspection ? "Completed" : "View", "", inspectionLink));
+        tr.appendChild(CreateResultsCellLink(p.passed_final_inspection ? "Completed" : "View", "", inspectionLink, true));
         return tr;
     }
     function CreateResultsCell(value, className) {
@@ -179,14 +251,19 @@ var PermitSearch;
         td.appendChild(document.createTextNode(value));
         return td;
     }
-    function CreateResultsCellLink(value, className, href) {
+    function CreateResultsCellLink(value, className, href, newTab) {
         if (className === void 0) { className = ""; }
         if (href === void 0) { href = ""; }
+        if (newTab === void 0) { newTab = false; }
         var td = document.createElement("td");
         if (className.length > 0)
             td.classList.add(className);
         var link = document.createElement("a");
         link.classList.add("has-text-link");
+        if (newTab) {
+            link.rel = "noopener";
+            link.target = "_blank";
+        }
         link.href = href;
         link.appendChild(document.createTextNode(value));
         td.appendChild(link);
@@ -331,7 +408,9 @@ var PermitSearch;
     function ViewPermitDetail(permit) {
         PopulatePermitHeading(permit);
         PopulatePermitInformation(permit);
-        QueryDocuments(permit.permit_number);
+        PermitSearch.Document.QueryDocuments(permit.permit_number);
+        PermitSearch.Hold.QueryHolds(permit.permit_number);
+        PermitSearch.Charge.QueryCharges(permit.permit_number);
     }
     function PopulatePermitHeading(permit) {
         var permitHeading = document.getElementById("permitHeading");
@@ -359,12 +438,122 @@ var PermitSearch;
     function PopulatePermitInformation(permit) {
         Utilities.Set_Value("permitCompleted", permit.is_closed ? "Yes" : "No");
         Utilities.Set_Value("permitFinalInspection", permit.passed_final_inspection ? "Yes" : "No");
-        Utilities.Set_Value("permitAddress", permit.address);
-        Utilities.Set_Value("permitOwner", permit.owner_name);
-        Utilities.Set_Value("permitParcel", permit.parcel_number);
-        Utilities.Set_Value("permitContractorNumber", permit.contractor_number);
-        Utilities.Set_Value("permitContractorName", permit.contractor_name);
-        Utilities.Set_Value("permitCompanyName", permit.company_name);
+        var permitInspectionButton = document.getElementById("permitInspectionSchedulerLink");
+        var inspectionLink = "https://public.claycountygov.com/inspectionscheduler/#permit=" + permit.permit_number.toString();
+        permitInspectionButton.href = inspectionLink;
+        Build_Property_Information_Display(permit);
+        Build_Contractor_Information_Display(permit);
+    }
+    function Build_Property_Information_Display(permit) {
+        var propertyContainer = document.getElementById("propertyFieldset");
+        var df = document.createDocumentFragment();
+        var legend = document.createElement("legend");
+        legend.classList.add("label");
+        legend.appendChild(document.createTextNode("Property Information"));
+        df.appendChild(legend);
+        if (permit.address.length > 0)
+            df.appendChild(Create_Field("Address", permit.address));
+        if (permit.owner_name.length > 0)
+            df.appendChild(Create_Field("Owner", permit.owner_name));
+        if (permit.parcel_number.length > 0) {
+            if (permit.pin_complete.length > 0) {
+                var link = "https://qpublic.schneidercorp.com/Application.aspx?AppID=830&LayerID=15008&PageTypeID=4&KeyValue=" + permit.pin_complete;
+                df.appendChild(Create_Field_Link("Parcel Number", permit.parcel_number, "View on CCPAO", link));
+            }
+            else {
+                df.appendChild(Create_Field("Parcel Number", permit.parcel_number));
+            }
+        }
+        Utilities.Clear_Element(propertyContainer);
+        propertyContainer.appendChild(df);
+    }
+    function Build_Contractor_Information_Display(permit) {
+        var contractorContainer = document.getElementById("contractorFieldset");
+        Utilities.Clear_Element(contractorContainer);
+        var df = document.createDocumentFragment();
+        var legend = document.createElement("legend");
+        legend.classList.add("label");
+        legend.appendChild(document.createTextNode("Contractor Information"));
+        df.appendChild(legend);
+        if (permit.contractor_name.length === 0 &&
+            permit.contractor_number.length === 0 &&
+            permit.company_name.length === 0) {
+            var p = document.createElement("p");
+            p.appendChild(document.createTextNode("No Contractor Information found."));
+            df.appendChild(p);
+        }
+        else {
+            if (permit.contractor_number.length > 0)
+                df.appendChild(Create_Field("Contractor Number", permit.contractor_number));
+            if (permit.contractor_name.length > 0)
+                df.appendChild(Create_Field("Contractor Name", permit.contractor_name));
+            if (permit.company_name.length > 0)
+                df.appendChild(Create_Field("Company Name", permit.company_name));
+        }
+        contractorContainer.appendChild(df);
+    }
+    function Create_Field(label, value) {
+        var field = document.createElement("div");
+        field.classList.add("field");
+        var fieldLabel = document.createElement("label");
+        fieldLabel.classList.add("label");
+        fieldLabel.classList.add("is-medium");
+        fieldLabel.appendChild(document.createTextNode(label));
+        field.appendChild(fieldLabel);
+        var control = document.createElement("div");
+        control.classList.add("control");
+        var input = document.createElement("input");
+        input.classList.add("input");
+        input.classList.add("is-medium");
+        input.disabled = true;
+        input.type = "text";
+        input.value = value;
+        control.appendChild(input);
+        field.appendChild(control);
+        return field;
+        //<div class="field" >
+        //  <label class="label is-medium" > Contractor Number < /label>
+        //    < div class="control" >
+        //      <input id="permitContractorNumber"
+        //class="input is-medium" type = "text" disabled value = "" />
+        //  </div>
+        //  < /div>
+    }
+    function Create_Field_Link(label, value, buttonLabel, link) {
+        var field = document.createElement("div");
+        field.classList.add("field");
+        var fieldLabel = document.createElement("label");
+        fieldLabel.classList.add("label");
+        fieldLabel.classList.add("is-medium");
+        fieldLabel.appendChild(document.createTextNode(label));
+        field.appendChild(fieldLabel);
+        var innerField = document.createElement("div");
+        innerField.classList.add("field");
+        innerField.classList.add("is-grouped");
+        var inputControl = document.createElement("div");
+        inputControl.classList.add("control");
+        var buttonControl = document.createElement("div");
+        buttonControl.classList.add("control");
+        var input = document.createElement("input");
+        input.classList.add("input");
+        input.classList.add("is-medium");
+        input.disabled = true;
+        input.type = "text";
+        input.value = value;
+        var button = document.createElement("a");
+        button.classList.add("button");
+        button.classList.add("is-medium");
+        button.classList.add("is-primary");
+        button.href = link;
+        button.target = "_blank";
+        button.rel = "noopener";
+        button.appendChild(document.createTextNode(buttonLabel));
+        inputControl.appendChild(input);
+        buttonControl.appendChild(button);
+        innerField.appendChild(inputControl);
+        innerField.appendChild(buttonControl);
+        field.appendChild(innerField);
+        return field;
     }
     function CreateLevelItem(label, value) {
         var container = document.createElement("div");
@@ -381,16 +570,6 @@ var PermitSearch;
         div.appendChild(title);
         container.appendChild(div);
         return container;
-        //<div class="level-item has-text-centered" >
-        //  <div>
-        //  <p class="heading" >
-        //    ISSUE DATE
-        //      < /p>
-        //      < p class="title" >
-        //        11 / 15 / 2018
-        //        < /p>
-        //        < /div>
-        //        < /div>
     }
     function GetPath() {
         var path = "/";
@@ -400,28 +579,33 @@ var PermitSearch;
         }
         return path;
     }
-    function QueryDocuments(permit_number) {
-        var path = GetPath();
-        Utilities.Get(path + "API/Permit/Documents?permitnumber=" + permit_number.toString())
-            .then(function (documents) {
-            console.log("documents", documents);
-            PermitSearch.permit_documents = documents;
-            if (PermitSearch.permit_documents.length > 0) {
-                //Utilities.Show("searchResults");
-                //CreateResultsTable(search_results);
-                //Toggle_Loading_Search_Buttons(false);
-            }
-            else {
-                //Utilities.Hide("searchResults");
-            }
-        }, function (e) {
-            console.log('error getting permits', e);
-            //Toggle_Loading_Search_Buttons(false);
-        });
+    PermitSearch.GetPath = GetPath;
+    function CreateMessageRow(container_id, colspan, message) {
+        var container = document.getElementById(container_id);
+        Utilities.Clear_Element(container);
+        var tr = document.createElement("tr");
+        var td = document.createElement("td");
+        td.colSpan = colspan;
+        td.appendChild(document.createTextNode(message));
+        tr.appendChild(td);
+        container.appendChild(tr);
     }
-    function QueryHolds(permit_number) {
+    PermitSearch.CreateMessageRow = CreateMessageRow;
+    function ResetSearch() {
+        // this function is going to empty the search form inputs and the search results.
+        Utilities.Hide(document.getElementById("searchResults"));
+        Utilities.Clear_Element(document.getElementById("resultsbody"));
+        location.hash = "";
+        Utilities.Set_Value("permitStatus", "all");
+        Utilities.Set_Value("permitSearch", "");
+        Utilities.Set_Value("streetNumberSearch", "");
+        Utilities.Set_Value("streetNameSearch", "");
+        Utilities.Set_Value("parcelSearch", "");
+        Utilities.Set_Value("ownerSearch", "");
+        Utilities.Set_Value("contractorNumberSearch", "");
+        Utilities.Set_Value("contractorNameSearch", "");
+        Utilities.Set_Value("companyNameSearch", "");
     }
-    function QueryCharges(permit_number) {
-    }
+    PermitSearch.ResetSearch = ResetSearch;
 })(PermitSearch || (PermitSearch = {}));
 //# sourceMappingURL=app.js.map

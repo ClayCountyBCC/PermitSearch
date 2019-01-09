@@ -33,6 +33,7 @@ namespace PermitSearch
 
     constructor(locationHash: string)
     {
+      console.log('new locationhash', locationHash);
       if (locationHash.length > 0)
       {
         let ha: Array<string> = locationHash.split("&")
@@ -75,17 +76,18 @@ namespace PermitSearch
               this.page = k[1];
               break;
           }
-        }
-        this.UpdateInputs();
+        }        
       }
       else
       {
         this.ReadInputs();
       }
+      this.UpdateInputs();
     }
 
     UpdateInputs(): void
     {
+      console.log('updating inputs');
       Utilities.Set_Value("permitStatus", this.permit_status);
       Utilities.Set_Value("permitSearch", this.permit_number);
       Utilities.Set_Value("streetNumberSearch", this.street_number);
@@ -100,9 +102,10 @@ namespace PermitSearch
 
     ReadInputs():void
     {
+      console.log('reading inputs');
       this.permit_status = Utilities.Get_Value("permitStatus").trim();
       this.permit_number = Utilities.Get_Value("permitSearch").trim();
-      if (this.permit_number.length > 0) this.permit_display = this.permit_number;
+      //if (this.permit_number.length > 0) this.permit_display = this.permit_number;
       this.street_number = Utilities.Get_Value("streetNumberSearch").trim();
       this.street_name = Utilities.Get_Value("streetNameSearch").trim();
       this.parcel_number = Utilities.Get_Value("parcelSearch").trim();
@@ -137,18 +140,7 @@ namespace PermitSearch
       h += LocationHash.AddToHash(this.company_name, "companyname");
       h += LocationHash.AddToHash(this.owner_name, "owner");
       h += LocationHash.AddToHash(this.parcel_number, "parcel");
-      h += LocationHash.AddToHash(this.page, "page");      
-      //if (this.permit_status.length > 0) h += "&status=" + this.permit_status;
-      //if (this.permit_number.length > 0) h += "&permitnumber=" + this.permit_number;      
-      //if (this.permit_display.length > 0) h += "&permitdisplay=" + this.permit_display;
-      //if (this.street_number.length > 0) h += "&streetnumber=" + this.street_number;
-      //if (this.street_name.length > 0) h += "&streetname=" + this.street_name;
-      //if (this.contractor_number.length > 0) h += "&contractorid=" + this.contractor_number;
-      //if (this.contractor_name.length > 0) h += "&contractorname=" + this.contractor_name;
-      //if (this.company_name.length > 0) h += "&companyname=" + this.company_name;
-      //if (this.owner_name.length > 0) h += "&owner=" + this.owner_name;
-      //if (this.parcel_number.length > 0) h += "&parcel=" + this.parcel_number;
-      //if (this.page.length > 0) h += "&page=" + this.page;
+      h += LocationHash.AddToHash(this.page, "page");
       if (h.length > 0)
       {
         h = "#" + h.substring(1) + "&v=" + new Date().getMilliseconds().toString();
@@ -159,6 +151,10 @@ namespace PermitSearch
 
     ReadyToTogglePermit(oldHash: LocationHash): boolean
     {
+      // This function simply checks to see if the old search
+      // is identical to the new search with the exception of the permit_display
+      // argument.  If it is, then we just toggle display of the permit detail,
+      // and we don't actually hit the database again.
       if (oldHash === null) return false;
 
       if ((this.permit_display.length > 0 && oldHash.permit_display.length === 0)

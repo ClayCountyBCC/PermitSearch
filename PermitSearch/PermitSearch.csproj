@@ -105,8 +105,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bower_components\fetch\fetch.js" />
-    <Content Include="bower_components\fetch\prettier.config.js" />
-    <Content Include="bower_components\fetch\rollup.config.js" />
     <Content Include="bower_components\promise-polyfill\dist\polyfill.js" />
     <Content Include="bower_components\promise-polyfill\dist\polyfill.min.js" />
     <Content Include="bower_components\promise-polyfill\karma.conf.js" />
@@ -114,6 +112,9 @@
     <Content Include="bower_components\promise-polyfill\src\finally.js" />
     <Content Include="bower_components\promise-polyfill\src\index.js" />
     <Content Include="bower_components\promise-polyfill\src\polyfill.js" />
+    <Content Include="content\48x48 document.png" />
+    <Content Include="content\favicon-16x16.png" />
+    <Content Include="content\favicon-32x32.png" />
     <Content Include="css\bulma.css" />
     <Content Include="css\bulma.min.css">
       <DependentUpon>bulma.css</DependentUpon>
@@ -168,6 +169,7 @@
     <Compile Include="Models\document.cs" />
     <Compile Include="Models\ErrorLog.cs" />
     <Compile Include="Models\hold.cs" />
+    <Compile Include="Models\myCache.cs" />
     <Compile Include="Models\permit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -234,7 +236,6 @@
     <Content Include="bower_components\bulma\darkergreenBulma.sass" />
     <Content Include="bower_components\fetch\.bower.json" />
     <Content Include="bower_components\fetch\bower.json" />
-    <Content Include="bower_components\fetch\fetch.js.flow" />
     <Content Include="bower_components\fetch\LICENSE" />
     <Content Include="bower_components\promise-polyfill\.bower.json" />
     <Content Include="bower_components\promise-polyfill\bower.json" />
@@ -264,6 +265,7 @@
       <SubType>Designer</SubType>
     </Content>
     <None Include="packages.config" />
+    <None Include="Properties\PublishProfiles\Public Production.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

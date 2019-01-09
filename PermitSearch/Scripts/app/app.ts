@@ -12,6 +12,9 @@ namespace PermitSearch
   export let permit_count: number = 0;
   export let search_results: Array<Permit> = [];
   export let permit_documents: Array<Document> = [];
+  export let permit_holds: Array<Hold> = [];
+  export let permit_charges: Array<Charge> = [];
+  export let date_updated: any;
 
   export let Menus: Array<Utilities.MenuItem> = [
     {
@@ -69,6 +72,65 @@ namespace PermitSearch
     {
       HandleHash(null);
     }
+    GetDateUpdated();
+
+    setInterval(() => { GetDateUpdated(); }, 60000);
+
+    HandleInputs();
+    HandleResetButtons();
+  }
+
+  function HandleInputs()
+  {
+    let sections = <NodeListOf<HTMLElement>>document.querySelectorAll("#views > section input");
+    if (sections.length > 0)
+    {
+      for (let i = 0; i < sections.length; i++)
+      {
+        let item = <HTMLInputElement>sections.item(i);
+        item.onkeydown = function (this: HTMLElement, event: KeyboardEvent)
+        {
+          var e = event || window.event;
+          if (event.keyCode == 13)
+          {
+            Search();
+          }
+        };
+      }
+    }
+  }
+
+  function HandleResetButtons()
+  {
+    let sections = <NodeListOf<HTMLElement>>document.querySelectorAll("#views > section button.is-reset");
+    if (sections.length > 0)
+    {
+      for (let i = 0; i < sections.length; i++)
+      {
+        let item = <HTMLButtonElement>sections.item(i);
+        item.onclick = () => ResetSearch();
+      }
+    }
+  }
+
+  function GetDateUpdated(): void
+  {
+    let path = GetPath();
+    Utilities.Get<any>(path + "API/Timing")
+      .then(function (dateUpdated: any)
+      {
+        // update pagination here
+        console.log("date Updated", dateUpdated, new Date());
+        date_updated = dateUpdated;
+        let timeContainer = document.getElementById("updateTimeContainer");
+        let time = document.getElementById("updateTime");
+        Utilities.Clear_Element(time);
+        time.appendChild(document.createTextNode(new Date(date_updated).toLocaleString('en-us')));
+        Utilities.Show(timeContainer);
+      }, function (e)
+        {
+          console.log('error getting date updated', e);
+        });
   }
 
   export function Search(): void
@@ -93,6 +155,7 @@ namespace PermitSearch
 
   export function HandleHash(event: HashChangeEvent)
   {
+    Utilities.Clear_Element(document.getElementById("permitSearchError"));
     let currentHash = new LocationHash(location.hash.substring(1));
     let newHash = new LocationHash(location.hash.substring(1));
     let oldHash: LocationHash = null;
@@ -107,26 +170,7 @@ namespace PermitSearch
 
     if (newHash.ReadyToTogglePermit(oldHash))
     {
-      let permitModal = document.getElementById("selectedPermit");
-      if (newHash.permit_display.length > 0)
-      {
-        permitModal.classList.add("is-active");
-        // let's find the permit in the search_results variable
-        let permit = search_results.filter(function (j)
-        {
-          return j.permit_number.toString() === newHash.permit_display;
-        });
-        if (permit.length === 1)
-        {
-          ViewPermitDetail(permit[0]);
-        }
-
-
-      }
-      else
-      {
-        permitModal.classList.remove("is-active");
-      }
+      TogglePermitDisplay(newHash.permit_display);
       Toggle_Loading_Search_Buttons(false);
     }
     else
@@ -135,7 +179,40 @@ namespace PermitSearch
       {
         Query(currentHash);
       }
+      else
+      {
+        Toggle_Loading_Search_Buttons(false);
+      }
     }
+  }
+
+  function TogglePermitDisplay(permit_number: string): void
+  {
+    // this function will either hide or show the the permit modals
+    // based on if the permit number has a length or not.
+    let permitModal = document.getElementById("selectedPermit");
+    let permitErrorModal = document.getElementById("selectedPermitError");
+    if (permit_number.length === 0)
+    {
+      permitErrorModal.classList.remove("is-active");
+      permitModal.classList.remove("is-active");
+      return;
+    }
+    let permit = search_results.filter(function (j)
+    {
+      return j.permit_number.toString() === permit_number;
+    });
+    if (permit.length > 0)
+    {
+      ViewPermitDetail(permit[0]);
+      permitModal.classList.add("is-active");
+    }
+    else
+    {
+      Utilities.Set_Text("permitNumberError", permit_number);      
+      permitErrorModal.classList.add("is-active");
+    }
+
   }
 
   function Query(currentHash: LocationHash):void
@@ -152,15 +229,22 @@ namespace PermitSearch
         search_results = permits;
         if (search_results.length > 0)
         {
-
+          console.log('permits found');
           Utilities.Show("searchResults");
-          CreateResultsTable(search_results);
-          Toggle_Loading_Search_Buttons(false);
+          CreateResultsTable(search_results);          
+          if (currentHash.permit_display.length > 0)
+          {
+            TogglePermitDisplay(currentHash.permit_display);
+          }
         }
         else
         {
+          console.log('no permits found');
           Utilities.Hide("searchResults");
+          Utilities.Error_Show("permitSearchError", "No permits found for this search.", true);
+          // Show that we got no search results
         }
+        Toggle_Loading_Search_Buttons(false);
 
       }, function (e)
         {
@@ -196,6 +280,8 @@ namespace PermitSearch
     let tbody = (<HTMLTableSectionElement>document.getElementById("resultsBody"));
     Utilities.Clear_Element(tbody);
     tbody.appendChild(df);
+    let results = document.getElementById("searchResults");
+    results.scrollIntoView();    
   }
 
   function CreateResultsRow(p: Permit, currentHash: LocationHash): HTMLTableRowElement
@@ -205,11 +291,18 @@ namespace PermitSearch
     let tr = document.createElement("tr");
     tr.appendChild(CreateResultsCellLink(p.permit_number.toString().padStart(8, "0"), "", currentHash.ToHash()));
     tr.appendChild(CreateResultsCell(p.is_closed ? "Yes" : "No"));
-    tr.appendChild(CreateResultsCell(Utilities.Format_Date(p.issue_date)));
+    if (new Date(p.issue_date).getFullYear() !== 1)
+    {
+      tr.appendChild(CreateResultsCell(Utilities.Format_Date(p.issue_date)));
+    }
+    else
+    {
+      tr.appendChild(CreateResultsCell("Not Issued"));
+    }
     tr.appendChild(CreateResultsCell(p.address, "has-text-left"));
     tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges - p.paid_charges), "has-text-right"));
     tr.appendChild(CreateResultsCell(p.document_count.toString()));
-    tr.appendChild(CreateResultsCellLink(p.passed_final_inspection ? "Completed" : "View", "",  inspectionLink));
+    tr.appendChild(CreateResultsCellLink(p.passed_final_inspection ? "Completed" : "View", "",  inspectionLink, true));
     return tr;
   }
 
@@ -221,12 +314,18 @@ namespace PermitSearch
     return td;
   }
 
-  function CreateResultsCellLink(value: string, className: string = "", href: string = ""): HTMLTableCellElement
+  function CreateResultsCellLink(value: string, className: string = "", href: string = "", newTab: boolean = false): HTMLTableCellElement
   {
     let td = document.createElement("td");
     if (className.length > 0) td.classList.add(className);
     let link = document.createElement("a");
     link.classList.add("has-text-link");
+    if (newTab)
+    {
+      link.rel = "noopener";
+      link.target = "_blank";
+    }
+
     link.href = href;
     link.appendChild(document.createTextNode(value));
     td.appendChild(link);
@@ -405,7 +504,9 @@ namespace PermitSearch
   {
     PopulatePermitHeading(permit);
     PopulatePermitInformation(permit);
-    QueryDocuments(permit.permit_number);
+    Document.QueryDocuments(permit.permit_number);
+    Hold.QueryHolds(permit.permit_number);
+    Charge.QueryCharges(permit.permit_number);
   }
 
   function PopulatePermitHeading(permit: Permit)
@@ -443,13 +544,146 @@ namespace PermitSearch
   {
     Utilities.Set_Value("permitCompleted", permit.is_closed ? "Yes" : "No");
     Utilities.Set_Value("permitFinalInspection", permit.passed_final_inspection ? "Yes" : "No");
-    Utilities.Set_Value("permitAddress", permit.address);
-    Utilities.Set_Value("permitOwner", permit.owner_name);
-    Utilities.Set_Value("permitParcel", permit.parcel_number);
-    Utilities.Set_Value("permitContractorNumber", permit.contractor_number);
-    Utilities.Set_Value("permitContractorName", permit.contractor_name);
-    Utilities.Set_Value("permitCompanyName", permit.company_name);
+    let permitInspectionButton = <HTMLAnchorElement>document.getElementById("permitInspectionSchedulerLink");
+    let inspectionLink = "https://public.claycountygov.com/inspectionscheduler/#permit=" + permit.permit_number.toString();
+    permitInspectionButton.href = inspectionLink;
+    Build_Property_Information_Display(permit);
 
+    Build_Contractor_Information_Display(permit);
+  }
+
+  function Build_Property_Information_Display(permit: Permit): void
+  {
+    let propertyContainer = document.getElementById("propertyFieldset");
+    let df = document.createDocumentFragment();
+    let legend = document.createElement("legend");
+    legend.classList.add("label");
+    legend.appendChild(document.createTextNode("Property Information"));
+    df.appendChild(legend);
+    if (permit.address.length > 0) df.appendChild(Create_Field("Address", permit.address));
+    if (permit.owner_name.length > 0) df.appendChild(Create_Field("Owner", permit.owner_name));
+    if (permit.parcel_number.length > 0)
+    {
+
+      if (permit.pin_complete.length > 0)
+      {
+        let link = "https://qpublic.schneidercorp.com/Application.aspx?AppID=830&LayerID=15008&PageTypeID=4&KeyValue=" + permit.pin_complete;
+        df.appendChild(Create_Field_Link("Parcel Number", permit.parcel_number, "View on CCPAO", link));
+      }
+      else
+      {
+        df.appendChild(Create_Field("Parcel Number", permit.parcel_number));
+      }
+    }
+
+
+    Utilities.Clear_Element(propertyContainer);
+    propertyContainer.appendChild(df);
+  }
+
+  function Build_Contractor_Information_Display(permit: Permit):void
+  {
+    let contractorContainer = document.getElementById("contractorFieldset");
+    Utilities.Clear_Element(contractorContainer);
+    let df = document.createDocumentFragment();
+
+    let legend = document.createElement("legend");
+    legend.classList.add("label");
+    legend.appendChild(document.createTextNode("Contractor Information"));
+    df.appendChild(legend);
+    if (
+      permit.contractor_name.length === 0 &&
+      permit.contractor_number.length === 0 &&
+      permit.company_name.length === 0)
+    {
+      let p = document.createElement("p");
+      p.appendChild(document.createTextNode("No Contractor Information found."));
+      df.appendChild(p);
+    }
+    else
+    {
+      if (permit.contractor_number.length > 0) df.appendChild(Create_Field("Contractor Number", permit.contractor_number));
+      if (permit.contractor_name.length > 0) df.appendChild(Create_Field("Contractor Name", permit.contractor_name));
+      if (permit.company_name.length > 0) df.appendChild(Create_Field("Company Name", permit.company_name));
+    }
+    contractorContainer.appendChild(df);
+  }
+
+  function Create_Field(label: string, value: string): HTMLElement
+  {
+    let field = document.createElement("div");
+    field.classList.add("field");
+    let fieldLabel = document.createElement("label");
+    fieldLabel.classList.add("label");
+    fieldLabel.classList.add("is-medium");
+    fieldLabel.appendChild(document.createTextNode(label));
+    field.appendChild(fieldLabel);
+    let control = document.createElement("div");
+    control.classList.add("control");
+
+    let input = document.createElement("input");
+    input.classList.add("input");
+    input.classList.add("is-medium");
+    input.disabled = true;
+    input.type = "text";
+    input.value = value;
+
+    control.appendChild(input);
+    field.appendChild(control);
+    return field;
+    //<div class="field" >
+    //  <label class="label is-medium" > Contractor Number < /label>
+    //    < div class="control" >
+    //      <input id="permitContractorNumber"
+    //class="input is-medium" type = "text" disabled value = "" />
+    //  </div>
+    //  < /div>
+  }
+
+  function Create_Field_Link(label: string, value: string, buttonLabel: string, link: string): HTMLElement
+  {
+    let field = document.createElement("div");
+    field.classList.add("field");
+    let fieldLabel = document.createElement("label");
+    fieldLabel.classList.add("label");
+    fieldLabel.classList.add("is-medium");
+    fieldLabel.appendChild(document.createTextNode(label));
+    field.appendChild(fieldLabel);
+
+    let innerField = document.createElement("div");
+    innerField.classList.add("field");
+    innerField.classList.add("is-grouped");
+
+
+    let inputControl = document.createElement("div");
+    inputControl.classList.add("control");
+
+    let buttonControl = document.createElement("div");
+    buttonControl.classList.add("control");
+
+    let input = document.createElement("input");
+    input.classList.add("input");
+    input.classList.add("is-medium");
+    input.disabled = true;
+    input.type = "text";
+    input.value = value;
+
+    let button = document.createElement("a");
+    button.classList.add("button");
+    button.classList.add("is-medium");
+    button.classList.add("is-primary");
+    button.href = link;
+    button.target = "_blank";
+    button.rel = "noopener"
+    button.appendChild(document.createTextNode(buttonLabel));
+
+    
+    inputControl.appendChild(input);
+    buttonControl.appendChild(button);
+    innerField.appendChild(inputControl);
+    innerField.appendChild(buttonControl);
+    field.appendChild(innerField);
+    return field;
   }
 
   function CreateLevelItem(label: string, value: string): HTMLDivElement
@@ -468,19 +702,9 @@ namespace PermitSearch
     div.appendChild(title);
     container.appendChild(div);
     return container;
-    //<div class="level-item has-text-centered" >
-    //  <div>
-    //  <p class="heading" >
-    //    ISSUE DATE
-    //      < /p>
-    //      < p class="title" >
-    //        11 / 15 / 2018
-    //        < /p>
-    //        < /div>
-    //        < /div>
   }
 
-  function GetPath(): string
+  export function GetPath(): string
   {
     let path = "/";
     let i = window.location.pathname.toLowerCase().indexOf("/permitsearch");
@@ -489,42 +713,36 @@ namespace PermitSearch
       path = "/permitsearch/";
     }
     return path;
-  }
+  }  
 
-  function QueryDocuments(permit_number: number) : void
+  export function CreateMessageRow(container_id: string, colspan: number, message: string): void
   {
-    let path = GetPath();
-    Utilities.Get<Array<Document>>(path + "API/Permit/Documents?permitnumber=" + permit_number.toString())
-      .then(function (documents: Array<Document>)
-      {
-        console.log("documents", documents);
-        permit_documents = documents;
-        if (permit_documents.length > 0)
-        {
-
-          //Utilities.Show("searchResults");
-          //CreateResultsTable(search_results);
-          //Toggle_Loading_Search_Buttons(false);
-        }
-        else
-        {
-          //Utilities.Hide("searchResults");
-        }
-
-      }, function (e)
-        {
-          console.log('error getting permits', e);
-          //Toggle_Loading_Search_Buttons(false);
-        });
+    let container = document.getElementById(container_id);
+    Utilities.Clear_Element(container);
+    let tr = document.createElement("tr");
+    let td = document.createElement("td");
+    td.colSpan = colspan;
+    td.appendChild(document.createTextNode(message));
+    tr.appendChild(td);
+    container.appendChild(tr);
   }
 
-  function QueryHolds(permit_number: number): void
+  export function ResetSearch():void
   {
-
+    // this function is going to empty the search form inputs and the search results.
+    Utilities.Hide(document.getElementById("searchResults"));
+    Utilities.Clear_Element(document.getElementById("resultsbody"))
+    location.hash = "";
+    Utilities.Set_Value("permitStatus", "all");
+    Utilities.Set_Value("permitSearch", "");
+    Utilities.Set_Value("streetNumberSearch", "");
+    Utilities.Set_Value("streetNameSearch", "");
+    Utilities.Set_Value("parcelSearch", "");
+    Utilities.Set_Value("ownerSearch", "");
+    Utilities.Set_Value("contractorNumberSearch", "");
+    Utilities.Set_Value("contractorNameSearch", "");
+    Utilities.Set_Value("companyNameSearch", "");
+    
   }
 
-  function QueryCharges(permit_number: number): void
-  {
-
-  }
 }

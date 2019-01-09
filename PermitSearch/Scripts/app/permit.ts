@@ -23,6 +23,7 @@ namespace PermitSearch
     company_name: string;
     owner_name: string;
     parcel_number: string;
+    pin_complete: string;
   }
   export class Permit implements IPermit
   {
@@ -43,6 +44,7 @@ namespace PermitSearch
     public company_name: string = "";
     public owner_name: string = "";
     public parcel_number: string = "";
+    public pin_complete: string = "";
 
     constructor() { }
   }
