@@ -14,7 +14,7 @@ var PermitSearch;
             this.parcel_number = "";
             this.owner_name = "";
             this.page = "1";
-            console.log('new locationhash', locationHash);
+            this.tab = "";
             if (locationHash.length > 0) {
                 var ha = locationHash.split("&");
                 for (var i = 0; i < ha.length; i++) {
@@ -55,14 +55,13 @@ var PermitSearch;
                             break;
                     }
                 }
+                //this.UpdateInputs();
             }
             else {
                 this.ReadInputs();
             }
-            this.UpdateInputs();
         }
         LocationHash.prototype.UpdateInputs = function () {
-            console.log('updating inputs');
             Utilities.Set_Value("permitStatus", this.permit_status);
             Utilities.Set_Value("permitSearch", this.permit_number);
             Utilities.Set_Value("streetNumberSearch", this.street_number);
@@ -74,7 +73,6 @@ var PermitSearch;
             Utilities.Set_Value("companyNameSearch", this.company_name);
         };
         LocationHash.prototype.ReadInputs = function () {
-            console.log('reading inputs');
             this.permit_status = Utilities.Get_Value("permitStatus").trim();
             this.permit_number = Utilities.Get_Value("permitSearch").trim();
             //if (this.permit_number.length > 0) this.permit_display = this.permit_number;
@@ -98,7 +96,6 @@ var PermitSearch;
         };
         LocationHash.prototype.ToHash = function () {
             var h = "";
-            h += LocationHash.AddToHash(this.permit_status, "status");
             h += LocationHash.AddToHash(this.permit_number, "permitnumber");
             h += LocationHash.AddToHash(this.permit_display, "permitdisplay");
             h += LocationHash.AddToHash(this.street_number, "streetnumber");
@@ -108,6 +105,9 @@ var PermitSearch;
             h += LocationHash.AddToHash(this.company_name, "companyname");
             h += LocationHash.AddToHash(this.owner_name, "owner");
             h += LocationHash.AddToHash(this.parcel_number, "parcel");
+            if (h.length === 0)
+                return "";
+            h += LocationHash.AddToHash(this.permit_status, "status");
             h += LocationHash.AddToHash(this.page, "page");
             if (h.length > 0) {
                 h = "#" + h.substring(1) + "&v=" + new Date().getMilliseconds().toString();

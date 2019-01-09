@@ -255,13 +255,6 @@ var Utilities;
         a.id = menuItem.id;
         a.onclick = function () {
             Update_Menu(menuItem);
-            //let title = document.getElementById("menuTitle");
-            //let subTitle = document.getElementById("menuSubTitle");
-            //Utilities.Clear_Element(title);
-            //Utilities.Clear_Element(subTitle);
-            //title.appendChild(document.createTextNode(menuItem.title));
-            //subTitle.appendChild(document.createTextNode(menuItem.subTitle));
-            //Utilities.Show_Menu(menuItem.id);
         };
         if (menuItem.icon.length > 0) {
             var span = document.createElement("span");

@@ -102,7 +102,7 @@ namespace PermitSearch
 
   function HandleResetButtons()
   {
-    let sections = <NodeListOf<HTMLElement>>document.querySelectorAll("#views > section button.is-reset");
+    let sections = <NodeListOf<HTMLElement>>document.querySelectorAll("#searchButtons button.is-reset");
     if (sections.length > 0)
     {
       for (let i = 0; i < sections.length; i++)
@@ -119,8 +119,6 @@ namespace PermitSearch
     Utilities.Get<any>(path + "API/Timing")
       .then(function (dateUpdated: any)
       {
-        // update pagination here
-        console.log("date Updated", dateUpdated, new Date());
         date_updated = dateUpdated;
         let timeContainer = document.getElementById("updateTimeContainer");
         let time = document.getElementById("updateTime");
@@ -159,6 +157,8 @@ namespace PermitSearch
     let currentHash = new LocationHash(location.hash.substring(1));
     let newHash = new LocationHash(location.hash.substring(1));
     let oldHash: LocationHash = null;
+    // if the event is null, we're loading this off of the initial
+    // page load.  
     if (event !== null)
     {
       let hash = event.oldURL.split("#");
@@ -166,6 +166,10 @@ namespace PermitSearch
       {
         oldHash = new LocationHash(hash[1]);
       }
+    }
+    else
+    {
+      currentHash.UpdateInputs();
     }
 
     if (newHash.ReadyToTogglePermit(oldHash))
@@ -731,8 +735,7 @@ namespace PermitSearch
   {
     // this function is going to empty the search form inputs and the search results.
     Utilities.Hide(document.getElementById("searchResults"));
-    Utilities.Clear_Element(document.getElementById("resultsbody"))
-    location.hash = "";
+    Utilities.Clear_Element(document.getElementById("resultsbody"))        
     Utilities.Set_Value("permitStatus", "all");
     Utilities.Set_Value("permitSearch", "");
     Utilities.Set_Value("streetNumberSearch", "");
@@ -742,7 +745,7 @@ namespace PermitSearch
     Utilities.Set_Value("contractorNumberSearch", "");
     Utilities.Set_Value("contractorNameSearch", "");
     Utilities.Set_Value("companyNameSearch", "");
-    
+    location.hash = "";
   }
 
 }

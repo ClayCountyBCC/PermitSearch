@@ -15,6 +15,7 @@ namespace PermitSearch
     parcel_number: string;
     owner_name: string;
     page: string;
+    tab: string;
   }
 
   export class LocationHash implements ILocationHash
@@ -30,10 +31,10 @@ namespace PermitSearch
     public parcel_number: string = "";
     public owner_name: string = "";
     public page: string = "1";
+    public tab: string = "";
 
     constructor(locationHash: string)
     {
-      console.log('new locationhash', locationHash);
       if (locationHash.length > 0)
       {
         let ha: Array<string> = locationHash.split("&")
@@ -77,17 +78,16 @@ namespace PermitSearch
               break;
           }
         }        
+        //this.UpdateInputs();
       }
       else
       {
         this.ReadInputs();
       }
-      this.UpdateInputs();
     }
 
     UpdateInputs(): void
     {
-      console.log('updating inputs');
       Utilities.Set_Value("permitStatus", this.permit_status);
       Utilities.Set_Value("permitSearch", this.permit_number);
       Utilities.Set_Value("streetNumberSearch", this.street_number);
@@ -102,7 +102,6 @@ namespace PermitSearch
 
     ReadInputs():void
     {
-      console.log('reading inputs');
       this.permit_status = Utilities.Get_Value("permitStatus").trim();
       this.permit_number = Utilities.Get_Value("permitSearch").trim();
       //if (this.permit_number.length > 0) this.permit_display = this.permit_number;
@@ -130,7 +129,7 @@ namespace PermitSearch
     ToHash(): string
     {
       let h: string = "";
-      h += LocationHash.AddToHash(this.permit_status, "status");
+      
       h += LocationHash.AddToHash(this.permit_number, "permitnumber");
       h += LocationHash.AddToHash(this.permit_display, "permitdisplay");
       h += LocationHash.AddToHash(this.street_number, "streetnumber");
@@ -140,6 +139,8 @@ namespace PermitSearch
       h += LocationHash.AddToHash(this.company_name, "companyname");
       h += LocationHash.AddToHash(this.owner_name, "owner");
       h += LocationHash.AddToHash(this.parcel_number, "parcel");
+      if (h.length === 0) return "";
+      h += LocationHash.AddToHash(this.permit_status, "status");
       h += LocationHash.AddToHash(this.page, "page");
       if (h.length > 0)
       {

@@ -87,7 +87,7 @@
           <label class="label">Permit Number</label>
         </div>
         <div class="field-body">
-          <div class="field is-grouped">
+          <div class="field">
             <div class="control">
               <input id="permitSearch"
                      class="input is-medium"
@@ -100,22 +100,10 @@
                      autofocus
                      placeholder="11800001" />
             </div>
-            <div class="control">
-              <button id="permitSearchButton"
-                      type="button"
-                      tabindex="2"
-                      onclick="PermitSearch.Search(); return false;"
-                      class="button is-primary is-medium">
-                Search
-              </button>
-              <button type="button"
-                      class="button is-medium is-warning is-reset">
-                Reset
-              </button>
-            </div>
           </div>
         </div>
       </div>
+
     </section>
 
     <section style="margin-bottom: 1em;"
@@ -159,28 +147,6 @@
         </div>
       </div>
 
-      <div class="field is-horizontal">
-        <div class="field-label is-medium">
-          <label class="label"></label>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <button id="addressSearchButton"
-                      type="button"
-                      tabindex="4"
-                      onclick="PermitSearch.Search(); return false;"
-                      class="button is-primary is-medium">
-                Search
-              </button>
-              <button type="button"
-                      class="button is-medium is-warning is-reset">
-                Reset
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </section>
 
     <section class="hide"
@@ -241,29 +207,6 @@
         </div>
       </div>
 
-      <div class="field is-horizontal">
-        <div class="field-label is-medium">
-          <label class="label"></label>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <button id="contractorSearchButton"
-                      type="button"
-                      tabindex="4"
-                      onclick="PermitSearch.Search(); return false;"
-                      class="button is-primary is-medium">
-                Search
-              </button>
-              <button type="button"
-                      class="button is-medium is-warning is-reset">
-                Reset
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </section>
 
     <section class="hide"
@@ -274,7 +217,7 @@
           <label class="label">Owner Name</label>
         </div>
         <div class="field-body">
-          <div class="field is-grouped">
+          <div class="field">
             <div class="control">
               <input id="ownerSearch"
                      class="input is-medium"
@@ -284,19 +227,6 @@
                      autofocus
                      value=""
                      placeholder="Owner Name" />
-            </div>
-            <div class="control">
-              <button id="ownerSearchButton"
-                      type="button"
-                      tabindex="2"
-                      onclick="PermitSearch.Search(); return false;"
-                      class="button is-primary is-medium">
-                Search
-              </button>
-              <button type="button"
-                      class="button is-medium is-warning is-reset">
-                Reset
-              </button>
             </div>
           </div>
         </div>
@@ -311,7 +241,7 @@
           <label class="label">Parcel Number</label>
         </div>
         <div class="field-body">
-          <div class="field is-grouped">
+          <div class="field">
             <div class="control">
               <input id="parcelSearch"
                      class="input is-medium"
@@ -322,10 +252,21 @@
                      value=""
                      placeholder="000000-000-00" />
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="searchButtons"
+         style="margin-top: .75em; margin-bottom: .75em;">
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label"></label>
+        </div>
+        <div class="field-body">
+          <div class="field">
             <div class="control">
-              <button id="parcelSearchButton"
-                      type="button"
-                      tabindex="2"
+              <button type="button"
                       onclick="PermitSearch.Search(); return false;"
                       class="button is-primary is-medium">
                 Search
@@ -338,7 +279,7 @@
           </div>
         </div>
       </div>
-    </section>
+    </div>
 
     <div id="permitSearchError"
          style="margin-bottom: .75em; margin-top: .75em;">

@@ -84,7 +84,7 @@ var PermitSearch;
         }
     }
     function HandleResetButtons() {
-        var sections = document.querySelectorAll("#views > section button.is-reset");
+        var sections = document.querySelectorAll("#searchButtons button.is-reset");
         if (sections.length > 0) {
             for (var i = 0; i < sections.length; i++) {
                 var item = sections.item(i);
@@ -96,8 +96,6 @@ var PermitSearch;
         var path = GetPath();
         Utilities.Get(path + "API/Timing")
             .then(function (dateUpdated) {
-            // update pagination here
-            console.log("date Updated", dateUpdated, new Date());
             PermitSearch.date_updated = dateUpdated;
             var timeContainer = document.getElementById("updateTimeContainer");
             var time = document.getElementById("updateTime");
@@ -128,11 +126,16 @@ var PermitSearch;
         var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
         var newHash = new PermitSearch.LocationHash(location.hash.substring(1));
         var oldHash = null;
+        // if the event is null, we're loading this off of the initial
+        // page load.  
         if (event !== null) {
             var hash = event.oldURL.split("#");
             if (hash.length === 2) {
                 oldHash = new PermitSearch.LocationHash(hash[1]);
             }
+        }
+        else {
+            currentHash.UpdateInputs();
         }
         if (newHash.ReadyToTogglePermit(oldHash)) {
             TogglePermitDisplay(newHash.permit_display);
@@ -595,7 +598,6 @@ var PermitSearch;
         // this function is going to empty the search form inputs and the search results.
         Utilities.Hide(document.getElementById("searchResults"));
         Utilities.Clear_Element(document.getElementById("resultsbody"));
-        location.hash = "";
         Utilities.Set_Value("permitStatus", "all");
         Utilities.Set_Value("permitSearch", "");
         Utilities.Set_Value("streetNumberSearch", "");
@@ -605,6 +607,7 @@ var PermitSearch;
         Utilities.Set_Value("contractorNumberSearch", "");
         Utilities.Set_Value("contractorNameSearch", "");
         Utilities.Set_Value("companyNameSearch", "");
+        location.hash = "";
     }
     PermitSearch.ResetSearch = ResetSearch;
 })(PermitSearch || (PermitSearch = {}));
