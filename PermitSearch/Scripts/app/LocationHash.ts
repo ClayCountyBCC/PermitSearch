@@ -46,36 +46,51 @@ namespace PermitSearch
             case "permitnumber":
               this.permit_number = k[1];
               break;
+
             case "permitdisplay":
               this.permit_display = k[1];
               break;
+
             case "status":
               this.permit_status = k[1];
               break;
+
             case "contractorid":
               this.contractor_number = k[1];
               break;
+
             case "contractorname":
               this.contractor_name = k[1];
               break;
+
             case "companyname":
               this.company_name = k[1];
               break;
+
             case "streetnumber":
               this.street_number = k[1];
               break;
+
             case "streetname":
               this.street_name = k[1];
               break;
+
             case "owner":
               this.owner_name = k[1];
               break;
+
             case "parcel":
               this.parcel_number = k[1];
               break;
+
             case "page":
               this.page = k[1];
               break;
+
+            case "tab":
+              this.tab = k[1];
+              break;
+
           }
         }        
         //this.UpdateInputs();
@@ -116,29 +131,62 @@ namespace PermitSearch
 
     ReadyToSearch(): boolean
     {
-      return (this.permit_number.length > 0) ||
-        (this.contractor_number.length > 0) ||
-        (this.contractor_name.length > 0) ||
-        (this.company_name.length > 0) ||
-        (this.street_number.length > 0) ||
-        (this.street_name.length > 0) ||
-        (this.owner_name.length > 0) ||
-        (this.parcel_number.length > 0);
+      switch (this.tab.toLowerCase())
+      {
+        case "permit":
+          return (this.permit_number.length > 0);
+
+        case "address":
+          return (this.street_number.length > 0) ||
+            (this.street_name.length > 0);
+
+        case "contractor":
+          return (this.contractor_number.length > 0) ||
+            (this.contractor_name.length > 0) ||
+            (this.company_name.length > 0);
+
+        case "owner":
+          return (this.owner_name.length > 0);
+
+        case "parcel":
+          return (this.parcel_number.length > 0);
+
+        case "":
+          break;
+
+      }
     }
 
     ToHash(): string
     {
       let h: string = "";
-      
-      h += LocationHash.AddToHash(this.permit_number, "permitnumber");
+      h += LocationHash.AddToHash(this.tab, "tab");
       h += LocationHash.AddToHash(this.permit_display, "permitdisplay");
-      h += LocationHash.AddToHash(this.street_number, "streetnumber");
-      h += LocationHash.AddToHash(this.street_name, "streetname");
-      h += LocationHash.AddToHash(this.contractor_number, "contrctorid");
-      h += LocationHash.AddToHash(this.contractor_name, "contractorname");
-      h += LocationHash.AddToHash(this.company_name, "companyname");
-      h += LocationHash.AddToHash(this.owner_name, "owner");
-      h += LocationHash.AddToHash(this.parcel_number, "parcel");
+
+      switch (this.tab.toLowerCase())
+      {
+        case "permit":
+          h += LocationHash.AddToHash(this.permit_number, "permitnumber");
+          break;
+
+        case "address":
+          h += LocationHash.AddToHash(this.street_number, "streetnumber");
+          h += LocationHash.AddToHash(this.street_name, "streetname");
+          break;
+        case "contractor":
+          h += LocationHash.AddToHash(this.contractor_number, "contractorid");
+          h += LocationHash.AddToHash(this.contractor_name, "contractorname");
+          h += LocationHash.AddToHash(this.company_name, "companyname");
+          break;
+        case "owner":
+          h += LocationHash.AddToHash(this.owner_name, "owner");
+          break;
+        case "parcel":
+          h += LocationHash.AddToHash(this.parcel_number, "parcel");
+          break;
+
+      }
+      
       if (h.length === 0) return "";
       h += LocationHash.AddToHash(this.permit_status, "status");
       h += LocationHash.AddToHash(this.page, "page");

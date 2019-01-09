@@ -15,6 +15,7 @@ namespace PermitSearch
   export let permit_holds: Array<Hold> = [];
   export let permit_charges: Array<Charge> = [];
   export let date_updated: any;
+  export let selected_tab: string = "permit";
 
   export let Menus: Array<Utilities.MenuItem> = [
     {
@@ -135,6 +136,7 @@ namespace PermitSearch
   {
     Toggle_Loading_Search_Buttons(true);
     let newHash = new LocationHash("");
+    newHash.tab = PermitSearch.selected_tab;
     location.hash = newHash.ToHash();
   }
 
@@ -225,6 +227,7 @@ namespace PermitSearch
 
     let newHash = currentHash.ToHash();
     let searchHash = "?" + newHash.substring(1)
+    console.log('hash', newHash);
     // Get the list of permits for this search
     Utilities.Get<Array<PermitSearch.Permit>>(path + "API/Search/Permit" + searchHash)
       .then(function (permits: Array<PermitSearch.Permit>)

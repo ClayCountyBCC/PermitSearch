@@ -279,6 +279,7 @@ var Utilities;
         Set_Text("menuSubTitle", menuItem.subTitle);
         Show_Menu(menuItem.id);
         document.getElementById(menuItem.autofocusId).focus();
+        PermitSearch.selected_tab = menuItem.label;
     }
     Utilities.Update_Menu = Update_Menu;
     function Build_Menu_Elements(target, Menus) {

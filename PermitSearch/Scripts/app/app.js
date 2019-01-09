@@ -10,6 +10,7 @@ var PermitSearch;
     PermitSearch.permit_documents = [];
     PermitSearch.permit_holds = [];
     PermitSearch.permit_charges = [];
+    PermitSearch.selected_tab = "permit";
     PermitSearch.Menus = [
         {
             id: "nav-permitSearchOptions",
@@ -109,6 +110,7 @@ var PermitSearch;
     function Search() {
         Toggle_Loading_Search_Buttons(true);
         var newHash = new PermitSearch.LocationHash("");
+        newHash.tab = PermitSearch.selected_tab;
         location.hash = newHash.ToHash();
     }
     PermitSearch.Search = Search;
@@ -177,6 +179,7 @@ var PermitSearch;
         var path = GetPath();
         var newHash = currentHash.ToHash();
         var searchHash = "?" + newHash.substring(1);
+        console.log('hash', newHash);
         // Get the list of permits for this search
         Utilities.Get(path + "API/Search/Permit" + searchHash)
             .then(function (permits) {
