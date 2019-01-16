@@ -171,6 +171,10 @@
     <Compile Include="Models\hold.cs" />
     <Compile Include="Models\myCache.cs" />
     <Compile Include="Models\permit.cs" />
+    <Compile Include="Models\PermitPrint\AssociatedPermit.cs" />
+    <Compile Include="Models\PermitPrint\MasterPermit.cs" />
+    <Compile Include="Models\PermitPrint\PermitPrintOutstandingHolds.cs" />
+    <Compile Include="Models\PermitPrint\PrintPermitCharges.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -275,6 +279,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\tsconfig.json.old" />
