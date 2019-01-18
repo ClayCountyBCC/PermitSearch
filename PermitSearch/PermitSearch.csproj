@@ -154,6 +154,10 @@
     </Content>
     <Content Include="Global.asax" />
     <Content Include="index.html" />
+    <Content Include="Scripts\bundle.js" />
+    <Content Include="Scripts\bundle.min.js">
+      <DependentUpon>bundle.js</DependentUpon>
+    </Content>
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -243,6 +247,7 @@
     <Content Include="bower_components\promise-polyfill\LICENSE" />
     <Content Include="bower_components\promise-polyfill\package.json" />
     <Content Include="bower_components\promise-polyfill\README.md" />
+    <None Include="bundleconfig.json" />
     <None Include="compilerconfig.json" />
     <None Include="compilerconfig.json.defaults">
       <DependentUpon>compilerconfig.json</DependentUpon>

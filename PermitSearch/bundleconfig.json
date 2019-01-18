@@ -1,0 +1,18 @@
+[
+  {
+    "outputFileName": "Scripts/bundle.js",
+    "inputFiles": [
+      "bower_components/promise-polyfill/dist/polyfill.js",
+      "bower_components/fetch/fetch.js",
+      "Scripts/app/string.js",
+      "Scripts/utilities/utilities.js",
+      "Scripts/utilities/menuitem.js",
+      "Scripts/app/permit.js",
+      "Scripts/app/charge.js",
+      "Scripts/app/document.js",
+      "Scripts/app/hold.js",
+      "Scripts/app/locationhash.js",
+      "Scripts/app/app.js"
+    ]
+  }
+]

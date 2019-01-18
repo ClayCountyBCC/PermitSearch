@@ -11,6 +11,8 @@ namespace PermitSearch.Models
   {
     const int page_size = 20;
     public int permit_number { get; set; }
+    public string permit_type { get; set; } = "";
+    public int days_since_last_passed_inspection { get; set; } = 0;
     public string address { get; set; }
     public DateTime issue_date { get; set; }
     public DateTime void_date { get; set; } = DateTime.MinValue;
@@ -41,6 +43,8 @@ namespace PermitSearch.Models
       string sql = @"
         SELECT
          P.permit_number,
+         ISNULL(P.permit_type, '') permit_type,
+         P.days_since_last_passed_inspection,
          P.address,
          P.issue_date,
          P.void_date,
@@ -233,6 +237,8 @@ namespace PermitSearch.Models
       string sql = @"
         SELECT
           P.permit_number,
+          ISNULL(P.permit_type, '') permit_type,
+          P.days_since_last_passed_inspection,
           P.address,
           P.issue_date,
           P.void_date,

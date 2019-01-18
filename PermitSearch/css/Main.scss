@@ -4,39 +4,6 @@
   min-height: 100vh;
   flex-direction: column;
 }
-#searchResults article.tile.is-child.box
-{
-  display: flex;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border-radius: 0;
-  justify-content: center;
-  align-items: center;
-}
-#searchResults div.tile.is-parent.group 
-{
-  padding: 0;
-}
-
-#searchResults div.tile.is-parent
-{
-  padding-top: 0;
-  padding-bottom: 0;
-}
-.Documents 
-{
-  background-color: cornsilk;
-}
-
-.Charges
-{
-  background-color: aquamarine;
-}
-
-.Inspections
-{
-  background-color:darkkhaki;
-}
 
 #searchResults .table tr > td, #searchResults .table tr > th
 {
