@@ -5,6 +5,8 @@ var PermitSearch;
     var Permit = /** @class */ (function () {
         function Permit() {
             this.permit_number = 0;
+            this.permit_type = "";
+            this.days_since_last_passed_inspection = 0;
             this.address = "";
             this.issue_date = new Date();
             this.co_date = new Date();
