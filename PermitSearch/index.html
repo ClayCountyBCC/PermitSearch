@@ -95,6 +95,7 @@
                      max="99999999"
                      min="100000"
                      maxlength="8"
+                     step="1"
                      value=""
                      tabindex="1"
                      autofocus
@@ -357,7 +358,7 @@
                   <label class="label is-medium">Is the Permit Completed?</label>
                   <div class="control">
                     <input id="permitCompleted"
-                           class="input is-medium" type="text" disabled value="" />
+                           class="input is-medium" type="text" readonly value="" />
                   </div>
                 </div>
                 <div class="column field">
@@ -365,7 +366,7 @@
                   <div class="field is-grouped">
                     <div class="control">
                       <input id="permitFinalInspection"
-                             class="input is-medium" type="text" maxlength="3" disabled value="" />
+                             class="input is-medium" type="text" maxlength="3" value="" readonly />
                     </div>
                     <div class="control">
                       <a href=""
@@ -516,7 +517,7 @@
   <script src="Scripts/app/hold.js"></script>
   <script src="Scripts/app/LocationHash.js"></script>
   <script src="Scripts/app/app.js"></script>-->
-  <script src="Scripts/bundle.js?20190116-1912"></script>
+  <script src="Scripts/bundle.js?20190122-0944"></script>
 
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function (event)

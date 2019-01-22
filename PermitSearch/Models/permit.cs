@@ -264,7 +264,7 @@ namespace PermitSearch.Models
         LEFT OUTER JOIN owner O ON O.id = PO.owner_id";
       sb.AppendLine(sql);
       sb.AppendLine(GetSearchQuery(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page));
-      sb.AppendLine("ORDER BY P.issue_date DESC");
+      sb.AppendLine("ORDER BY ISNULL(P.issue_date, GETDATE()) DESC");
       sb.AppendLine($"OFFSET @Page ROWS FETCH NEXT { page_size.ToString() } ROWS ONLY;");
       return Constants.Get_Data<permit>("Production", sb.ToString(), dp);
     }

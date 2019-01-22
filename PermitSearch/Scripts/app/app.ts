@@ -717,7 +717,7 @@ namespace PermitSearch
     let input = document.createElement("input");
     input.classList.add("input");
     input.classList.add("is-medium");
-    input.disabled = true;
+    input.readOnly = true;
     input.type = "text";
     input.value = value;
 
@@ -757,7 +757,7 @@ namespace PermitSearch
     let input = document.createElement("input");
     input.classList.add("input");
     input.classList.add("is-medium");
-    input.disabled = true;
+    input.readOnly = true;
     input.type = "text";
     input.value = value;
 

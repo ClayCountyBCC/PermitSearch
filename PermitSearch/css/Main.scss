@@ -25,3 +25,9 @@
   top: 0;
   border-bottom: 1px dotted #333333;
 }
+
+/*input:read-only, input:-moz-read-only*/
+input[readonly]
+{
+  background-color: #eee;
+}
