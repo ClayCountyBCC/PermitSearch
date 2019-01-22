@@ -18,10 +18,10 @@ namespace PermitSearch.Models.PermitPrint
 
     }
 
-    public static AssociatedPermit GetPermit(string permitNo)
+    public static AssociatedPermit GetPermit(string permitNumber)
     {
       var param = new DynamicParameters();
-      param.Add("@permit_number", permitNo);
+      param.Add("@permit_number", permitNumber);
 
       var query = @"
           USE WATSC;

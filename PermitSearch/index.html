@@ -383,7 +383,7 @@
                   <label class="label is-medium">&nbsp;</label>
                   <div style="display: flex; justify-content: center;"
                        class="control">
-                    <button class="button is-warning is-medium">Printable Permit View</button>
+                    <button id="PermitPrintButton" class="button is-warning is-medium" value="" onclick="PermitSearch.CreatePrintPermitPreview();">Printable Permit View</button>
                   </div>
                 </div>
               </div>
@@ -522,6 +522,7 @@
     document.addEventListener("DOMContentLoaded", function (event)
     {
       PermitSearch.Start();
+
     });
   </script>
 </body>

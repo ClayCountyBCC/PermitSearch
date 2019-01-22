@@ -295,7 +295,5 @@ namespace PermitSearch.Models
 
 
 
-
-
   }
 }
