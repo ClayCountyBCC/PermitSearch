@@ -95,6 +95,7 @@
                      max="99999999"
                      min="100000"
                      maxlength="8"
+                     step="1"
                      value=""
                      tabindex="1"
                      autofocus
@@ -291,8 +292,8 @@
          id="searchResults">
 
       <table class="table is-fullwidth">
-        <thead>
-          <tr>
+        <thead id="resultsHead">
+          <!--<tr>
             <th>Permit #</th>
             <th>Completed?</th>
             <th>Issue Date</th>
@@ -302,7 +303,7 @@
                 style="width: 15%;">Unpaid Charges</th>
             <th style="width: 15%;">Documents</th>
             <th>Inspections</th>
-          </tr>
+          </tr>-->
         </thead>
         <tbody id="resultsBody"></tbody>
       </table>
@@ -357,7 +358,7 @@
                   <label class="label is-medium">Is the Permit Completed?</label>
                   <div class="control">
                     <input id="permitCompleted"
-                           class="input is-medium" type="text" disabled value="" />
+                           class="input is-medium" type="text" readonly value="" />
                   </div>
                 </div>
                 <div class="column field">
@@ -365,7 +366,7 @@
                   <div class="field is-grouped">
                     <div class="control">
                       <input id="permitFinalInspection"
-                             class="input is-medium" type="text" maxlength="3" disabled value="" />
+                             class="input is-medium" type="text" maxlength="3" value="" readonly />
                     </div>
                     <div class="control">
                       <a href=""
@@ -506,7 +507,7 @@
     </div>
 
   </footer>
-  <script src="bower_components/promise-polyfill/dist/polyfill.min.js"></script>
+  <!--<script src="bower_components/promise-polyfill/dist/polyfill.min.js"></script>
   <script src="bower_components/fetch/fetch.js"></script>
   <script src="Scripts/app/string.js"></script>
   <script src="Scripts/utilities/Utilities.js"></script>
@@ -515,8 +516,8 @@
   <script src="Scripts/app/document.js"></script>
   <script src="Scripts/app/hold.js"></script>
   <script src="Scripts/app/LocationHash.js"></script>
-  <script src="Scripts/app/app.js"></script>
-
+  <script src="Scripts/app/app.js"></script>-->
+  <script src="Scripts/bundle.js?20190122-0944"></script>
 
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function (event)

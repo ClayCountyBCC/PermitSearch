@@ -7,6 +7,8 @@ namespace PermitSearch
   interface IPermit
   {
     permit_number: number;
+    permit_type: string;
+    days_since_last_passed_inspection: number;
     address: string;
     issue_date: any;
     void_date: any;
@@ -28,6 +30,8 @@ namespace PermitSearch
   export class Permit implements IPermit
   {
     public permit_number: number = 0;
+    public permit_type: string = "";
+    public days_since_last_passed_inspection: number = 0;
     public address: string = "";
     public issue_date: any = new Date();
     public void_date: any;

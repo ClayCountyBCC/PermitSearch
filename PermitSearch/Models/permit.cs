@@ -11,6 +11,8 @@ namespace PermitSearch.Models
   {
     const int page_size = 20;
     public int permit_number { get; set; }
+    public string permit_type { get; set; } = "";
+    public int days_since_last_passed_inspection { get; set; } = 0;
     public string address { get; set; }
     public DateTime issue_date { get; set; }
     public DateTime void_date { get; set; } = DateTime.MinValue;
@@ -41,6 +43,8 @@ namespace PermitSearch.Models
       string sql = @"
         SELECT
          P.permit_number,
+         ISNULL(P.permit_type, '') permit_type,
+         P.days_since_last_passed_inspection,
          P.address,
          P.issue_date,
          P.void_date,
@@ -233,6 +237,8 @@ namespace PermitSearch.Models
       string sql = @"
         SELECT
           P.permit_number,
+          ISNULL(P.permit_type, '') permit_type,
+          P.days_since_last_passed_inspection,
           P.address,
           P.issue_date,
           P.void_date,
@@ -258,7 +264,7 @@ namespace PermitSearch.Models
         LEFT OUTER JOIN owner O ON O.id = PO.owner_id";
       sb.AppendLine(sql);
       sb.AppendLine(GetSearchQuery(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page));
-      sb.AppendLine("ORDER BY P.issue_date DESC");
+      sb.AppendLine("ORDER BY ISNULL(P.issue_date, GETDATE()) DESC");
       sb.AppendLine($"OFFSET @Page ROWS FETCH NEXT { page_size.ToString() } ROWS ONLY;");
       return Constants.Get_Data<permit>("Production", sb.ToString(), dp);
     }

@@ -297,6 +297,7 @@ namespace PermitSearch
     // clear and populate the table body with table rows.
     let currentHash = new LocationHash(location.hash.substring(1));
     let df = document.createDocumentFragment();
+    CreateResultsHeaderRow(currentHash.tab);
     for (let p of permits)
     {
       df.appendChild(CreateResultsRow(p, currentHash));
@@ -308,13 +309,56 @@ namespace PermitSearch
     results.scrollIntoView();    
   }
 
+  function CreateResultsHeaderRow(rowType: string)
+  {
+    let df = document.createDocumentFragment();
+    let tr = document.createElement("tr");
+    tr.appendChild(CreateResultsHeaderCell("Permit #", "", "7.5%"));
+    tr.appendChild(CreateResultsHeaderCell("Status", "", "10%"));
+    tr.appendChild(CreateResultsHeaderCell("Issued", "", "7.5%"));
+    tr.appendChild(CreateResultsHeaderCell("Address", "has-text-left", "30%"));
+
+    switch (rowType.toLowerCase())
+    {
+      case "contractor":
+        tr.appendChild(CreateResultsHeaderCell("Contractor Name", "", "15%"));
+        tr.appendChild(CreateResultsHeaderCell("Company", "", "15%"));
+        tr.appendChild(CreateResultsHeaderCell("Age", "has-text-right", "5%"));
+        break;
+
+      case "owner":
+        tr.appendChild(CreateResultsHeaderCell("Owner Name", "", "15%"));
+        tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%"));
+        break;
+      case "parcel":
+        tr.appendChild(CreateResultsHeaderCell("Parcel #", "", "15%"));
+        tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%"));
+        break;
+
+      case "permit":
+      case "address":
+      default:
+        // we want permit / address to be the default
+        tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%"));
+        tr.appendChild(CreateResultsHeaderCell("Documents", "", "15%"));
+    }
+    tr.appendChild(CreateResultsHeaderCell("Inspections", "", "10%"));
+
+    df.appendChild(tr);
+
+    let head = document.getElementById("resultsHead");
+    Utilities.Clear_Element(head);
+    head.appendChild(df);
+
+  }
+
   function CreateResultsRow(p: Permit, currentHash: LocationHash): HTMLTableRowElement
   {
     currentHash.permit_display = p.permit_number.toString();
     let inspectionLink = "https://public.claycountygov.com/inspectionscheduler/#permit=" + p.permit_number.toString();
     let tr = document.createElement("tr");
     tr.appendChild(CreateResultsCellLink(p.permit_number.toString().padStart(8, "0"), "", currentHash.ToHash()));
-    tr.appendChild(CreateResultsCell(p.is_closed ? "Yes" : "No"));
+    tr.appendChild(CreateResultsCell(p.is_closed ? "Closed" : "Open"));
     if (new Date(p.issue_date).getFullYear() !== 1)
     {
       tr.appendChild(CreateResultsCell(Utilities.Format_Date(p.issue_date)));
@@ -324,10 +368,44 @@ namespace PermitSearch
       tr.appendChild(CreateResultsCell("Not Issued"));
     }
     tr.appendChild(CreateResultsCell(p.address, "has-text-left"));
-    tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges - p.paid_charges), "has-text-right"));
-    tr.appendChild(CreateResultsCell(p.document_count.toString()));
+
+    switch (currentHash.tab.toLowerCase())
+    {
+      case "contractor":
+        tr.appendChild(CreateResultsCell(p.contractor_name));
+        tr.appendChild(CreateResultsCell(p.company_name));
+        tr.appendChild(CreateResultsCell(p.days_since_last_passed_inspection.toString()));
+        break;
+
+      case "owner":
+        tr.appendChild(CreateResultsCell(p.owner_name));
+        tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges - p.paid_charges), "has-text-right"));
+        break;
+      case "parcel":
+        tr.appendChild(CreateResultsCell(p.parcel_number));
+        tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges - p.paid_charges), "has-text-right"));
+        break;
+
+      case "permit":
+      case "address":
+      default:
+        tr.appendChild(CreateResultsCell(Utilities.Format_Amount(p.total_charges - p.paid_charges), "has-text-right"));
+        tr.appendChild(CreateResultsCell(p.document_count.toString()));
+    }
+
+
+
     tr.appendChild(CreateResultsCellLink(p.passed_final_inspection ? "Completed" : "View", "",  inspectionLink, true));
     return tr;
+  }
+
+  function CreateResultsHeaderCell(heading: string, className: string = "", width: string): HTMLTableHeaderCellElement
+  {
+    let th = document.createElement("th");
+    th.style.width = width;
+    if (className.length > 0) th.classList.add(className);
+    th.appendChild(document.createTextNode(heading));
+    return th;
   }
 
   function CreateResultsCell(value: string, className: string = ""): HTMLTableCellElement
@@ -538,8 +616,12 @@ namespace PermitSearch
     let permitHeading = document.getElementById("permitHeading");
     Utilities.Clear_Element(permitHeading);
     let permitNumberContainer = CreateLevelItem("PERMIT #", permit.permit_number.toString().padStart(8, "0"));
-    permitNumberContainer.style.flexGrow = "3";
+    permitNumberContainer.style.flexGrow = "2";
     permitHeading.appendChild(permitNumberContainer);
+    if (permit.permit_type.length > 0)
+    {
+      permitHeading.appendChild(CreateLevelItem("PERMIT TYPE", permit.permit_type));
+    }
     if (new Date(permit.issue_date).getFullYear() !== 1)
     {
       // permit is issued
@@ -626,7 +708,11 @@ namespace PermitSearch
     }
     else
     {
-      if (permit.contractor_number.length > 0) df.appendChild(Create_Field("Contractor Number", permit.contractor_number));
+      if (permit.contractor_number.length > 0)
+      {
+        df.appendChild(Create_Field("Contractor Number", permit.contractor_number));
+        df.appendChild(Create_Field("Days Since Last Passed Inspection", permit.days_since_last_passed_inspection.toString()));
+      }
       if (permit.contractor_name.length > 0) df.appendChild(Create_Field("Contractor Name", permit.contractor_name));
       if (permit.company_name.length > 0) df.appendChild(Create_Field("Company Name", permit.company_name));
     }
@@ -648,7 +734,7 @@ namespace PermitSearch
     let input = document.createElement("input");
     input.classList.add("input");
     input.classList.add("is-medium");
-    input.disabled = true;
+    input.readOnly = true;
     input.type = "text";
     input.value = value;
 
@@ -688,7 +774,7 @@ namespace PermitSearch
     let input = document.createElement("input");
     input.classList.add("input");
     input.classList.add("is-medium");
-    input.disabled = true;
+    input.readOnly = true;
     input.type = "text";
     input.value = value;
 
