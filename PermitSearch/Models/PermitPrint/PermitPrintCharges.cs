@@ -5,7 +5,7 @@ using System.Web;
 
 namespace PermitSearch.Models.PermitPrint
 {
-  public class PrintPermitCharges
+  public class PermitPrintCharges
   {
   }
 }

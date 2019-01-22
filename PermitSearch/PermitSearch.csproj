@@ -178,7 +178,7 @@
     <Compile Include="Models\PermitPrint\AssociatedPermit.cs" />
     <Compile Include="Models\PermitPrint\MasterPermit.cs" />
     <Compile Include="Models\PermitPrint\PermitPrintOutstandingHolds.cs" />
-    <Compile Include="Models\PermitPrint\PrintPermitCharges.cs" />
+    <Compile Include="Models\PermitPrint\PermitPrintCharges.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
