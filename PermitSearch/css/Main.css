@@ -6,6 +6,9 @@
 #searchResults .table tr > td, #searchResults .table tr > th {
   text-align: center; }
 
+nav ul li {
+  list-style-type: none; }
+
 .table tr > th {
   width: 10%;
   vertical-align: bottom; }
@@ -16,6 +19,5 @@
   top: 0;
   border-bottom: 1px dotted #333333; }
 
-/*input:read-only, input:-moz-read-only*/
 input[readonly] {
   background-color: #eee; }
