@@ -1478,6 +1478,8 @@ var PermitSearch;
             this.owner_name = "";
             this.page = "1";
             this.tab = "";
+            this.sort_on = "issuedate";
+            this.sort_direction = "D";
             if (locationHash.length > 0) {
                 var ha = locationHash.split("&");
                 for (var i = 0; i < ha.length; i++) {
@@ -1518,6 +1520,12 @@ var PermitSearch;
                             break;
                         case "tab":
                             this.tab = k[1];
+                            break;
+                        case "sortdirection":
+                            this.sort_direction = k[1];
+                            break;
+                        case "sortfield":
+                            this.sort_on = k[1];
                             break;
                     }
                 }
@@ -1573,6 +1581,8 @@ var PermitSearch;
             var h = "";
             h += LocationHash.AddToHash(this.tab, "tab");
             h += LocationHash.AddToHash(this.permit_display, "permitdisplay");
+            h += LocationHash.AddToHash(this.sort_on, "sortfield");
+            h += LocationHash.AddToHash(this.sort_direction, "sortdirection");
             switch (this.tab.toLowerCase()) {
                 case "permit":
                     h += LocationHash.AddToHash(this.permit_number, "permitnumber");
@@ -1871,32 +1881,32 @@ var PermitSearch;
     function CreateResultsHeaderRow(rowType) {
         var df = document.createDocumentFragment();
         var tr = document.createElement("tr");
-        tr.appendChild(CreateResultsHeaderCell("Permit #", "", "7.5%"));
-        tr.appendChild(CreateResultsHeaderCell("Status", "", "10%"));
-        tr.appendChild(CreateResultsHeaderCell("Issued", "", "7.5%"));
-        tr.appendChild(CreateResultsHeaderCell("Address", "has-text-left", "30%"));
+        tr.appendChild(CreateResultsHeaderCell("Permit", "", "8.5%", "permit"));
+        tr.appendChild(CreateResultsHeaderCell("Status", "", "9%", "status"));
+        tr.appendChild(CreateResultsHeaderCell("Issued", "", "7.5%", "issuedate"));
+        tr.appendChild(CreateResultsHeaderCell("Address", "has-text-left", "30%", "address"));
         switch (rowType.toLowerCase()) {
             case "contractor":
-                tr.appendChild(CreateResultsHeaderCell("Contractor Name", "", "15%"));
-                tr.appendChild(CreateResultsHeaderCell("Company", "", "15%"));
-                tr.appendChild(CreateResultsHeaderCell("Age", "has-text-right", "5%"));
+                tr.appendChild(CreateResultsHeaderCell("Contractor", "", "12%", "contractorname"));
+                tr.appendChild(CreateResultsHeaderCell("Company", "", "15%", "company"));
+                tr.appendChild(CreateResultsHeaderCell("Age", "has-text-right", "8%", "age"));
                 break;
             case "owner":
-                tr.appendChild(CreateResultsHeaderCell("Owner Name", "", "15%"));
-                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%"));
+                tr.appendChild(CreateResultsHeaderCell("Owner Name", "", "15%", "owner"));
+                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", "charges"));
                 break;
             case "parcel":
-                tr.appendChild(CreateResultsHeaderCell("Parcel #", "", "15%"));
-                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%"));
+                tr.appendChild(CreateResultsHeaderCell("Parcel #", "", "15%", "parcel"));
+                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", "charges"));
                 break;
             case "permit":
             case "address":
             default:
                 // we want permit / address to be the default
-                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%"));
-                tr.appendChild(CreateResultsHeaderCell("Documents", "", "15%"));
+                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", "charges"));
+                tr.appendChild(CreateResultsHeaderCell("Documents", "", "15%", "documents"));
         }
-        tr.appendChild(CreateResultsHeaderCell("Inspections", "", "10%"));
+        tr.appendChild(CreateResultsHeaderCell("Inspections", "", "10%", ""));
         df.appendChild(tr);
         var head = document.getElementById("resultsHead");
         Utilities.Clear_Element(head);
@@ -1938,13 +1948,33 @@ var PermitSearch;
         tr.appendChild(CreateResultsCellLink(p.passed_final_inspection ? "Completed" : "View", "", inspectionLink, true));
         return tr;
     }
-    function CreateResultsHeaderCell(heading, className, width) {
+    function CreateResultsHeaderCell(heading, className, width, field) {
         if (className === void 0) { className = ""; }
+        var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
         var th = document.createElement("th");
         th.style.width = width;
         if (className.length > 0)
             th.classList.add(className);
-        th.appendChild(document.createTextNode(heading));
+        if (field.length > 0) {
+            var link = document.createElement("a");
+            currentHash.sort_on = field;
+            currentHash.sort_direction = currentHash.sort_direction == "A" ? "D" : "A";
+            currentHash.page = "1";
+            link.href = currentHash.ToHash();
+            link.classList.add("has-text-link");
+            link.appendChild(document.createTextNode(heading));
+            var icon = document.createElement("span");
+            icon.classList.add("icon");
+            var i = document.createElement("i");
+            i.classList.add("fas");
+            i.classList.add("fa-sort");
+            icon.appendChild(i);
+            link.appendChild(icon);
+            th.appendChild(link);
+        }
+        else {
+            th.appendChild(document.createTextNode(heading));
+        }
         return th;
     }
     function CreateResultsCell(value, className) {

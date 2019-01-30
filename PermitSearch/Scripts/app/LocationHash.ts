@@ -16,6 +16,8 @@ namespace PermitSearch
     owner_name: string;
     page: string;
     tab: string;
+    sort_on: string;
+    sort_direction: string;
   }
 
   export class LocationHash implements ILocationHash
@@ -32,6 +34,8 @@ namespace PermitSearch
     public owner_name: string = "";
     public page: string = "1";
     public tab: string = "";
+    public sort_on: string = "issuedate";
+    public sort_direction: string = "D";
 
     constructor(locationHash: string)
     {
@@ -91,6 +95,13 @@ namespace PermitSearch
               this.tab = k[1];
               break;
 
+            case "sortdirection":
+              this.sort_direction = k[1];
+              break;
+
+            case "sortfield":
+              this.sort_on = k[1];
+              break;
           }
         }        
         //this.UpdateInputs();
@@ -153,7 +164,6 @@ namespace PermitSearch
 
         case "":
           break;
-
       }
     }
 
@@ -162,6 +172,8 @@ namespace PermitSearch
       let h: string = "";
       h += LocationHash.AddToHash(this.tab, "tab");
       h += LocationHash.AddToHash(this.permit_display, "permitdisplay");
+      h += LocationHash.AddToHash(this.sort_on, "sortfield");
+      h += LocationHash.AddToHash(this.sort_direction, "sortdirection");
 
       switch (this.tab.toLowerCase())
       {

@@ -15,19 +15,21 @@ namespace PermitSearch.Controllers
     [HttpGet]
     [Route("Permit")]
     public IHttpActionResult Get(
-      int permitnumber = -1, 
-      string status = "all", 
-      string contractorid = "", 
-      string contractorname = "", 
+      int permitnumber = -1,
+      string status = "all",
+      string contractorid = "",
+      string contractorname = "",
       string companyname = "",
       string streetnumber = "",
       string streetname = "",
       string owner = "",
-      string parcel = "", 
+      string parcel = "",
+      string sortfield = "issuedate",
+      string sortdirection = "D",
       int page = 1)
     {
 
-      var permitlist = permit.Search(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page);
+      var permitlist = permit.Search(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page, sortfield, sortdirection);
       return Ok(permitlist);
 
     }

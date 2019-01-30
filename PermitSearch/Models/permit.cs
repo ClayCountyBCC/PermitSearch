@@ -230,7 +230,9 @@ namespace PermitSearch.Models
       string streetname,
       string owner ,
       string parcel,
-      int page)
+      int page,
+      string sortfield,
+      string sortdirection)
     {
       var dp = GetDynamicParameters(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page);
       var sb = new StringBuilder();
@@ -264,9 +266,70 @@ namespace PermitSearch.Models
         LEFT OUTER JOIN owner O ON O.id = PO.owner_id";
       sb.AppendLine(sql);
       sb.AppendLine(GetSearchQuery(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page));
-      sb.AppendLine("ORDER BY ISNULL(P.issue_date, GETDATE()) DESC");
+      //sb.AppendLine("ORDER BY @sortfield @sortdirection");
+      sb.AppendLine(GetOrderBy(sortfield, sortdirection));
       sb.AppendLine($"OFFSET @Page ROWS FETCH NEXT { page_size.ToString() } ROWS ONLY;");
       return Constants.Get_Data<permit>("Production", sb.ToString(), dp);
+    }
+
+    public static string GetOrderBy(string column, string direction)
+    {
+      string orderby = "";
+      direction = direction == "A" ? " ASC" : " DESC"; // handle direction here, with a leading space
+
+      switch (column)
+      {
+        case "parcel":
+          orderby = "PA.parcel_number" + direction;
+          break;
+
+        case "owner":
+          orderby = "O.owner_name" + direction;
+          break;
+
+        case "company":
+          orderby = "C.company_name" + direction;
+          break;
+
+        case "contractorname":
+          orderby = "C.contractor_name" + direction;
+          break;
+
+        case "charges":
+          orderby = "total_charges - paid_charges" + direction;
+          break;
+
+        case "address":
+          orderby = "A.street_number" + direction + ", A.street_name" + direction;
+          break;
+
+        case "issuedate":
+          orderby = "ISNULL(issue_date, GETDATE())" + direction;
+          break;
+
+        case "documents":
+          orderby = "document_count" + direction;
+          break;
+
+        case "permit":
+          orderby = "permit_number" + direction;
+          break;
+
+        case "status":
+          orderby = "is_closed" + direction;
+          break;
+
+        case "age":
+          orderby = "days_since_last_passed_inspection" + direction;
+          break;
+
+        default:
+          orderby = "ISNULL(issue_date, GETDATE())" + direction;
+          break;
+      }
+
+      return "ORDER BY " + orderby;
+
     }
 
 

@@ -15,6 +15,8 @@ var PermitSearch;
             this.owner_name = "";
             this.page = "1";
             this.tab = "";
+            this.sort_on = "issuedate";
+            this.sort_direction = "D";
             if (locationHash.length > 0) {
                 var ha = locationHash.split("&");
                 for (var i = 0; i < ha.length; i++) {
@@ -55,6 +57,12 @@ var PermitSearch;
                             break;
                         case "tab":
                             this.tab = k[1];
+                            break;
+                        case "sortdirection":
+                            this.sort_direction = k[1];
+                            break;
+                        case "sortfield":
+                            this.sort_on = k[1];
                             break;
                     }
                 }
@@ -110,6 +118,8 @@ var PermitSearch;
             var h = "";
             h += LocationHash.AddToHash(this.tab, "tab");
             h += LocationHash.AddToHash(this.permit_display, "permitdisplay");
+            h += LocationHash.AddToHash(this.sort_on, "sortfield");
+            h += LocationHash.AddToHash(this.sort_direction, "sortdirection");
             switch (this.tab.toLowerCase()) {
                 case "permit":
                     h += LocationHash.AddToHash(this.permit_number, "permitnumber");
