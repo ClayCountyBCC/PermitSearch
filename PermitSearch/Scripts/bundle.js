@@ -1755,7 +1755,7 @@ var PermitSearch;
     function CreatePrintPermitPreview() {
         var path = GetPath();
         var permit_num = document.getElementById("PermitPrintButton").getAttribute("value");
-        // let permitNumber = 11802222;
+        var permitNumber = 11802222;
         var permit_number = parseInt(permit_num);
         if ((permit_number > 10000 && permit_number < 20000000 /* LOWEST PERMITNUMBER FOUND is 00010001 */) ||
             (permit_number > 89999999 && permit_number < 100000000)) {

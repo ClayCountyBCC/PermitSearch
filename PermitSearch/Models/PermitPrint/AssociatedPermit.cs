@@ -48,9 +48,9 @@ namespace PermitSearch.Models.PermitPrint
     {
 
       var permit = GetPermitRaw(permitNumber);
-      permit.permit_fees = PermitPrintCharges.GetCharges(permitNumber);
-      permit.outstanding_holds = PermitPrintCharges.GetOutstandingHolds(permitNumber);
-
+      permit.permit_fees = PermitPrintCharges.Get(permitNumber);
+      permit.outstanding_holds = PermitPrintOutstandingHolds.Get(permitNumber);
+      permit.notes = Constants.GetPermitNotes(permit.permit_number);
 
       return new AssociatedPermit();
 
@@ -118,6 +118,41 @@ namespace PermitSearch.Models.PermitPrint
 
 
 
-    
+    public List<string> GetNotes()
+    {
+      var param = new DynamicParameters();
+      param.Add("@permit_number", permit_number);
+
+      var query = @"
+        USE WATSC;
+
+        SELECT CAST(ChrgDesc + ' ' + ISNULL(UnitPrompt,'') + ' ' + CAST(UNIT AS VARCHAR(10)) AS VARCHAR(MAX)) NOTE
+        FROM bpAssocChrg AC
+        INNER JOIN bpAssocChrgType_Ref ACT ON ACT.ChrgCd = AC.ChrgCd
+        WHERE PermitNo = @permit_number
+        UNION ALL
+        SELECT distinct Note FROM (
+        select TOP 500 CAST(Note AS VARCHAR(MAX)) NOTE from bpNotes n
+        where permitno = @permit_number
+          AND INFOTYPE =  'T'
+          ORDER BY N.NoteID DESC) AS TMP;
+
+        
+        ";
+
+      try
+      {
+        var i = Constants.Get_Data<string>("Production", query, param);
+
+        return i;
+      }
+      catch (Exception ex)
+      {
+        new ErrorLog(ex, query);
+      }
+
+      return new List<string>();
+    }
+
   }
 }

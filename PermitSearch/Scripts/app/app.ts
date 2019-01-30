@@ -144,7 +144,7 @@ namespace PermitSearch
   {
     let path = GetPath();
     let permit_num = document.getElementById("PermitPrintButton").getAttribute("value");
-    // let permitNumber = 11802222;
+    let permitNumber = 11802222;
     let permit_number = parseInt(permit_num);
     if ((permit_number > 10000 && permit_number < 20000000 /* LOWEST PERMITNUMBER FOUND is 00010001 */) ||
       (permit_number > 89999999 && permit_number < 100000000))
