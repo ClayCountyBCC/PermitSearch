@@ -140,6 +140,23 @@ namespace PermitSearch
     location.hash = newHash.ToHash();
   }
 
+  export function CreatePrintPermitPreview(): void
+  {
+    let path = GetPath();
+    let permit_num = document.getElementById("PermitPrintButton").getAttribute("value");
+    let permitNumber = 11802222;
+    let permit_number = parseInt(permit_num);
+    if ((permit_number > 10000 && permit_number < 20000000 /* LOWEST PERMITNUMBER FOUND is 00010001 */) ||
+      (permit_number > 89999999 && permit_number < 100000000))
+    {
+      Utilities.Get<PrintedMasterPermit>(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
+    }
+    else
+    {
+      Utilities.Get<PrintedAssociatedPermit>(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
+    }
+  }
+
   function Toggle_Loading_Search_Buttons(disabled: boolean)
   {
     let sections = <NodeListOf<HTMLElement>>document.querySelectorAll("#views > section button");

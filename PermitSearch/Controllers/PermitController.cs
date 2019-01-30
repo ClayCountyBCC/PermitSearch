@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using PermitSearch.Models;
+using PermitSearch.Models.PermitPrint;
+
 
 /* This controller will return one specific permit when searched.
  * 
@@ -46,6 +48,19 @@ namespace PermitSearch.Controllers
       return Ok(charge.GetCharges(permitnumber));
     }
 
+    [HttpGet]
+    [Route("PrintPermit")]
+    public IHttpActionResult PrintPermit(int permit_number)
+    {
+       if(permit_number < 20000000 || permit_number > 89999999)
+       {
+        return Ok(MasterPermit.GetPermit(permit_number.ToString()));
+       }
+       else
+       {
+        return Ok(AssociatedPermit.GetPermit(permit_number.ToString()));
+       }
+    }
 
   }
 }

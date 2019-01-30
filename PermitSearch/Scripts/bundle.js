@@ -1281,6 +1281,8 @@ var PermitSearch;
         };
         Document.QueryDocuments = function (permit_number) {
             Document.ResetDocuments();
+            var permitPrintButton = document.getElementById("PermitPrintButton");
+            permitPrintButton.setAttribute("value", permit_number.toString());
             var path = PermitSearch.GetPath();
             Utilities.Get(path + "API/Permit/Documents?permitnumber=" + permit_number.toString())
                 .then(function (documents) {
@@ -1760,6 +1762,20 @@ var PermitSearch;
         location.hash = newHash.ToHash();
     }
     PermitSearch.Search = Search;
+    function CreatePrintPermitPreview() {
+        var path = GetPath();
+        var permit_num = document.getElementById("PermitPrintButton").getAttribute("value");
+        var permitNumber = 11802222;
+        var permit_number = parseInt(permit_num);
+        if ((permit_number > 10000 && permit_number < 20000000 /* LOWEST PERMITNUMBER FOUND is 00010001 */) ||
+            (permit_number > 89999999 && permit_number < 100000000)) {
+            Utilities.Get(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
+        }
+        else {
+            Utilities.Get(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
+        }
+    }
+    PermitSearch.CreatePrintPermitPreview = CreatePrintPermitPreview;
     function Toggle_Loading_Search_Buttons(disabled) {
         var sections = document.querySelectorAll("#views > section button");
         if (sections.length > 0) {
