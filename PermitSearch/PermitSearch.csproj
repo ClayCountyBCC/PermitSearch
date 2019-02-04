@@ -178,7 +178,7 @@
     <Compile Include="Models\PermitPrint\AssociatedPermit.cs" />
     <Compile Include="Models\PermitPrint\MasterPermit.cs" />
     <Compile Include="Models\PermitPrint\PermitPrintOutstandingHolds.cs" />
-    <Compile Include="Models\PermitPrint\PrintPermitCharges.cs" />
+    <Compile Include="Models\PermitPrint\PermitPrintCharges.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -284,7 +284,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Controllers\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\tsconfig.json.old" />
@@ -296,6 +295,8 @@
     <TypeScriptCompile Include="Scripts\app\app.ts" />
     <TypeScriptCompile Include="Scripts\app\charge.ts" />
     <TypeScriptCompile Include="Scripts\app\document.ts" />
+    <TypeScriptCompile Include="Scripts\app\PrintedAssociatedPermit.ts" />
+    <TypeScriptCompile Include="Scripts\app\PrintedMasterPermit.ts" />
     <TypeScriptCompile Include="Scripts\app\string.ts" />
     <TypeScriptCompile Include="Scripts\app\hold.ts" />
     <TypeScriptCompile Include="Scripts\app\LocationHash.ts" />
