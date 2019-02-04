@@ -25,7 +25,8 @@ namespace PermitSearch.Models
       param.Add("@permit_number", permit_number);
 
       var query = @"
-      
+        USE PermitSearch;
+
         SELECT 
           cashier_id, 
           charge_description, 

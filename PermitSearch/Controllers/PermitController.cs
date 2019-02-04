@@ -53,12 +53,15 @@ namespace PermitSearch.Controllers
     {
        if(permit_number < 20000000 || permit_number > 89999999)
        {
-        return Ok(MasterPermit.GetPermit(permit_number.ToString()));
+        var permit = MasterPermit.GetPermit(permit_number.ToString());
+        return Ok(permit);
        }
        else
        {
-        return Ok(AssociatedPermit.GetPermit(permit_number.ToString()));
-       }
+        var permit = AssociatedPermit.GetPermit(permit_number.ToString());
+        return Ok(permit);
+
+      }
     }
 
   }

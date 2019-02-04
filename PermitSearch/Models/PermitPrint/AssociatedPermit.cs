@@ -124,7 +124,7 @@ namespace PermitSearch.Models
         LEFT OUTER JOIN clCustomer C1 ON C1.ContractorCd = B.ContractorId
         LEFT OUTER JOIN bpPROPUSE_REF ON B.PropUseCode = bpPROPUSE_REF.UseCode 
         LEFT OUTER JOIN clCustomer ON C.ContractorCd = clCustomer.ContractorCd
-        WHERE A.PermitNo = @PermitNo;
+        WHERE A.PermitNo = @permit_number;
       
       ";
 
