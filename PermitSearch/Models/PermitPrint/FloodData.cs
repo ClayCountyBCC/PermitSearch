@@ -39,7 +39,7 @@ namespace PermitSearch.Models
           CLOMR conditional_letter_of_map_revision
         FROM bpFLOOD_ZONE F
         INNER JOIN bpBASE_PERMIT B ON B.BaseId = F.BaseId
-        WHERE BaseID = @BaseID
+        INNER JOIN bpMASTER_PERMIT M ON M.BaseId = B.BaseId AND M.PermitNo=@permit_number        
       ";
 
       try

@@ -83,7 +83,6 @@ namespace PermitSearch.Models
 
     public MasterPermit()
     {
-
     }
 
     public static MasterPermit GetPermit(string permit_number)
@@ -178,9 +177,10 @@ namespace PermitSearch.Models
 
       ";
 
-      var master_permit = Constants.Get_Data<MasterPermit>("production", query, param).FirstOrDefault();
+      MasterPermit master_permit = Constants.Get_Data<MasterPermit>("production", query, param).FirstOrDefault();
+      //var master_permit = Constants.Get_Data<MasterPermit>("production", query, param).FirstOrDefault();
 
-      if(master_permit.permit_number.Length == 0)
+      if (master_permit.permit_number.Length == 0)
       {
         
       }
@@ -197,7 +197,7 @@ namespace PermitSearch.Models
       param.Add("@permit_number", permit_number);
 
       var query = @"
-      
+        USE WATSC;
         WITH ClearanceSheets AS (
           SELECT DISTINCT ClrSht
           FROM bpBASE_PERMIT B
