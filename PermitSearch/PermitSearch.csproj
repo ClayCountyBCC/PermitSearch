@@ -176,6 +176,7 @@
     <Compile Include="Models\myCache.cs" />
     <Compile Include="Models\permit.cs" />
     <Compile Include="Models\PermitPrint\AssociatedPermit.cs" />
+    <Compile Include="Models\PermitPrint\FloodData.cs" />
     <Compile Include="Models\PermitPrint\MasterPermit.cs" />
     <Compile Include="Models\PermitPrint\PermitPrintOutstandingHolds.cs" />
     <Compile Include="Models\PermitPrint\PermitPrintCharges.cs" />

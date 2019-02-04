@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using PermitSearch.Models;
-using PermitSearch.Models.PermitPrint;
 
 
 /* This controller will return one specific permit when searched.

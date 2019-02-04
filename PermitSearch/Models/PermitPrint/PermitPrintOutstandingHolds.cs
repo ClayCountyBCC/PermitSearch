@@ -4,7 +4,7 @@ using Dapper;
 using System.Linq;
 using System.Web;
 
-namespace PermitSearch.Models.PermitPrint
+namespace PermitSearch.Models
 {
   public class PermitPrintOutstandingHolds
   {

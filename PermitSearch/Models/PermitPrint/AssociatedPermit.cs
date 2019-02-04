@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Dapper;
+using PermitSearch.Models;
 
-
-namespace PermitSearch.Models.PermitPrint
+namespace PermitSearch.Models 
 {
   public class AssociatedPermit
   {
@@ -23,9 +23,9 @@ namespace PermitSearch.Models.PermitPrint
     public string prop_use_description { get; set; } = "";
     public string project_address_complete { get; set; } = "";
     public string project_address_state { get; set; } = "";
-    public string contractor_data_line_one { get; set; } = "";
-    public string contractor_data_line_two { get; set; } = "";
-    public string contractor_data_line_three { get; set; } = "";
+    public string contractor_data_line1 { get; set; } = "";
+    public string contractor_data_line2 { get; set; } = "";
+    public string contractor_data_linee3 { get; set; } = "";
     public string general_contractor_license_number { get; set; } = "";
     public string general_contractor_name { get; set; } = "";
     public string type { get; set; } = "";
@@ -43,16 +43,18 @@ namespace PermitSearch.Models.PermitPrint
       
     }
 
-
     public static AssociatedPermit GetPermit(string permitNumber)
     {
 
       var permit = GetPermitRaw(permitNumber);
-      permit.permit_fees = PermitPrintCharges.Get(permitNumber);
-      permit.outstanding_holds = PermitPrintOutstandingHolds.Get(permitNumber);
-      permit.notes = Constants.GetPermitNotes(permit.permit_number);
+      if (permit != null)
+      {
+        permit.permit_fees = PermitPrintCharges.Get(permit.permit_number);
+        permit.outstanding_holds = PermitPrintOutstandingHolds.Get(permit.permit_number);
+        permit.notes = Models.permit.GetPermitNotes(permit.permit_number);
+      }
 
-      return new AssociatedPermit();
+      return permit;
 
     }
     public static AssociatedPermit GetPermitRaw(string permitNumber)
@@ -66,32 +68,48 @@ namespace PermitSearch.Models.PermitPrint
           SELECT 
           A.BaseID base_id,
           permit_type_string = 
-            CASE Left(A.PermitNo, 1) 
-              WHEN '2' THEN 'Electrical'
-              WHEN '3' THEN 'Plumbing'
-              WHEN '4' THEN 'Mechanical'
-              WHEN '6' THEN 'Fire'
-              WHEN '8' THEN 'Irrigation'
-            END,  
+          CASE Left(A.PermitNo, 1) 
+            WHEN '2' THEN 'Electrical'
+            WHEN '3' THEN 'Plumbing'
+            WHEN '4' THEN 'Mechanical'
+            WHEN '6' THEN 'Fire'
+            WHEN '8' THEN 'Irrigation'
+          END,  
           A.PermitNo permit_number, 
           A.safety, 
           A.SafetyCvt safety_cvt,
           A.MPermitNo master_permit_number,
           A.IssueDate issue_date, 
-          B.ParcelNo parcel_number,
+          CASE WHEN confidential = 1 THEN 'Confidential' ELSE B.ParcelNo  END parcel_number, 
           B.valuation, 
-          B.Legal legal_description, 
+          CASE WHEN confidential = 1 THEN 'Confidential' ELSE B.LEGAL END legal_description, 
 	        B.PropUseCode prop_use_code,
           ISNULL(bpPROPUSE_REF.UseDescription, '') prop_use_description,
-	        RTRIM(ISNULL(B.ProjAddrCombined,'')) + ',   ' + 
-            RTRIM(ISNULL(B.ProjCity,'')) + '  FL  ' + 
-            ISNULL(B.ProjZip,'') project_address_complete, 
-	        RTRIM(ISNULL(A.ServAddr,'')) + ',   ' + RTRIM(ISNULL(B.ProjCity,'')) + '  FL  ' + ISNULL(B.ProjZip,'') serv_address,
-	        B.OwnerName owner_name, 
-          RTRIM(ISNULL(B.OwnerStreet,'')) + '  ' + RTRIM(ISNULL(B.OwnerCity,'')) + '  ' + RTRIM(ISNULL(B.OwnerState,'')) + '  ' + RTRIM(ISNULL(B.OwnerZip,'')) owner_address, 
-	        RTRIM(ISNULL(clCustomer.CustomerName,'')) + '  *  ' + RTRIM(ISNULL(C.CompanyName,'')) contractor_data_line_one, 
-	        RTRIM(ISNULL(clCustomer.Address1,'')) + '  ' + RTRIM(ISNULL(clCustomer.Address2,'')) + ' ' + RTRIM(ISNULL(clCustomer.City,'')) + ' ' + RTRIM(ISNULL(clCustomer.State,'')) + ' ' + RTRIM(ISNULL(clCustomer.Zip,'')) contractor_data_line_two, 
-	        RTRIM(ISNULL(A.ContractorId,'')) + '   phone:' + RTRIM(ISNULL(clCustomer.Phone1,'')) + '  fax: ' + RTRIM(ISNULL(clCustomer.Fax,'')) contractor_data_line_three, 
+	        CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL'
+            ELSE RTRIM(ISNULL(B.ProjAddrCombined,'')) + ',   ' + 
+               RTRIM(ISNULL(B.ProjCity,'')) + '  FL  ' + 
+               ISNULL(B.ProjZip,'') END project_address_complete, 
+
+	        RTRIM(ISNULL(A.ServAddr,'')) + ',   ' + 
+          RTRIM(ISNULL(B.ProjCity,'')) + '  FL  ' + 
+          ISNULL(B.ProjZip,'') serv_address,
+	        CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL' 
+            ELSE B.OwnerName END owner_name, 
+          CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL' 
+            ELSE RTRIM(ISNULL(B.OwnerStreet,'')) + '  ' + 
+                   RTRIM(ISNULL(B.OwnerCity,'')) + '  ' + 
+                   RTRIM(ISNULL(B.OwnerState,'')) + '  ' + 
+                   RTRIM(ISNULL(B.OwnerZip,'')) END owner_address, 
+	        RTRIM(ISNULL(clCustomer.CustomerName,'')) + '  *  ' + 
+            RTRIM(ISNULL(C.CompanyName,'')) contractor_data_line1, 
+	        RTRIM(ISNULL(clCustomer.Address1,'')) + '  ' + 
+            RTRIM(ISNULL(clCustomer.Address2,'')) + ' ' + 
+            RTRIM(ISNULL(clCustomer.City,'')) + ' ' + 
+            RTRIM(ISNULL(clCustomer.State,'')) + ' ' + 
+            RTRIM(ISNULL(clCustomer.Zip,'')) contractor_data_line2, 
+	        RTRIM(ISNULL(A.ContractorId,'')) + ' phone:' + 
+            RTRIM(ISNULL(clCustomer.Phone1,'')) + ' fax: ' + 
+            RTRIM(ISNULL(clCustomer.Fax,'')) contractor_data_line3, 
           C1.ContractorCd general_contractor_license_number, 
           C1.CustomerName AS general_contractor_name,
 	        A.Type, 
@@ -110,49 +128,20 @@ namespace PermitSearch.Models.PermitPrint
       
       ";
 
-
-
-      return new AssociatedPermit();
-
-    }
-
-
-
-    public List<string> GetNotes()
-    {
-      var param = new DynamicParameters();
-      param.Add("@permit_number", permit_number);
-
-      var query = @"
-        USE WATSC;
-
-        SELECT CAST(ChrgDesc + ' ' + ISNULL(UnitPrompt,'') + ' ' + CAST(UNIT AS VARCHAR(10)) AS VARCHAR(MAX)) NOTE
-        FROM bpAssocChrg AC
-        INNER JOIN bpAssocChrgType_Ref ACT ON ACT.ChrgCd = AC.ChrgCd
-        WHERE PermitNo = @permit_number
-        UNION ALL
-        SELECT distinct Note FROM (
-        select TOP 500 CAST(Note AS VARCHAR(MAX)) NOTE from bpNotes n
-        where permitno = @permit_number
-          AND INFOTYPE =  'T'
-          ORDER BY N.NoteID DESC) AS TMP;
-
-        
-        ";
-
       try
       {
-        var i = Constants.Get_Data<string>("Production", query, param);
-
-        return i;
+        var permit = Constants.Get_Data<AssociatedPermit>("production", query, param).FirstOrDefault();
+        return permit;
       }
-      catch (Exception ex)
+      catch(Exception ex)
       {
         new ErrorLog(ex, query);
+        return null;
       }
 
-      return new List<string>();
     }
+
+    
 
   }
 }

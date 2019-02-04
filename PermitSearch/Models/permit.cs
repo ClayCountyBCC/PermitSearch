@@ -362,7 +362,55 @@ namespace PermitSearch.Models
       return Constants.Exec_Scalar<int>("Production", sb.ToString(), dp);
     }
 
+    public static List<string> GetPermitNotes(string permit_number)
+    {
 
+      var param = new DynamicParameters();
+      param.Add("@permit_number", permit_number);
+
+      var query = @"
+        USE WATSC;
+
+        WITH Notes AS (
+        SELECT
+          CAST(Note AS VARCHAR(MAX)) note
+        FROM bpNotes n
+        WHERE 
+          permitno = @permit_number
+          AND INFOTYPE =  'T'
+        )
+
+        SELECT 
+          CAST(ChrgDesc + ' ' + ISNULL(UnitPrompt,'') + ' ' + CAST(UNIT AS VARCHAR(10)) AS VARCHAR(MAX)) NOTE
+        FROM bpAssocChrg AC
+        INNER JOIN bpAssocChrgType_Ref ACT ON ACT.ChrgCd = AC.ChrgCd
+        WHERE PermitNo = @permit_number
+        UNION ALL
+        SELECT note
+        FROM Notes 
+        ";
+      var notes = new List<string>();
+      try
+      {
+
+        var tempNoteList = Constants.Get_Data<string>("Production", query, param);
+        var stringSeparators = new string[] { "< /br>" };
+
+        foreach (var n in tempNoteList)
+        {
+          notes.AddRange(n.Split(stringSeparators, StringSplitOptions.RemoveEmptyEntries));
+        }
+
+
+      }
+      catch (Exception ex)
+      {
+        new ErrorLog(ex, query);
+        notes = new List<string>();
+      }
+
+      return notes;
+    }
 
   }
 }

@@ -86,50 +86,5 @@ namespace PermitSearch.Models
       }
     }
 
-    public static List<string> GetPermitNotes(string permit_number)
-    {
-
-      var param = new DynamicParameters();
-      param.Add("@permit_number", permit_number);
-
-      var query = @"
-        USE WATSC;
-
-        SELECT CAST(ChrgDesc + ' ' + ISNULL(UnitPrompt,'') + ' ' + CAST(UNIT AS VARCHAR(10)) AS VARCHAR(MAX)) NOTE
-        FROM bpAssocChrg AC
-        INNER JOIN bpAssocChrgType_Ref ACT ON ACT.ChrgCd = AC.ChrgCd
-        WHERE PermitNo = @permit_number
-        UNION ALL
-        SELECT distinct Note FROM (
-        select TOP 500 CAST(Note AS VARCHAR(MAX)) NOTE from bpNotes n
-        where permitno = @permit_number
-          AND INFOTYPE =  'T'
-          ORDER BY N.NoteID DESC) AS TMP;
-
-        
-        ";
-      var notes = new List<string>();
-      try
-      {
-        
-        var tempNoteList = Constants.Get_Data<string>("Production", query, param);
-        var stringSeparators = new string[] { "< /br>" , "<p>" };
-
-        foreach (var n in tempNoteList)
-        {
-          notes.AddRange(n.Split(stringSeparators, StringSplitOptions.None));
-        }
-
-
-      }
-      catch (Exception ex)
-      {
-        new ErrorLog(ex, query);
-        notes = new List<string>();
-      }
-
-      return notes;
-    }
-
   }
 }
