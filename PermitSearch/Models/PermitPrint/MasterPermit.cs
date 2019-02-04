@@ -18,7 +18,7 @@ namespace PermitSearch.Models
     public string legal { get; set; } = "";
     public int square_footage { get; set; } = -1;
     public int stories { get; set; } = -1;
-    public int max_height { get; set; } = -1;
+    public string max_height { get; set; } = "";
     public string prop_use_code { get; set; } = "";
     public string use_description { get; set; } = "";
     public bool prop_use_co { get; set; } = false;
@@ -41,16 +41,45 @@ namespace PermitSearch.Models
     public int occupation_load { get; set; } = -1;
     public char co_closed_type { get; set; } = ' ';
 
-    public List<charge> permit_fees => charge.GetCharges(int.Parse(permit_number));
+    public List<FloodData> flood_data
+    {
+      get
+      {
+        return FloodData.Get(permit_number);
+      }
+    }
 
-    public List<string> notes => permit.GetPermitNotes(permit_number);
+    public List<charge> permit_fees
+    {
+      get
+      {
+        return charge.GetCharges(int.Parse(permit_number));
+      }
+    }
 
-    public List<string> outstanding_holds => permit.GetOutstandingHolds(permit_number);
+    public List<string> notes
+    {
+      get
+      {
+        return permit.GetPermitNotes(permit_number);
+      }
+    }
 
-    public List<string> occupancy_class => GetOccupancyClass();
+    public List<string> outstanding_holds
+    {
+      get
+      {
+        return permit.GetOutstandingHolds(permit_number);
+      }
+    }
 
-    public List<FloodData> flood_data => FloodData.Get(permit_number);
-
+    public List<string> occupancy_class
+    {
+      get
+      {
+        return GetOccupancyClass();
+      }
+    }
 
     public MasterPermit()
     {

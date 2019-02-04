@@ -10,10 +10,10 @@ namespace PermitSearch.Models
   {
     public string flood_zone_code { get; set; } = "";
     public string fema_map { get; set; } = "";
-    public bool sfha { get; set; } = false;
+    public bool special_flood_hazard_area { get; set; } = false;
     public string flood_zone_id { get; set; } = "";
     public string fema_elevation { get; set; } = "";
-    public bool CLOMR { get; set; } = false;
+    public bool conditional_letter_of_map_revision { get; set; } = false;
     
     public FloodData()
     {
@@ -44,18 +44,15 @@ namespace PermitSearch.Models
 
       try
       {
-        var fz = Constants.Get_Data<FloodData>("production", query, param);
-        if (fz != null)
-        {
-          return fz;
-        }
+        return Constants.Get_Data<FloodData>("production", query, param);
+
       }
       catch (Exception ex)
       {
         new ErrorLog(ex, query);
+        return new List<FloodData>();
       }
 
-      return new List<FloodData>();
 
     }
   }

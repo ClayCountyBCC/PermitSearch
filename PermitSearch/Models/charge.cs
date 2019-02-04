@@ -22,8 +22,11 @@ namespace PermitSearch.Models
 
     public static List<charge> GetCharges(int permit_number)
     {
-      if (permit_number <= 0) return new List<charge>();
-      
+      if (permit_number <= 0)
+      {
+        return new List<charge>();
+      }
+
       var dp = new DynamicParameters();
       dp.Add("@permit_number", permit_number);
       string sql = @"
