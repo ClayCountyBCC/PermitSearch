@@ -167,16 +167,15 @@ namespace PermitSearch.Models
             ISNULL(B.ConstrType, '') construction_type, 
             B.OccLoad occupation_load, 
             B.FireSprinkler fire_sprinkler, 
-            dbo.bpCategory_Codes.Description code_edition, 
+            CAT.Description code_edition, 
             M.CoClosedType co_closed_type
           FROM bpMASTER_PERMIT M
             INNER JOIN bpBASE_PERMIT B ON M.BaseID = B.BaseID
-            INNER JOIN bpPROPUSE_REF PR ON B.PropUseCode = PR.UseCode
+            LEFT OUTER JOIN bpPROPUSE_REF PR ON B.PropUseCode = PR.UseCode
             LEFT OUTER JOIN bpASSOC_PERMIT A ON A.BaseID = B.BaseID
             LEFT OUTER JOIN clCustomer AS C1 ON B.ContractorId = C1.ContractorCd 
-            LEFT OUTER JOIN bpPROPUSE_REF ON B.PropUseCode = bpPROPUSE_REF.UseCode 
-            LEFT OUTER JOIN bpCategory_Codes ON B.CodeEdition = bpCategory_Codes.Code AND bpCategory_Codes.Type_Code = 107 
-            LEFT OUTER JOIN bpCategory_Codes AS bpCategory_Codes_1 ON B.ConstrType = bpCategory_Codes_1.Code AND bpCategory_Codes.Type_Code = 109
+            LEFT OUTER JOIN bpCategory_Codes CAT ON B.CodeEdition = CAT.Code AND CAT.Type_Code = 107 
+            LEFT OUTER JOIN bpCategory_Codes CAT1 ON B.ConstrType = CAT1.Code AND CAT.Type_Code = 109
           WHERE M.PermitNo = @permit_number
   
 
