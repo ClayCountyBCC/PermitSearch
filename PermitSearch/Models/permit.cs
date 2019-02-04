@@ -241,7 +241,7 @@ namespace PermitSearch.Models
           P.permit_number,
           ISNULL(P.permit_type, '') permit_type,
           P.days_since_last_passed_inspection,
-          P.address,
+          ISNULL(P.address, '') address,
           P.issue_date,
           P.void_date,
           P.co_date,
