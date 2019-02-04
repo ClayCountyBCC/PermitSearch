@@ -13,7 +13,7 @@ namespace PermitSearch.Models
     public string permit_number { get; set; } = "";
     public DateTime issue_date { get; set; } = DateTime.MinValue;
     public string parcel_number { get; set; } = "";
-    public decimal valuation { get; set; }
+    public decimal valuation { get; set; } = -1;
     public string clearance_sheet { get; set; } = "";
     public string legal { get; set; } = "";
     public int square_footage { get; set; } = -1;
@@ -31,58 +31,25 @@ namespace PermitSearch.Models
     public string contractor_data_line1 { get; set; } = "";
     public string contractor_data_line2 { get; set; } = ""; 
     public string contractor_data_line3 { get; set; } = "";
-    public char set_back_type { get; set; }
-    public char set_back { get; set; }
+    public char set_back_type { get; set; } = ' ';
+    public char set_back { get; set; } = ' ';
     public string front { get; set; } = "";
     public string side { get; set; } = "";
     public string rear { get; set; } = "";
     public DateTime void_date { get; set; } = DateTime.MinValue;
     public string construction_type { get; set; } = "";
     public int occupation_load { get; set; } = -1;
-    public char co_closed_type { get; set; }
+    public char co_closed_type { get; set; } = ' ';
 
-    public List<PermitPrintCharges> permit_fees
-    {
-      get
-      {
-        return PermitPrintCharges.Get(permit_number);
-      }
+    public List<charge> permit_fees => charge.GetCharges(int.Parse(permit_number));
 
-    }
+    public List<string> notes => permit.GetPermitNotes(permit_number);
 
-    public List<PermitPrintOutstandingHolds> outstanding_holds
-    {
-      get
-      {
-        return PermitPrintOutstandingHolds.Get(permit_number);
-      }
+    public List<string> outstanding_holds => permit.GetOutstandingHolds(permit_number);
 
-    }
+    public List<string> occupancy_class => GetOccupancyClass();
 
-    public List<string> notes
-    {
-      get 
-      {
-        return permit.GetPermitNotes(permit_number);
-      }
-    } 
-
-    public List<string> occupancy_class 
-    { 
-      get 
-      {
-        return GetOccupancyClass();
-      } 
-    }
-
-    public List<FloodData> flood_data 
-    { 
-      get 
-      {
-        return FloodData.Get(permit_number);
-      } 
-      
-    }
+    public List<FloodData> flood_data => FloodData.Get(permit_number);
 
 
     public MasterPermit()
@@ -98,6 +65,7 @@ namespace PermitSearch.Models
 
     public static MasterPermit GetPermitRaw(string permit_number)
     {
+      if (permit_number.Length == 0) return new MasterPermit();
 
       var param = new DynamicParameters();
       param.Add("@permit_number", permit_number);
@@ -180,58 +148,50 @@ namespace PermitSearch.Models
   
 
       ";
-      try
-      {
-        var master_permit = Constants.Get_Data<MasterPermit>("production", query, param).First();
 
-      }
-      catch(Exception ex)
+      var master_permit = Constants.Get_Data<MasterPermit>("production", query, param).FirstOrDefault();
+
+      if(master_permit.permit_number.Length == 0)
       {
-        new ErrorLog(ex, query);
+        
       }
 
-      return null;      
+      return master_permit;
+
     }
 
     public List<string> GetOccupancyClass()
     {
+      if (permit_number.Length == 0) return new List<string>();
 
-      var param = new DynamicParameters();
+       var param = new DynamicParameters();
       param.Add("@permit_number", permit_number);
 
       var query = @"
       
-        USE WATSC;
-
         WITH ClearanceSheets AS (
           SELECT DISTINCT ClrSht
           FROM bpBASE_PERMIT B
           INNER JOIN bpMASTER_PERMIT M ON M.BaseID = B.BaseId
           WHERE M.PermitNo = @permit_number)
 
-        SELECT 
+        SELECT
           CC.Description OccClass
         FROM bpOccClass O
         INNER JOIN bpCategory_Codes CC ON O.Code = CC.Code AND CC.Type_Code = 108
-        WHERE O.Clrsht IN (SELECT Clrsht FROM ClearanceSheets)
+        INNER JOIN ClearanceSheets CS ON O.Clrsht = CS.ClrSht
       
       ";
       try
       {
-        var oc = Constants.Get_Data<string>("production", query, param);
+        return Constants.Get_Data<string>("production", query, param);
 
-        if (oc == null)
-        {
-          oc = new List<string>();
-        }
-
-        return oc;
       }
       catch (Exception ex)
       {
         new ErrorLog(ex, query);
         return new List<string>();
-        }
+      }
       
     }
   }

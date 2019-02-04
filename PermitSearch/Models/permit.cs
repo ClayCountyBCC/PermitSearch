@@ -364,6 +364,7 @@ namespace PermitSearch.Models
 
     public static List<string> GetPermitNotes(string permit_number)
     {
+      if (permit_number.Length == 0) return new List<string>();
 
       var param = new DynamicParameters();
       param.Add("@permit_number", permit_number);
@@ -412,5 +413,45 @@ namespace PermitSearch.Models
       return notes;
     }
 
+
+    public static List<string> GetOutstandingHolds(string permit_number)
+    {
+      if (permit_number.Length == 0) return new List<string>();
+
+      var param = new DynamicParameters();
+      param.Add("@permit_number", permit_number);
+
+      var query = @"
+          USE WATSC;
+
+          SELECT 
+            HR.HoldDesc 
+          FROM bpHOLD H  
+          INNER JOIN bpHOLD_REF HR ON HR.HoldCode = H.HldCd
+          WHERE PermitNo = @permit_number
+            AND H.Deleted IS NULL 
+            AND h.HldDate IS NULL
+	          AND HR.Active = 1
+  
+        ";
+
+      
+      try
+      {
+        var outstandingHolds = Constants.Get_Data<string>("Production", query, param);
+        if (outstandingHolds.Count() == 0)
+        {
+          outstandingHolds.Add("No outstanding holds");
+        }
+        return outstandingHolds;
+      }
+      catch (Exception ex)
+      {
+        new ErrorLog(ex, query);
+        var holds = new List<string>();
+        holds.Add("There was an issue getting the outstanding holds");
+        return holds;
+      }
+    }
   }
 }

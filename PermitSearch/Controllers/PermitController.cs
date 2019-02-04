@@ -56,12 +56,14 @@ namespace PermitSearch.Controllers
         var permit = MasterPermit.GetPermit(permit_number.ToString());
         return Ok(permit);
        }
-       else
+       else if(permit_number >= 20000000 && permit_number < 90000000) 
        {
         var permit = AssociatedPermit.GetPermit(permit_number.ToString());
         return Ok(permit);
 
-      }
+       }
+
+      return Ok(BadRequest("Not a valid Permit Number"));
     }
 
   }

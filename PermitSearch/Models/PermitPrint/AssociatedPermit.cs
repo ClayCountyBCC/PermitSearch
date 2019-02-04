@@ -33,30 +33,29 @@ namespace PermitSearch.Models
     public string temp_service { get; set; } = "";
     public string nal_legal { get; set; } = "";
     public DateTime void_date { get; set; } = DateTime.MinValue;
-    public List<string> notes { get; set; } = new List<string>();
-    public List<PermitPrintCharges> permit_fees { get; set; } = new List<PermitPrintCharges>();
-    public List<PermitPrintOutstandingHolds> outstanding_holds { get; set; } = new List<PermitPrintOutstandingHolds>();
 
+    public List<string> notes => permit.GetPermitNotes(permit_number);
+
+    public List<string> outstanding_holds => permit.GetOutstandingHolds(permit_number);
+
+    public List<charge> permit_fees => charge.GetCharges(int.Parse(permit_number));
 
     public AssociatedPermit()
     {
       
     }
 
-    public static AssociatedPermit GetPermit(string permitNumber)
+    public static AssociatedPermit GetPermit(string permit_number)
     {
+      if (permit_number.Length == 0) return new AssociatedPermit();
 
-      var permit = GetPermitRaw(permitNumber);
-      if (permit != null)
-      {
-        permit.permit_fees = PermitPrintCharges.Get(permit.permit_number);
-        permit.outstanding_holds = PermitPrintOutstandingHolds.Get(permit.permit_number);
-        permit.notes = Models.permit.GetPermitNotes(permit.permit_number);
-      }
+      var permit = GetPermitRaw(permit_number);
 
       return permit;
 
     }
+
+
     public static AssociatedPermit GetPermitRaw(string permitNumber)
     {
       var param = new DynamicParameters();
@@ -130,13 +129,12 @@ namespace PermitSearch.Models
 
       try
       {
-        var permit = Constants.Get_Data<AssociatedPermit>("production", query, param).FirstOrDefault();
-        return permit;
+        return Constants.Get_Data<AssociatedPermit>("production", query, param).FirstOrDefault();
       }
       catch(Exception ex)
       {
         new ErrorLog(ex, query);
-        return null;
+        return new AssociatedPermit();
       }
 
     }
