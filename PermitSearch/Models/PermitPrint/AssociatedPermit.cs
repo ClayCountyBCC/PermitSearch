@@ -81,7 +81,7 @@ namespace PermitSearch.Models
           A.IssueDate issue_date, 
           CASE WHEN confidential = 1 THEN 'Confidential' ELSE B.ParcelNo  END parcel_number, 
           B.valuation, 
-          CASE WHEN confidential = 1 THEN 'Confidential' ELSE B.LEGAL END legal_description, 
+          B.LEGAL legal_description, 
 	        B.PropUseCode prop_use_code,
           ISNULL(bpPROPUSE_REF.UseDescription, '') prop_use_description,
 	        CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL'
@@ -99,16 +99,20 @@ namespace PermitSearch.Models
                    RTRIM(ISNULL(B.OwnerCity,'')) + '  ' + 
                    RTRIM(ISNULL(B.OwnerState,'')) + '  ' + 
                    RTRIM(ISNULL(B.OwnerZip,'')) END owner_address, 
+
 	        RTRIM(ISNULL(clCustomer.CustomerName,'')) + '  *  ' + 
             RTRIM(ISNULL(C.CompanyName,'')) contractor_data_line1, 
+
 	        RTRIM(ISNULL(clCustomer.Address1,'')) + '  ' + 
             RTRIM(ISNULL(clCustomer.Address2,'')) + ' ' + 
             RTRIM(ISNULL(clCustomer.City,'')) + ' ' + 
             RTRIM(ISNULL(clCustomer.State,'')) + ' ' + 
             RTRIM(ISNULL(clCustomer.Zip,'')) contractor_data_line2, 
+
 	        RTRIM(ISNULL(A.ContractorId,'')) + ' phone:' + 
             RTRIM(ISNULL(clCustomer.Phone1,'')) + ' fax: ' + 
             RTRIM(ISNULL(clCustomer.Fax,'')) contractor_data_line3, 
+
           C1.ContractorCd general_contractor_license_number, 
           C1.CustomerName AS general_contractor_name,
 	        A.Type, 
