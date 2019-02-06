@@ -9,7 +9,6 @@ namespace PermitSearch.Models
 {
   public class AssociatedPermit
   {
-    public int base_id { get; set; } = -1;
     public string permit_number { get; set; } = "";
     public string master_permit_number { get; set; } = "";
     public string permit_type_string { get; set; } = "";
@@ -25,7 +24,7 @@ namespace PermitSearch.Models
     public string project_address_state { get; set; } = "";
     public string contractor_data_line1 { get; set; } = "";
     public string contractor_data_line2 { get; set; } = "";
-    public string contractor_data_linee3 { get; set; } = "";
+    public string contractor_data_line3 { get; set; } = "";
     public string general_contractor_license_number { get; set; } = "";
     public string general_contractor_name { get; set; } = "";
     public string type { get; set; } = "";
@@ -65,70 +64,65 @@ namespace PermitSearch.Models
           USE WATSC;
 
           SELECT 
-          A.BaseID base_id,
-          permit_type_string = 
-          CASE Left(A.PermitNo, 1) 
-            WHEN '2' THEN 'Electrical'
-            WHEN '3' THEN 'Plumbing'
-            WHEN '4' THEN 'Mechanical'
-            WHEN '6' THEN 'Fire'
-            WHEN '8' THEN 'Irrigation'
-          END,  
-          A.PermitNo permit_number, 
-          A.safety, 
-          A.SafetyCvt safety_cvt,
-          A.MPermitNo master_permit_number,
-          A.IssueDate issue_date, 
-          CASE WHEN confidential = 1 THEN 'Confidential' ELSE B.ParcelNo  END parcel_number, 
-          B.valuation, 
-          B.LEGAL legal_description, 
-	        B.PropUseCode prop_use_code,
-          ISNULL(bpPROPUSE_REF.UseDescription, '') prop_use_description,
-	        CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL'
+            permit_type_string = 
+            CASE Left(A.PermitNo, 1) 
+              WHEN '2' THEN 'Electrical'
+              WHEN '3' THEN 'Plumbing'
+              WHEN '4' THEN 'Mechanical'
+              WHEN '6' THEN 'Fire'
+              WHEN '8' THEN 'Irrigation'
+            END,  
+            A.PermitNo permit_number, 
+            A.safety, 
+            A.SafetyCvt safety_cvt,
+            A.MPermitNo master_permit_number,
+            A.IssueDate issue_date, 
+            CASE WHEN confidential = 1 THEN 'Confidential' ELSE B.ParcelNo  END parcel_number, 
+            B.valuation, 
+            B.LEGAL legal_description, 
+	          B.PropUseCode prop_use_code,
+            ISNULL(bpPROPUSE_REF.UseDescription, '') prop_use_description,
+	          CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL'
             ELSE RTRIM(ISNULL(B.ProjAddrCombined,'')) + ',   ' + 
-               RTRIM(ISNULL(B.ProjCity,'')) + '  FL  ' + 
-               ISNULL(B.ProjZip,'') END project_address_complete, 
+                 RTRIM(ISNULL(B.ProjCity,'')) + '  FL  ' + 
+                 ISNULL(B.ProjZip,'') END project_address_complete, 
 
-	        RTRIM(ISNULL(A.ServAddr,'')) + ',   ' + 
-          RTRIM(ISNULL(B.ProjCity,'')) + '  FL  ' + 
-          ISNULL(B.ProjZip,'') serv_address,
-	        CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL' 
-            ELSE B.OwnerName END owner_name, 
-          CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL' 
-            ELSE RTRIM(ISNULL(B.OwnerStreet,'')) + '  ' + 
-                   RTRIM(ISNULL(B.OwnerCity,'')) + '  ' + 
-                   RTRIM(ISNULL(B.OwnerState,'')) + '  ' + 
-                   RTRIM(ISNULL(B.OwnerZip,'')) END owner_address, 
+	          RTRIM(ISNULL(A.ServAddr,'')) + ',   ' + 
+            RTRIM(ISNULL(B.ProjCity,'')) + '  FL  ' + 
+            ISNULL(B.ProjZip,'') serv_address,
+	          CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL' 
+              ELSE B.OwnerName END owner_name, 
+            CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL' 
+              ELSE RTRIM(ISNULL(B.OwnerStreet,'')) + '  ' + 
+                     RTRIM(ISNULL(B.OwnerCity,'')) + '  ' + 
+                     RTRIM(ISNULL(B.OwnerState,'')) + '  ' + 
+                     RTRIM(ISNULL(B.OwnerZip,'')) END owner_address, 
+	          RTRIM(ISNULL(clCustomer.CustomerName,'')) + '  *  ' + 
+              RTRIM(ISNULL(C.CompanyName,'')) contractor_data_line1, 
+	          RTRIM(ISNULL(clCustomer.Address1,'')) + '  ' + 
+              RTRIM(ISNULL(clCustomer.Address2,'')) + ' ' + 
+              RTRIM(ISNULL(clCustomer.City,'')) + ' ' + 
+              RTRIM(ISNULL(clCustomer.State,'')) + ' ' + 
+              RTRIM(ISNULL(clCustomer.Zip,'')) contractor_data_line2, 
+	          RTRIM(ISNULL(A.ContractorId,'')) + ' phone:' + 
+              RTRIM(ISNULL(clCustomer.Phone1,'')) + ' fax: ' + 
+              RTRIM(ISNULL(clCustomer.Fax,'')) contractor_data_line3, 
+            C1.ContractorCd general_contractor_license_number, 
+            C1.CustomerName AS general_contractor_name,
+	          A.Type, 
+            A.PowerCo power_company, 
+            A.TempSrv temporary_service, 
+            apNAL.Lgl as nal_legal,
+            A.VoidDate void_date
+          FROM  bpASSOC_PERMIT A
+          LEFT OUTER JOIN clContractor C ON C.ContractorCd = A.ContractorId
+          LEFT OUTER JOIN bpBASE_PERMIT B ON A.BaseID = B.BaseID   
+          LEFT OUTER JOIN apNAL ON apNAL.Parcel = B.ParcelNo
+          LEFT OUTER JOIN clCustomer C1 ON C1.ContractorCd = B.ContractorId
+          LEFT OUTER JOIN bpPROPUSE_REF ON B.PropUseCode = bpPROPUSE_REF.UseCode 
+          LEFT OUTER JOIN clCustomer ON C.ContractorCd = clCustomer.ContractorCd
+          WHERE A.PermitNo = @permit_number;
 
-	        RTRIM(ISNULL(clCustomer.CustomerName,'')) + '  *  ' + 
-            RTRIM(ISNULL(C.CompanyName,'')) contractor_data_line1, 
-
-	        RTRIM(ISNULL(clCustomer.Address1,'')) + '  ' + 
-            RTRIM(ISNULL(clCustomer.Address2,'')) + ' ' + 
-            RTRIM(ISNULL(clCustomer.City,'')) + ' ' + 
-            RTRIM(ISNULL(clCustomer.State,'')) + ' ' + 
-            RTRIM(ISNULL(clCustomer.Zip,'')) contractor_data_line2, 
-
-	        RTRIM(ISNULL(A.ContractorId,'')) + ' phone:' + 
-            RTRIM(ISNULL(clCustomer.Phone1,'')) + ' fax: ' + 
-            RTRIM(ISNULL(clCustomer.Fax,'')) contractor_data_line3, 
-
-          C1.ContractorCd general_contractor_license_number, 
-          C1.CustomerName AS general_contractor_name,
-	        A.Type, 
-          A.PowerCo power_company, 
-          A.TempSrv temporary_service, 
-          apNAL.Lgl as nal_legal,
-          A.VoidDate void_date
-        FROM  bpASSOC_PERMIT A
-        LEFT OUTER JOIN clContractor C ON C.ContractorCd = A.ContractorId
-        LEFT OUTER JOIN bpBASE_PERMIT B ON A.BaseID = B.BaseID   
-        LEFT OUTER JOIN apNAL ON apNAL.Parcel = B.ParcelNo
-        LEFT OUTER JOIN clCustomer C1 ON C1.ContractorCd = B.ContractorId
-        LEFT OUTER JOIN bpPROPUSE_REF ON B.PropUseCode = bpPROPUSE_REF.UseCode 
-        LEFT OUTER JOIN clCustomer ON C.ContractorCd = clCustomer.ContractorCd
-        WHERE A.PermitNo = @permit_number;
-      
       ";
 
       try

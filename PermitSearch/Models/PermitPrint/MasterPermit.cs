@@ -8,7 +8,6 @@ namespace PermitSearch.Models
 {
   public class MasterPermit
   {
-    public int base_id { get; set; } = -1;
     public string permit_type_label { get; set; } = "";
     public string permit_number { get; set; } = "";
     public DateTime issue_date { get; set; } = DateTime.MinValue;
@@ -20,7 +19,7 @@ namespace PermitSearch.Models
     public int stories { get; set; } = -1;
     public string max_height { get; set; } = "";
     public string prop_use_code { get; set; } = "";
-    public string use_description { get; set; } = "";
+    public string prop_use_description { get; set; } = "";
     public bool prop_use_co { get; set; } = false;
     public DateTime temp_co_date { get; set; } = DateTime.MinValue;
     public int temp_co_date_days { get; set; } = -1;
@@ -31,25 +30,49 @@ namespace PermitSearch.Models
     public string contractor_data_line1 { get; set; } = "";
     public string contractor_data_line2 { get; set; } = ""; 
     public string contractor_data_line3 { get; set; } = "";
-    public char set_back_type { get; set; } = ' ';
-    public char set_back { get; set; } = ' ';
+    public string set_back_type { get; set; } = "";
+    public string set_back { get; set; } = "";
     public string front { get; set; } = "";
     public string side { get; set; } = "";
     public string rear { get; set; } = "";
     public DateTime void_date { get; set; } = DateTime.MinValue;
     public string construction_type { get; set; } = "";
     public int occupation_load { get; set; } = -1;
-    public char co_closed_type { get; set; } = ' ';
+    public string co_closed_type { get; set; } = "";
 
     public List<FloodData> flood_data => FloodData.Get(permit_number);
 
-    public List<charge> permit_fees => charge.GetCharges(int.Parse(permit_number));
+    public List<charge> permit_fees
+    {
+      get
+      {
+        return charge.GetCharges(int.Parse(permit_number));
+      }
+    }
 
-    public List<string> notes => permit.GetPermitNotes(permit_number);
+    public List<string> notes
+    {
+      get
+      {
+        return permit.GetPermitNotes(permit_number);
+      }
+    }
 
-    public List<string> outstanding_holds => permit.GetOutstandingHolds(permit_number);
+    public List<string> outstanding_holds
+    {
+      get
+      {
+        return permit.GetOutstandingHolds(permit_number);
+      }
+    }
 
-    public List<string> occupancy_class => GetOccupancyClass();
+    public List<string> occupancy_class
+    {
+      get
+      {
+        return GetOccupancyClass();
+      }
+    }
 
     public MasterPermit()
     {
@@ -72,7 +95,6 @@ namespace PermitSearch.Models
         USE WATSC;
 
         SELECT DISTINCT 
-            B.BaseId base_id,
             permit_type_label = 
             CASE Left(@permit_number, 1) 
               WHEN '1' THEN 'Building'
@@ -94,7 +116,7 @@ namespace PermitSearch.Models
             ISNULL(stories, 0) stories,
             B.MaxHeight max_height,
             B.PropUseCode prop_use_code,
-            PR.UseDescription use_description, 
+            ISNULL(M.PropUseDesc,PR.UseDescription ) prop_use_description, 
             PR.CO prop_use_co, 
             M.TempCoDate temp_co_date, 
             ISNULL(M.TempCoDateDays, -1) temp_co_date_days, 
@@ -130,7 +152,7 @@ namespace PermitSearch.Models
             B.side, 
             B.rear, 
             M.VoidDate, 
-            ISNULL(B.ConstrType, '') construction_type, 
+            B.ConstrType construction_type, 
             B.OccLoad occupation_load, 
             B.FireSprinkler fire_sprinkler, 
             CAT.Description code_edition, 
@@ -152,7 +174,7 @@ namespace PermitSearch.Models
 
       if (master_permit.permit_number.Length == 0)
       {
-        
+        return new MasterPermit();
       }
 
       return master_permit;

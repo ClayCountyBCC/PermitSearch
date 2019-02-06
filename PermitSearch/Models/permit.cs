@@ -365,10 +365,40 @@ namespace PermitSearch.Models
     public static List<string> GetPermitNotes(string permit_number)
     {
       if (permit_number.Length == 0) return new List<string>();
+      var permit_type = "";
+      switch (permit_number[0])
+      {
+
+        case '1':
+        case '0':
+        case '9':
+          permit_type = "BL";
+          break;
+        case '2':
+          permit_type = "EL";
+          break;
+        case '3':
+          permit_type = "PL";
+          break;
+        case '4':
+          permit_type = "ME";
+          break;
+        case '6':
+          permit_type = "FR";
+          break;
+        case '7':
+          permit_type = "MH";
+          break;
+        case '8':
+          permit_type = "IR";
+          break;
+
+      }
+
 
       var param = new DynamicParameters();
       param.Add("@permit_number", permit_number);
-
+      param.Add("@permit_type", permit_type);
       var query = @"
         USE WATSC;
 
@@ -382,13 +412,17 @@ namespace PermitSearch.Models
         )
 
         SELECT 
-          CAST(ChrgDesc + ' ' + ISNULL(UnitPrompt,'') + ' ' + CAST(UNIT AS VARCHAR(10)) AS VARCHAR(MAX)) NOTE
+          CAST(ChrgDesc + ' ' + 
+          ISNULL(UnitPrompt,'') + ' ' + 
+          CAST(UNIT AS VARCHAR(10)) AS VARCHAR(MAX)) + ' ' + 
+          CAST(DESCRIPTION AS VARCHAR(100)) NOTE
         FROM bpAssocChrg AC
-        INNER JOIN bpAssocChrgType_Ref ACT ON ACT.ChrgCd = AC.ChrgCd
+        INNER JOIN bpAssocChrgType_Ref ACT ON ACT.ChrgCd = AC.ChrgCd AND PermitType = @permit_type
         WHERE PermitNo = @permit_number
         UNION ALL
-        SELECT note
-        FROM Notes 
+        SELECT Note
+        FROM Notes N
+
         ";
       var notes = new List<string>();
       try
