@@ -36,55 +36,31 @@ namespace PermitSearch.Models
     public string side { get; set; } = "";
     public string rear { get; set; } = "";
     public DateTime void_date { get; set; } = DateTime.MinValue;
-    public string construction_type { get; set; } = "";
-    public int occupation_load { get; set; } = -1;
     public string co_closed_type { get; set; } = "";
 
     public List<FloodData> flood_data => FloodData.Get(permit_number);
 
-    public List<charge> permit_fees
-    {
-      get
-      {
-        return charge.GetCharges(int.Parse(permit_number));
-      }
-    }
+    public List<charge> permit_fees => charge.GetCharges(int.Parse(permit_number));
 
-    public List<string> notes
-    {
-      get
-      {
-        return permit.GetPermitNotes(permit_number);
-      }
-    }
+    public List<string> notes => permit.GetPermitNotes(permit_number);
 
     public List<string> outstanding_holds
     {
       get
       {
-        return permit.GetOutstandingHolds(permit_number);
+        var holds = hold.GetHolds(int.Parse(permit_number));
+        if (holds.Count() == 0) holds.Add("No outstanding holds");
+        return holds;
       }
     }
 
-    public List<string> occupancy_class
-    {
-      get
-      {
-        return GetOccupancyClass();
-      }
-    }
+    public List<string> occupancy_class => GetOccupancyClass();
 
     public MasterPermit()
     {
     }
 
     public static MasterPermit GetPermit(string permit_number)
-    {
-      var permit = GetPermitRaw(permit_number);
-      return permit;
-    }
-
-    public static MasterPermit GetPermitRaw(string permit_number)
     {
       if (permit_number.Length == 0) return new MasterPermit();
 
@@ -108,7 +84,7 @@ namespace PermitSearch.Models
             END,
             M.PermitNo permit_number,
             M.IssueDate issue_date, 
-            CASE WHEN confidential = 1 THEN 'Confidential' ELSE B.ParcelNo  END parcel_number, 
+            B.ParcelNo parcel_number, 
             B.valuation, 
             B.ClrSht clearance_sheet, 
             B.legal, 
@@ -152,21 +128,14 @@ namespace PermitSearch.Models
             B.side, 
             B.rear, 
             M.VoidDate, 
-            B.ConstrType construction_type, 
-            B.OccLoad occupation_load, 
-            B.FireSprinkler fire_sprinkler, 
-            CAT.Description code_edition, 
             M.CoClosedType co_closed_type
           FROM bpMASTER_PERMIT M
             INNER JOIN bpBASE_PERMIT B ON M.BaseID = B.BaseID
             LEFT OUTER JOIN bpPROPUSE_REF PR ON B.PropUseCode = PR.UseCode
             LEFT OUTER JOIN bpASSOC_PERMIT A ON A.BaseID = B.BaseID
             LEFT OUTER JOIN clCustomer AS C1 ON B.ContractorId = C1.ContractorCd 
-            LEFT OUTER JOIN bpCategory_Codes CAT ON B.CodeEdition = CAT.Code AND CAT.Type_Code = 107 
-            LEFT OUTER JOIN bpCategory_Codes CAT1 ON B.ConstrType = CAT1.Code AND CAT.Type_Code = 109
-          WHERE M.PermitNo = @permit_number
-  
-
+          WHERE 
+            M.PermitNo = @permit_number
       ";
 
       MasterPermit master_permit = Constants.Get_Data<MasterPermit>("production", query, param).FirstOrDefault();
@@ -189,24 +158,51 @@ namespace PermitSearch.Models
       param.Add("@permit_number", permit_number);
 
       var query = @"
+        DECLARE @permit_number VARCHAR(8) = '11802598';
+
         USE WATSC;
         WITH ClearanceSheets AS (
-          SELECT DISTINCT ClrSht
+          SELECT DISTINCT ClrSht, CodeEdition, OccLoad, ConstrType, FireSprinkler
           FROM bpBASE_PERMIT B
           INNER JOIN bpMASTER_PERMIT M ON M.BaseID = B.BaseId
-          WHERE M.PermitNo = @permit_number)
-
+          WHERE M.PermitNo = @permit_number
+        ), BasicData AS (
         SELECT
+          0 ord, 
+          CC.Description OccClass
+        FROM bpCategory_Codes CC 
+        INNER JOIN ClearanceSheets CS ON CS.CodeEdition = CC.Code AND CC.Type_Code = 107
+        UNION
+        SELECT
+          1, 
           CC.Description OccClass
         FROM bpOccClass O
         INNER JOIN bpCategory_Codes CC ON O.Code = CC.Code AND CC.Type_Code = 108
         INNER JOIN ClearanceSheets CS ON O.Clrsht = CS.ClrSht
-      
-      ";
+        UNION
+        SELECT
+          3, 
+          'Occupancy Load: ' + CAST(OccLoad AS VARCHAR(5))
+        FROM ClearanceSheets
+        UNION
+        SELECT 
+          4, 
+          'Fire Sprinklers Required'
+        FROM ClearanceSheets
+        WHERE FireSprinkler = 1
+        UNION
+        SELECT
+          2, 
+          ConstrType
+        FROM ClearanceSheets
+        )
+        SELECT
+          OccClass
+        FROM BasicData
+        ORDER BY ord ASC";
       try
       {
         return Constants.Get_Data<string>("production", query, param);
-
       }
       catch (Exception ex)
       {

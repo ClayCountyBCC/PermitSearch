@@ -17,7 +17,7 @@ namespace PermitSearch.Models
     public DateTime issue_date { get; set; } = DateTime.MinValue;
     public string parcel_number { get; set; } = "";
     public decimal valuation { get; set; } = 0;
-    public string legal_description { get; set; } = "";
+    public string legal { get; set; } = "";
     public string prop_use_code { get; set; } = "";
     public string prop_use_description { get; set; } = "";
     public string project_address_complete { get; set; } = "";
@@ -35,7 +35,15 @@ namespace PermitSearch.Models
 
     public List<string> notes => permit.GetPermitNotes(permit_number);
 
-    public List<string> outstanding_holds => permit.GetOutstandingHolds(permit_number);
+    public List<string> outstanding_holds
+    {
+      get
+      {
+        var holds = hold.GetHolds(int.Parse(permit_number));
+        if (holds.Count() == 0) holds.Add("No outstanding holds");
+        return holds;
+      }
+    }
 
     public List<charge> permit_fees => charge.GetCharges(int.Parse(permit_number));
 
@@ -44,18 +52,7 @@ namespace PermitSearch.Models
       
     }
 
-    public static AssociatedPermit GetPermit(string permit_number)
-    {
-      if (permit_number.Length == 0) return new AssociatedPermit();
-
-      var permit = GetPermitRaw(permit_number);
-
-      return permit;
-
-    }
-
-
-    public static AssociatedPermit GetPermitRaw(string permitNumber)
+    public static AssociatedPermit GetPermit(string permitNumber)
     {
       var param = new DynamicParameters();
       param.Add("@permit_number", permitNumber);
@@ -77,9 +74,9 @@ namespace PermitSearch.Models
             A.SafetyCvt safety_cvt,
             A.MPermitNo master_permit_number,
             A.IssueDate issue_date, 
-            CASE WHEN confidential = 1 THEN 'Confidential' ELSE B.ParcelNo  END parcel_number, 
+            B.ParcelNo parcel_number, 
             B.valuation, 
-            B.LEGAL legal_description, 
+            B.LEGAL legal, 
 	          B.PropUseCode prop_use_code,
             ISNULL(bpPROPUSE_REF.UseDescription, '') prop_use_description,
 	          CASE WHEN B.Confidential = 1 THEN 'CONFIDENTIAL'

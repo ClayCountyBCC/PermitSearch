@@ -420,7 +420,8 @@ namespace PermitSearch.Models
         INNER JOIN bpAssocChrgType_Ref ACT ON ACT.ChrgCd = AC.ChrgCd AND PermitType = @permit_type
         WHERE PermitNo = @permit_number
         UNION ALL
-        SELECT Note
+        SELECT DISTINCT
+          Note
         FROM Notes N
 
         ";
@@ -448,44 +449,45 @@ namespace PermitSearch.Models
     }
 
 
-    public static List<string> GetOutstandingHolds(string permit_number)
-    {
-      if (permit_number.Length == 0) return new List<string>();
+    //public static List<string> GetOutstandingHolds(string permit_number)
+    //{
+    //  if (permit_number.Length == 0) return new List<string>();
 
-      var param = new DynamicParameters();
-      param.Add("@permit_number", permit_number);
+    //  var param = new DynamicParameters();
+    //  param.Add("@permit_number", permit_number);
 
-      var query = @"
-          USE WATSC;
+    //  var query = @"
+    //      USE WATSC;
 
-          SELECT 
-            HR.HoldDesc 
-          FROM bpHOLD H  
-          INNER JOIN bpHOLD_REF HR ON HR.HoldCode = H.HldCd
-          WHERE PermitNo = @permit_number
-            AND H.Deleted IS NULL 
-            AND h.HldDate IS NULL
-	          AND HR.Active = 1
+    //      SELECT 
+    //        HR.HoldDesc 
+    //      FROM bpHOLD H  
+    //      INNER JOIN bpHOLD_REF HR ON HR.HoldCode = H.HldCd
+    //      WHERE PermitNo = @permit_number
+    //        AND H.Deleted IS NULL 
+    //        AND h.HldDate IS NULL
+	   //       AND HR.Active = 1
   
-        ";
+    //    ";
 
       
-      try
-      {
-        var outstandingHolds = Constants.Get_Data<string>("Production", query, param);
-        if (outstandingHolds.Count() == 0)
-        {
-          outstandingHolds.Add("No outstanding holds");
-        }
-        return outstandingHolds;
-      }
-      catch (Exception ex)
-      {
-        new ErrorLog(ex, query);
-        var holds = new List<string>();
-        holds.Add("There was an issue getting the outstanding holds");
-        return holds;
-      }
-    }
+    //  try
+    //  {
+    //    var outstandingHolds = Constants.Get_Data<string>("Production", query, param);
+    //    if (outstandingHolds.Count() == 0)
+    //    {
+    //      outstandingHolds.Add("No outstanding holds");
+    //    }
+    //    return outstandingHolds;
+    //  }
+    //  catch (Exception ex)
+    //  {
+    //    new ErrorLog(ex, query);
+    //    var holds = new List<string>();
+    //    holds.Add("There was an issue getting the outstanding holds");
+    //    return holds;
+    //  }
+    //}
+
   }
 }
