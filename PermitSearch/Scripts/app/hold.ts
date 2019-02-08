@@ -29,7 +29,7 @@ namespace PermitSearch
           }
           else
           {
-            Hold.CreateDocumentsTable(holds);
+            Hold.CreateDocumentsTable(holds, Hold.holds_container);
           }
 
         }, function (e)
@@ -45,14 +45,14 @@ namespace PermitSearch
       PermitSearch.CreateMessageRow(Hold.holds_container, 4, "Loading Holds...")
     }
 
-    static CreateDocumentsTable(holds: Array<Hold>): void
+    static CreateDocumentsTable(holds: Array<Hold>, container: string): void
     {
       let df = document.createDocumentFragment();
       for (let h of holds)
       {
         df.appendChild(Hold.CreateRow(h));
       }
-      let tbody = (<HTMLTableSectionElement>document.getElementById(Hold.holds_container));
+      let tbody = (<HTMLTableSectionElement>document.getElementById(container));
       Utilities.Clear_Element(tbody);
       tbody.appendChild(df);
     }

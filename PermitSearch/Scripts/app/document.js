@@ -16,8 +16,6 @@ var PermitSearch;
         };
         Document.QueryDocuments = function (permit_number) {
             Document.ResetDocuments();
-            var permitPrintButton = document.getElementById("PermitPrintButton");
-            permitPrintButton.setAttribute("value", permit_number.toString());
             var path = PermitSearch.GetPath();
             Utilities.Get(path + "API/Permit/Documents?permitnumber=" + permit_number.toString())
                 .then(function (documents) {

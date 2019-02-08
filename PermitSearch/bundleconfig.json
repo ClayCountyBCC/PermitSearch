@@ -7,6 +7,8 @@
       "Scripts/app/string.js",
       "Scripts/utilities/utilities.js",
       "Scripts/utilities/menuitem.js",
+      "Scripts/app/MasterPermit.js",
+      "Scripts/app/AssociatedPermit.js",
       "Scripts/app/permit.js",
       "Scripts/app/charge.js",
       "Scripts/app/document.js",

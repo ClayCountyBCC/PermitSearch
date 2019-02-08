@@ -35,8 +35,6 @@ namespace PermitSearch
     public static QueryDocuments(permit_number: number): void
     {
       Document.ResetDocuments();
-      let permitPrintButton = document.getElementById("PermitPrintButton");
-      permitPrintButton.setAttribute("value", permit_number.toString());
       let path = PermitSearch.GetPath();
       Utilities.Get<Array<Document>>(path + "API/Permit/Documents?permitnumber=" + permit_number.toString())
         .then(function (documents: Array<Document>)

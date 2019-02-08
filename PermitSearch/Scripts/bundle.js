@@ -1138,6 +1138,54 @@ var Utilities;
     Utilities.MenuItem = MenuItem;
 })(Utilities || (Utilities = {}));
 //# sourceMappingURL=menuitem.js.map
+var PermitSearch;
+(function (PermitSearch) {
+    "use strict";
+    var MasterPermit = /** @class */ (function () {
+        function MasterPermit() {
+        }
+        MasterPermit.Get = function (permit_number) {
+            var path = PermitSearch.GetPath();
+            Utilities.Get(path + "API/Permit/PrintPermit?permit_number=" + permit_number)
+                .then(function (permit) {
+                console.log("master permit", permit);
+                PermitSearch.LoadMasterPermit(permit);
+            }, function (e) {
+                console.log('error getting master permit ' + permit_number, e);
+            });
+        };
+        return MasterPermit;
+    }());
+    PermitSearch.MasterPermit = MasterPermit;
+})(PermitSearch || (PermitSearch = {}));
+//# sourceMappingURL=MasterPermit.js.map
+var PermitSearch;
+(function (PermitSearch) {
+    "use strict";
+    var AssociatedPermit = /** @class */ (function () {
+        function AssociatedPermit() {
+        }
+        AssociatedPermit.Get = function (permit_number) {
+            var path = PermitSearch.GetPath();
+            Utilities.Get(path + "API/Permit/PrintPermit?permit_number=" + permit_number)
+                .then(function (permit) {
+                console.log("assoc permit", permit);
+                PermitSearch.LoadAssocPermit(permit);
+            }, function (e) {
+                console.log('error getting assoc permit ' + permit_number, e);
+            });
+        };
+        return AssociatedPermit;
+    }());
+    PermitSearch.AssociatedPermit = AssociatedPermit;
+})(PermitSearch || (PermitSearch = {}));
+//public string general_contractor_license_number { get; set; } = "";
+//public string general_contractor_name { get; set; } = "";
+//public DateTime void_date { get; set; } = DateTime.MinValue;
+//public List < string > notes => permit.GetPermitNotes(permit_number);
+//public List < hold > outstanding_holds
+//public List < charge > permit_fees => charge.GetCharges(int.Parse(permit_number));
+//# sourceMappingURL=AssociatedPermit.js.map
 /// <reference path="app.ts" />
 var PermitSearch;
 (function (PermitSearch) {
@@ -1193,19 +1241,29 @@ var PermitSearch;
                     PermitSearch.CreateMessageRow(Charge.charges_container, 4, "No charges were found for this permit.");
                 }
                 else {
-                    Charge.CreateTable(charges);
+                    Charge.CreateTable(charges, Charge.charges_container);
                 }
             }, function (e) {
                 console.log('error getting charges', e);
             });
         };
-        Charge.CreateTable = function (charges) {
+        Charge.CreateTable = function (charges, container) {
             var df = document.createDocumentFragment();
             for (var _i = 0, charges_1 = charges; _i < charges_1.length; _i++) {
                 var c = charges_1[_i];
                 df.appendChild(Charge.CreateRow(c));
             }
-            var tbody = document.getElementById(Charge.charges_container);
+            var tbody = document.getElementById(container);
+            Utilities.Clear_Element(tbody);
+            tbody.appendChild(df);
+        };
+        Charge.CreatePrintableViewTable = function (charges, container) {
+            var df = document.createDocumentFragment();
+            for (var _i = 0, charges_2 = charges; _i < charges_2.length; _i++) {
+                var c = charges_2[_i];
+                df.appendChild(Charge.CreatePrintablePermitRow(c));
+            }
+            var tbody = document.getElementById(container);
             Utilities.Clear_Element(tbody);
             tbody.appendChild(df);
         };
@@ -1231,6 +1289,21 @@ var PermitSearch;
                 tr.appendChild(Charge.CreateCellLink("View Receipt", "has-text-centered", receiptLink));
             }
             //tr.appendChild(Charge.CreateCell("View", "has-text-centered"));
+            return tr;
+        };
+        Charge.CreatePrintablePermitRow = function (c) {
+            var tr = document.createElement("tr");
+            tr.appendChild(Charge.CreateCell(c.permit_number.toString()));
+            tr.appendChild(Charge.CreateCell(c.charge_description));
+            var narrative = c.narrative !== c.charge_description ? c.narrative : "";
+            tr.appendChild(Charge.CreateCell(narrative));
+            tr.appendChild(Charge.CreateCell(Utilities.Format_Amount(c.amount), "has-text-right"));
+            if (c.cashier_id.length === 0) {
+                tr.appendChild(Charge.CreateCell(""));
+            }
+            else {
+                tr.appendChild(Charge.CreateCell(c.cashier_id, "has-text-centered"));
+            }
             return tr;
         };
         Charge.CreateCell = function (value, className) {
@@ -1281,8 +1354,6 @@ var PermitSearch;
         };
         Document.QueryDocuments = function (permit_number) {
             Document.ResetDocuments();
-            var permitPrintButton = document.getElementById("PermitPrintButton");
-            permitPrintButton.setAttribute("value", permit_number.toString());
             var path = PermitSearch.GetPath();
             Utilities.Get(path + "API/Permit/Documents?permitnumber=" + permit_number.toString())
                 .then(function (documents) {
@@ -1423,7 +1494,7 @@ var PermitSearch;
                     PermitSearch.CreateMessageRow(Hold.holds_container, 1, "No Holds were found for this permit.");
                 }
                 else {
-                    Hold.CreateDocumentsTable(holds);
+                    Hold.CreateDocumentsTable(holds, Hold.holds_container);
                 }
             }, function (e) {
                 PermitSearch.CreateMessageRow(Hold.holds_container, 4, "There was an issue retrieving the holds for this permit.  Please try again.");
@@ -1434,13 +1505,13 @@ var PermitSearch;
             PermitSearch.permit_holds = [];
             PermitSearch.CreateMessageRow(Hold.holds_container, 4, "Loading Holds...");
         };
-        Hold.CreateDocumentsTable = function (holds) {
+        Hold.CreateDocumentsTable = function (holds, container) {
             var df = document.createDocumentFragment();
             for (var _i = 0, holds_1 = holds; _i < holds_1.length; _i++) {
                 var h = holds_1[_i];
                 df.appendChild(Hold.CreateRow(h));
             }
-            var tbody = document.getElementById(Hold.holds_container);
+            var tbody = document.getElementById(container);
             Utilities.Clear_Element(tbody);
             tbody.appendChild(df);
         };
@@ -1763,25 +1834,165 @@ var PermitSearch;
     }
     PermitSearch.Search = Search;
     function CreatePrintPermitPreview() {
+        var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
+        var permit_number = parseInt(currentHash.permit_display);
+        console.log('permit number we want to print', permit_number);
         var path = GetPath();
-        var permit_num = document.getElementById("PermitPrintButton").getAttribute("value");
-        var permitNumber = 11802222;
-        var permit_number = parseInt(permit_num);
         if ((permit_number > 10000 && permit_number < 20000000 /* LOWEST PERMITNUMBER FOUND is 00010001 */) ||
             (permit_number > 89999999 && permit_number < 100000000)) {
-            Utilities.Get(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
+            console.log('getting master permit');
+            //Utilities.Get<MasterPermit>(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
+            PermitSearch.MasterPermit.Get(permit_number.toString());
         }
         else {
-            Utilities.Get(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
+            console.log('getting assoc permit');
+            PermitSearch.AssociatedPermit.Get(permit_number.toString());
         }
     }
     PermitSearch.CreatePrintPermitPreview = CreatePrintPermitPreview;
+    function LoadMasterPermit(permit) {
+        // don't forget to do something with flood data
+        Toggle_Master_Permit_Only(true);
+        Toggle_Assoc_Permit_Only(false);
+        var permitTitle = "Building Permit # " + permit.permit_number;
+        if (new Date(permit.void_date).getFullYear() !== 1)
+            permitTitle += " VOIDED";
+        Utilities.Set_Text("printablePermitTitle", permitTitle);
+        Utilities.Set_Text("printablePermitIssueDate", Utilities.Format_Date(permit.issue_date));
+        Utilities.Set_Text("printablePermitParcel", permit.parcel_number);
+        Utilities.Set_Text("printablePermitProposedUse", permit.proposed_use);
+        Utilities.Set_Text("printablePermitValuation", Utilities.Format_Amount(permit.valuation));
+        Utilities.Set_Text("printablePermitLegal", permit.legal);
+        Utilities.Set_Text("printablePermitProjectAddress", permit.project_address);
+        Utilities.Set_Text("printablePermitOwner", permit.owner_name);
+        Utilities.Set_Text("printablePermitOwnerAddress", permit.owner_address);
+        Utilities.Set_Text("printablePermitContractor1", permit.contractor_data_line1);
+        Utilities.Set_Text("printablePermitContractor2", permit.contractor_data_line2);
+        Utilities.Set_Text("printablePermitContractor3", permit.contractor_data_line3);
+        var info = document.getElementById("printablePermitInformation");
+        Utilities.Clear_Element(info);
+        for (var _i = 0, _a = permit.notes; _i < _a.length; _i++) {
+            var n = _a[_i];
+            var p = document.createElement("p");
+            p.appendChild(document.createTextNode(n));
+            info.appendChild(p);
+        }
+        if (permit.outstanding_holds.length === 0) {
+            PermitSearch.CreateMessageRow("printablePermitHoldContainer", 1, "No outstanding holds were found for this permit.");
+        }
+        else {
+            PermitSearch.Hold.CreateDocumentsTable(permit.outstanding_holds, "printablePermitHoldContainer");
+        }
+        if (permit.permit_fees.length === 0) {
+            PermitSearch.CreateMessageRow("printablePermitFeeContainer", 4, "No charges were found for this permit.");
+        }
+        else {
+            PermitSearch.Charge.CreatePrintableViewTable(permit.permit_fees, "printablePermitFeeContainer");
+        }
+        FinalizePrintablePermit();
+    }
+    PermitSearch.LoadMasterPermit = LoadMasterPermit;
+    function LoadAssocPermit(permit) {
+        // don't forget to do something with flood data
+        Toggle_Master_Permit_Only(false);
+        Toggle_Assoc_Permit_Only(true);
+        var permitTitle = permit.permit_type_string + " Permit # " + permit.permit_number;
+        if (new Date(permit.void_date).getFullYear() !== 1)
+            permitTitle += " VOIDED";
+        Utilities.Set_Text("printablePermitTitle", permitTitle);
+        Utilities.Set_Text("printablePermitIssueDate", Utilities.Format_Date(permit.issue_date));
+        Utilities.Set_Text("printablePermitParcel", permit.parcel_number);
+        var propuse = "N/A";
+        if (permit.proposed_use.trim().length > 0)
+            propuse = permit.proposed_use.trim();
+        Utilities.Set_Text("printablePermitProposedUse", propuse);
+        Utilities.Set_Text("printablePermitValuation", Utilities.Format_Amount(permit.valuation));
+        var legal = "N/A";
+        if (permit.legal.length > 0)
+            legal = permit.legal;
+        Utilities.Set_Text("printablePermitLegal", legal);
+        Utilities.Set_Text("printablePermitProjectAddress", permit.project_address);
+        Utilities.Set_Text("printablePermitOwner", permit.owner_name);
+        Utilities.Set_Text("printablePermitOwnerAddress", permit.owner_address);
+        Utilities.Set_Text("printablePermitContractor1", permit.contractor_data_line1);
+        Utilities.Set_Text("printablePermitContractor2", permit.contractor_data_line2);
+        Utilities.Set_Text("printablePermitContractor3", permit.contractor_data_line3);
+        if (permit.master_permit_number.length === 0) {
+            Utilities.Set_Text("printablePermitMasterPermitNumber", "");
+            Utilities.Set_Text("printablePermitMasterContractorNumber", "");
+            Utilities.Set_Text("printablePermitMasterContractorName", "");
+            Utilities.Set_Text("printablePermitMasterPermitTitle", "");
+            Utilities.Hide("master-permit-container");
+            Utilities.Hide("printablePermitMasterPermitTitle");
+        }
+        else {
+            Utilities.Show("master-permit-container");
+            Utilities.Show("printablePermitMasterPermitTitle");
+            Utilities.Set_Text("printablePermitMasterPermitTitle", "Master Permit # " + permit.master_permit_number);
+            Utilities.Set_Text("printablePermitMasterPermitNumber", permit.master_permit_number);
+            Utilities.Set_Text("printablePermitMasterContractorNumber", permit.general_contractor_license_number);
+            Utilities.Set_Text("printablePermitMasterContractorName", permit.general_contractor_name);
+        }
+        var info = document.getElementById("printablePermitInformation");
+        Utilities.Clear_Element(info);
+        for (var _i = 0, _a = permit.notes; _i < _a.length; _i++) {
+            var n = _a[_i];
+            var p = document.createElement("p");
+            p.appendChild(document.createTextNode(n));
+            info.appendChild(p);
+        }
+        if (permit.outstanding_holds.length === 0) {
+            PermitSearch.CreateMessageRow("printablePermitHoldContainer", 1, "No outstanding holds were found for this permit.");
+        }
+        else {
+            PermitSearch.Hold.CreateDocumentsTable(permit.outstanding_holds, "printablePermitHoldContainer");
+        }
+        if (permit.permit_fees.length === 0) {
+            PermitSearch.CreateMessageRow("printablePermitFeeContainer", 4, "No charges were found for this permit.");
+        }
+        else {
+            PermitSearch.Charge.CreatePrintableViewTable(permit.permit_fees, "printablePermitFeeContainer");
+        }
+        FinalizePrintablePermit();
+    }
+    PermitSearch.LoadAssocPermit = LoadAssocPermit;
+    function FinalizePrintablePermit() {
+        PermitSearch.CloseModals();
+        Utilities.Hide("views");
+        Utilities.Show("printablePermit");
+    }
     function Toggle_Loading_Search_Buttons(disabled) {
         var sections = document.querySelectorAll("#views > section button");
         if (sections.length > 0) {
             for (var i = 0; i < sections.length; i++) {
                 var item = sections.item(i);
                 Utilities.Toggle_Loading_Button(item, disabled);
+            }
+        }
+    }
+    function Toggle_Master_Permit_Only(show) {
+        var sections = document.querySelectorAll("#printablePermit .master-permit-only");
+        if (sections.length > 0) {
+            for (var i = 0; i < sections.length; i++) {
+                if (show) {
+                    Utilities.Show(sections.item(i));
+                }
+                else {
+                    Utilities.Hide(sections.item(i));
+                }
+            }
+        }
+    }
+    function Toggle_Assoc_Permit_Only(show) {
+        var sections = document.querySelectorAll("#printablePermit .assoc-permit-only");
+        if (sections.length > 0) {
+            for (var i = 0; i < sections.length; i++) {
+                if (show) {
+                    Utilities.Show(sections.item(i));
+                }
+                else {
+                    Utilities.Hide(sections.item(i));
+                }
             }
         }
     }
@@ -2174,9 +2385,11 @@ var PermitSearch;
         if (new Date(permit.issue_date).getFullYear() !== 1) {
             // permit is issued
             permitHeading.appendChild(CreateLevelItem("ISSUE DATE", Utilities.Format_Date(permit.issue_date)));
+            Utilities.Show("PermitPrintButton");
         }
         else {
             permitHeading.appendChild(CreateLevelItem("ISSUE DATE", "Not Issued"));
+            Utilities.Hide("PermitPrintButton");
         }
         if (new Date(permit.void_date).getFullYear() !== 1) {
             // permit is voided

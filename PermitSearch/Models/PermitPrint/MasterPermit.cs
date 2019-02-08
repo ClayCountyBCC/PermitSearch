@@ -13,16 +13,17 @@ namespace PermitSearch.Models
     public DateTime issue_date { get; set; } = DateTime.MinValue;
     public string parcel_number { get; set; } = "";
     public decimal valuation { get; set; } = -1;
-    public string clearance_sheet { get; set; } = "";
+    //public string clearance_sheet { get; set; } = "";
     public string legal { get; set; } = "";
     public int square_footage { get; set; } = -1;
     public int stories { get; set; } = -1;
-    public string max_height { get; set; } = "";
-    public string prop_use_code { get; set; } = "";
-    public string prop_use_description { get; set; } = "";
-    public bool prop_use_co { get; set; } = false;
-    public DateTime temp_co_date { get; set; } = DateTime.MinValue;
-    public int temp_co_date_days { get; set; } = -1;
+    public string proposed_use { get; set; } = "";
+    //public string max_height { get; set; } = "";
+    //public string prop_use_code { get; set; } = "";
+    //public string prop_use_description { get; set; } = "";
+    //public bool prop_use_co { get; set; } = false;
+    //public DateTime temp_co_date { get; set; } = DateTime.MinValue;
+    //public int temp_co_date_days { get; set; } = -1;
     public string project_name { get; set; } = "";
     public string project_address { get; set; } = "";
     public string owner_name { get; set; } = "";
@@ -30,31 +31,51 @@ namespace PermitSearch.Models
     public string contractor_data_line1 { get; set; } = "";
     public string contractor_data_line2 { get; set; } = ""; 
     public string contractor_data_line3 { get; set; } = "";
-    public string set_back_type { get; set; } = "";
-    public string set_back { get; set; } = "";
+    //public string set_back_type { get; set; } = "";
+    //public string set_back { get; set; } = "";
     public string front { get; set; } = "";
     public string side { get; set; } = "";
     public string rear { get; set; } = "";
     public DateTime void_date { get; set; } = DateTime.MinValue;
-    public string co_closed_type { get; set; } = "";
+    //public string co_closed_type { get; set; } = "";
 
     public List<FloodData> flood_data => FloodData.Get(permit_number);
 
-    public List<charge> permit_fees => charge.GetCharges(int.Parse(permit_number));
+    public List<charge> permit_fees => charge.GetMasterPermitCharges(int.Parse(permit_number));
 
-    public List<string> notes => permit.GetPermitNotes(permit_number);
-
-    public List<string> outstanding_holds
+    public List<string> notes
     {
       get
       {
-        var holds = hold.GetHolds(int.Parse(permit_number));
-        if (holds.Count() == 0) holds.Add("No outstanding holds");
-        return holds;
+        var notes = permit.GetPermitNotes(permit_number);
+        if(square_footage > 0)
+        {
+          notes.Add("Square Footage: " + square_footage.ToString());
+        }
+        if (stories > 0)
+        {
+          notes.Add("Stories: " + stories.ToString());
+        }
+        else
+        {
+          notes.Add("Stories: None");
+        }
+        if (front.Length > 0) notes.Add("Front: " + front);
+        if (side.Length > 0) notes.Add("Side: " + side);
+        if (rear.Length > 0) notes.Add("Rear: " + rear);
+        return notes;
       }
     }
 
-    public List<string> occupancy_class => GetOccupancyClass();
+    public List<hold> outstanding_holds
+    {
+      get
+      {
+        return hold.GetHolds(int.Parse(permit_number));
+      }
+    }
+
+    //public List<string> occupancy_class => GetOccupancyClass();
 
     public MasterPermit()
     {
@@ -72,7 +93,7 @@ namespace PermitSearch.Models
 
         SELECT DISTINCT 
             permit_type_label = 
-            CASE Left(@permit_number, 1) 
+            CASE LEFT(@permit_number, 1) 
               WHEN '1' THEN 'Building'
               WHEN '2' THEN 'Electrical'
               WHEN '3' THEN 'Plumbing'
@@ -86,18 +107,24 @@ namespace PermitSearch.Models
             M.IssueDate issue_date, 
             B.ParcelNo parcel_number, 
             B.valuation, 
-            B.ClrSht clearance_sheet, 
+            --B.ClrSht clearance_sheet, 
             B.legal, 
             B.SqFt square_footage,
             ISNULL(stories, 0) stories,
-            B.MaxHeight max_height,
-            B.PropUseCode prop_use_code,
-            ISNULL(M.PropUseDesc,PR.UseDescription ) prop_use_description, 
-            PR.CO prop_use_co, 
-            M.TempCoDate temp_co_date, 
-            ISNULL(M.TempCoDateDays, -1) temp_co_date_days, 
+
+            --B.MaxHeight max_height,
+
+            --B.PropUseCode prop_use_code,
+            --ISNULL(M.PropUseDesc,PR.UseDescription) prop_use_description, 
+            B.PropUseCode + ' ' + ISNULL(M.PropUseDesc,PR.UseDescription) proposed_use,
+            --PR.CO prop_use_co, 
+            --M.TempCoDate temp_co_date, 
+
+            --ISNULL(M.TempCoDateDays, -1) temp_co_date_days, 
+
             CASE WHEN confidential = 1 THEN 'Confidential' 
               ELSE ISNULL(B.ProjName, '') END  project_name, 
+
             CASE WHEN confidential = 1 THEN 'Confidential' 
              ELSE RTRIM(ISNULL(B.ProjAddrCombined, '')) + ', ' + 
                   RTRIM(ISNULL(B.ProjCity, '')) + ' FL ' + 
@@ -105,21 +132,21 @@ namespace PermitSearch.Models
             CASE WHEN confidential = 1 THEN 'Confidential' 
               ELSE B.OwnerName END owner_name, 
             CASE WHEN confidential = 1 THEN 'Confidential' 
-              ELSE RTRIM(ISNULL(B.OwnerStreet, '')) + '  ' + 
+              ELSE RTRIM(ISNULL(B.OwnerStreet, '')) + ', ' + 
                    RTRIM(ISNULL(B.OwnerCity, '')) + '  ' + 
                    RTRIM(ISNULL(B.OwnerState, ''))+ '  ' + 
                    RTRIM(ISNULL(B.OwnerZip, '')) END owner_address, 
             
 	          RTRIM(ISNULL(C1.CustomerName,'')) contractor_data_line1, 
 
-            RTRIM(ISNULL(C1.Address1, '')) + '  ' + 
+            RTRIM(ISNULL(C1.Address1, '')) + ' ' + 
               RTRIM(ISNULL(C1.Address2, '')) + ' ' + 
               RTRIM(ISNULL(C1.City, '')) + ' ' + 
               RTRIM(ISNULL(C1.State, '')) + ' ' + 
               RTRIM(ISNULL(C1.Zip, '')) contractor_data_line2, 
 
-            RTRIM(ISNULL(B.ContractorId, '')) + ' phone: ' + 
-              RTRIM(ISNULL(C1.Phone1, '')) + ' fax: ' + 
+            RTRIM(ISNULL(B.ContractorId, '')) + ' Phone: ' + 
+              RTRIM(ISNULL(C1.Phone1, '')) + ' Fax: ' + 
               RTRIM(ISNULL(C1.Fax, '')) contractor_data_line3, 
 
             B.SetbackType set_back_type, 
@@ -150,66 +177,68 @@ namespace PermitSearch.Models
 
     }
 
-    public List<string> GetOccupancyClass()
-    {
-      if (permit_number.Length == 0) return new List<string>();
+    //public List<string> GetOccupancyClass()
+    //{
+    //  if (permit_number.Length == 0) return new List<string>();
 
-       var param = new DynamicParameters();
-      param.Add("@permit_number", permit_number);
+    //   var param = new DynamicParameters();
+    //  param.Add("@permit_number", permit_number);
 
-      var query = @"
-        DECLARE @permit_number VARCHAR(8) = '11802598';
-
-        USE WATSC;
-        WITH ClearanceSheets AS (
-          SELECT DISTINCT ClrSht, CodeEdition, OccLoad, ConstrType, FireSprinkler
-          FROM bpBASE_PERMIT B
-          INNER JOIN bpMASTER_PERMIT M ON M.BaseID = B.BaseId
-          WHERE M.PermitNo = @permit_number
-        ), BasicData AS (
-        SELECT
-          0 ord, 
-          CC.Description OccClass
-        FROM bpCategory_Codes CC 
-        INNER JOIN ClearanceSheets CS ON CS.CodeEdition = CC.Code AND CC.Type_Code = 107
-        UNION
-        SELECT
-          1, 
-          CC.Description OccClass
-        FROM bpOccClass O
-        INNER JOIN bpCategory_Codes CC ON O.Code = CC.Code AND CC.Type_Code = 108
-        INNER JOIN ClearanceSheets CS ON O.Clrsht = CS.ClrSht
-        UNION
-        SELECT
-          3, 
-          'Occupancy Load: ' + CAST(OccLoad AS VARCHAR(5))
-        FROM ClearanceSheets
-        UNION
-        SELECT 
-          4, 
-          'Fire Sprinklers Required'
-        FROM ClearanceSheets
-        WHERE FireSprinkler = 1
-        UNION
-        SELECT
-          2, 
-          ConstrType
-        FROM ClearanceSheets
-        )
-        SELECT
-          OccClass
-        FROM BasicData
-        ORDER BY ord ASC";
-      try
-      {
-        return Constants.Get_Data<string>("production", query, param);
-      }
-      catch (Exception ex)
-      {
-        new ErrorLog(ex, query);
-        return new List<string>();
-      }
+    //  var query = @"
+    //    USE WATSC;
+    //    WITH ClearanceSheets AS (
+    //      SELECT DISTINCT ClrSht, CodeEdition, OccLoad, ConstrType, FireSprinkler
+    //      FROM bpBASE_PERMIT B
+    //      INNER JOIN bpMASTER_PERMIT M ON M.BaseID = B.BaseId
+    //      WHERE M.PermitNo = @permit_number
+    //    ), BasicData AS (
+    //    SELECT
+    //      0 ord, 
+    //      CC.Description OccClass
+    //    FROM bpCategory_Codes CC 
+    //    INNER JOIN ClearanceSheets CS ON CS.CodeEdition = CC.Code AND CC.Type_Code = 107
+    //    WHERE CC.Description IS NOT NULL
+    //    UNION
+    //    SELECT
+    //      1, 
+    //      CC.Description OccClass
+    //    FROM bpOccClass O
+    //    INNER JOIN bpCategory_Codes CC ON O.Code = CC.Code AND CC.Type_Code = 108
+    //    INNER JOIN ClearanceSheets CS ON O.Clrsht = CS.ClrSht
+    //    WHERE CC.Description IS NOT NULL
+    //    UNION
+    //    SELECT
+    //      3, 
+    //      'Occupancy Load: ' + CAST(OccLoad AS VARCHAR(5))
+    //    FROM ClearanceSheets
+    //    WHERE OccLoad IS NOT NULL
+    //    UNION
+    //    SELECT 
+    //      4, 
+    //      'Fire Sprinklers Required'
+    //    FROM ClearanceSheets
+    //    WHERE FireSprinkler = 1
+    //    UNION
+    //    SELECT
+    //      2, 
+    //      ConstrType
+    //    FROM ClearanceSheets
+    //    WHERE ConstrType IS NOT NULL
+    //    )
+    //    SELECT
+    //      OccClass
+    //    FROM BasicData
+    //    ORDER BY ord ASC";
+    //  try
+    //  {
+    //    return Constants.Get_Data<string>("production", query, param);
+    //  }
+    //  catch (Exception ex)
+    //  {
+    //    new ErrorLog(ex, query);
+    //    return new List<string>();
+    //  }
       
-    }
+    //}
   }
 }

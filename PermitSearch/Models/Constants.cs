@@ -33,7 +33,6 @@ namespace PermitSearch.Models
       return ConfigurationManager.ConnectionStrings[cs].ConnectionString;
     }
 
-
     public static List<T> Get_Data<T>(string cs, string query, DynamicParameters dbA)
     {
       try

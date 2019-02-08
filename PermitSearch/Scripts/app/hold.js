@@ -15,7 +15,7 @@ var PermitSearch;
                     PermitSearch.CreateMessageRow(Hold.holds_container, 1, "No Holds were found for this permit.");
                 }
                 else {
-                    Hold.CreateDocumentsTable(holds);
+                    Hold.CreateDocumentsTable(holds, Hold.holds_container);
                 }
             }, function (e) {
                 PermitSearch.CreateMessageRow(Hold.holds_container, 4, "There was an issue retrieving the holds for this permit.  Please try again.");
@@ -26,13 +26,13 @@ var PermitSearch;
             PermitSearch.permit_holds = [];
             PermitSearch.CreateMessageRow(Hold.holds_container, 4, "Loading Holds...");
         };
-        Hold.CreateDocumentsTable = function (holds) {
+        Hold.CreateDocumentsTable = function (holds, container) {
             var df = document.createDocumentFragment();
             for (var _i = 0, holds_1 = holds; _i < holds_1.length; _i++) {
                 var h = holds_1[_i];
                 df.appendChild(Hold.CreateRow(h));
             }
-            var tbody = document.getElementById(Hold.holds_container);
+            var tbody = document.getElementById(container);
             Utilities.Clear_Element(tbody);
             tbody.appendChild(df);
         };

@@ -142,19 +142,157 @@ namespace PermitSearch
 
   export function CreatePrintPermitPreview(): void
   {
+    let currentHash = new LocationHash(location.hash.substring(1));
+    let permit_number = parseInt(currentHash.permit_display);
+    console.log('permit number we want to print', permit_number);
     let path = GetPath();
-    let permit_num = document.getElementById("PermitPrintButton").getAttribute("value");
-    let permitNumber = 11802222;
-    let permit_number = parseInt(permit_num);
     if ((permit_number > 10000 && permit_number < 20000000 /* LOWEST PERMITNUMBER FOUND is 00010001 */) ||
       (permit_number > 89999999 && permit_number < 100000000))
     {
-      Utilities.Get<PrintedMasterPermit>(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
+      console.log('getting master permit');
+      //Utilities.Get<MasterPermit>(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
+      MasterPermit.Get(permit_number.toString());
     }
     else
     {
-      Utilities.Get<PrintedAssociatedPermit>(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
+      console.log('getting assoc permit');
+      AssociatedPermit.Get(permit_number.toString());
     }
+
+  }
+
+  export function LoadMasterPermit(permit: MasterPermit):void
+  {
+    // don't forget to do something with flood data
+    Toggle_Master_Permit_Only(true);
+    Toggle_Assoc_Permit_Only(false);
+    let permitTitle = "Building Permit # " + permit.permit_number;
+    if (new Date(permit.void_date).getFullYear() !== 1) permitTitle += " VOIDED";
+    Utilities.Set_Text("printablePermitTitle", permitTitle);
+    Utilities.Set_Text("printablePermitIssueDate", Utilities.Format_Date(permit.issue_date));
+    Utilities.Set_Text("printablePermitParcel", permit.parcel_number);
+    Utilities.Set_Text("printablePermitProposedUse", permit.proposed_use);
+    Utilities.Set_Text("printablePermitValuation", Utilities.Format_Amount(permit.valuation));
+    Utilities.Set_Text("printablePermitLegal", permit.legal);
+    Utilities.Set_Text("printablePermitProjectAddress", permit.project_address);
+    Utilities.Set_Text("printablePermitOwner", permit.owner_name);
+    Utilities.Set_Text("printablePermitOwnerAddress", permit.owner_address);
+    Utilities.Set_Text("printablePermitContractor1", permit.contractor_data_line1);
+    Utilities.Set_Text("printablePermitContractor2", permit.contractor_data_line2);
+    Utilities.Set_Text("printablePermitContractor3", permit.contractor_data_line3);
+    let info = document.getElementById("printablePermitInformation");
+    Utilities.Clear_Element(info);
+    for (let n of permit.notes)
+    {
+      let p = document.createElement("p");
+      p.appendChild(document.createTextNode(n));      
+      info.appendChild(p);
+    }
+
+    if (permit.outstanding_holds.length === 0)
+    {
+      PermitSearch.CreateMessageRow("printablePermitHoldContainer", 1, "No outstanding holds were found for this permit.");
+    }
+    else
+    {
+      Hold.CreateDocumentsTable(permit.outstanding_holds, "printablePermitHoldContainer");
+    }
+
+    if (permit.permit_fees.length === 0)
+    {
+      PermitSearch.CreateMessageRow("printablePermitFeeContainer", 4, "No charges were found for this permit.");
+    }
+    else
+    {
+      Charge.CreatePrintableViewTable(permit.permit_fees, "printablePermitFeeContainer");
+    }
+
+
+    FinalizePrintablePermit();
+  }
+
+  export function LoadAssocPermit(permit: AssociatedPermit): void
+  {
+    // don't forget to do something with flood data
+    Toggle_Master_Permit_Only(false);
+    Toggle_Assoc_Permit_Only(true);
+    let permitTitle = permit.permit_type_string + " Permit # " + permit.permit_number;
+    if (new Date(permit.void_date).getFullYear() !== 1) permitTitle += " VOIDED";
+    Utilities.Set_Text("printablePermitTitle", permitTitle);
+    
+    Utilities.Set_Text("printablePermitIssueDate", Utilities.Format_Date(permit.issue_date));
+    Utilities.Set_Text("printablePermitParcel", permit.parcel_number);
+    let propuse = "N/A";
+    if (permit.proposed_use.trim().length > 0) propuse = permit.proposed_use.trim();
+    Utilities.Set_Text("printablePermitProposedUse", propuse);
+    Utilities.Set_Text("printablePermitValuation", Utilities.Format_Amount(permit.valuation));
+    let legal = "N/A";
+    if (permit.legal.length > 0) legal = permit.legal;
+    Utilities.Set_Text("printablePermitLegal", legal);
+    Utilities.Set_Text("printablePermitProjectAddress", permit.project_address);
+    Utilities.Set_Text("printablePermitOwner", permit.owner_name);
+    Utilities.Set_Text("printablePermitOwnerAddress", permit.owner_address);
+    Utilities.Set_Text("printablePermitContractor1", permit.contractor_data_line1);
+    Utilities.Set_Text("printablePermitContractor2", permit.contractor_data_line2);
+    Utilities.Set_Text("printablePermitContractor3", permit.contractor_data_line3);
+
+    if (permit.master_permit_number.length === 0)
+    {
+      Utilities.Set_Text("printablePermitMasterPermitNumber", "");
+      Utilities.Set_Text("printablePermitMasterContractorNumber", "")
+      Utilities.Set_Text("printablePermitMasterContractorName", "")
+      Utilities.Set_Text("printablePermitMasterPermitTitle", "");
+      Utilities.Hide("master-permit-container");
+      Utilities.Hide("printablePermitMasterPermitTitle");
+    }
+    else
+    {
+      Utilities.Show("master-permit-container");
+      Utilities.Show("printablePermitMasterPermitTitle");
+      Utilities.Set_Text("printablePermitMasterPermitTitle", "Master Permit # " + permit.master_permit_number);
+      Utilities.Set_Text("printablePermitMasterPermitNumber", permit.master_permit_number);
+      Utilities.Set_Text("printablePermitMasterContractorNumber", permit.general_contractor_license_number)
+      Utilities.Set_Text("printablePermitMasterContractorName", permit.general_contractor_name)
+    }
+
+
+    let info = document.getElementById("printablePermitInformation");
+    Utilities.Clear_Element(info);
+    for (let n of permit.notes)
+    {
+      let p = document.createElement("p");
+      p.appendChild(document.createTextNode(n));
+      info.appendChild(p);
+    }
+
+    if (permit.outstanding_holds.length === 0)
+    {
+      PermitSearch.CreateMessageRow("printablePermitHoldContainer", 1, "No outstanding holds were found for this permit.");
+    }
+    else
+    {
+      Hold.CreateDocumentsTable(permit.outstanding_holds, "printablePermitHoldContainer");
+    }
+
+    if (permit.permit_fees.length === 0)
+    {
+      PermitSearch.CreateMessageRow("printablePermitFeeContainer", 4, "No charges were found for this permit.");
+    }
+    else
+    {
+      Charge.CreatePrintableViewTable(permit.permit_fees, "printablePermitFeeContainer");
+    }
+
+
+    FinalizePrintablePermit();
+  }
+
+  function FinalizePrintablePermit()
+  {
+    PermitSearch.CloseModals();
+    Utilities.Hide("views");
+    Utilities.Show("printablePermit");
+    
   }
 
   function Toggle_Loading_Search_Buttons(disabled: boolean)
@@ -166,6 +304,46 @@ namespace PermitSearch
       {
         let item = <HTMLButtonElement>sections.item(i);
         Utilities.Toggle_Loading_Button(item, disabled);
+      }
+    }
+  }
+
+  function Toggle_Master_Permit_Only(show: boolean)
+  {
+    let sections = <NodeListOf<HTMLElement>>document.querySelectorAll("#printablePermit .master-permit-only");
+    if (sections.length > 0)
+    {
+      for (let i = 0; i < sections.length; i++)
+      {
+        if (show)
+        {
+          Utilities.Show(sections.item(i));
+        }
+        else
+        {
+          Utilities.Hide(sections.item(i));
+        }
+        
+      }
+    }
+  }
+
+  function Toggle_Assoc_Permit_Only(show: boolean)
+  {
+    let sections = <NodeListOf<HTMLElement>>document.querySelectorAll("#printablePermit .assoc-permit-only");
+    if (sections.length > 0)
+    {
+      for (let i = 0; i < sections.length; i++)
+      {
+        if (show)
+        {
+          Utilities.Show(sections.item(i));
+        }
+        else
+        {
+          Utilities.Hide(sections.item(i));
+        }
+
       }
     }
   }
@@ -650,10 +828,12 @@ namespace PermitSearch
     {
       // permit is issued
       permitHeading.appendChild(CreateLevelItem("ISSUE DATE", Utilities.Format_Date(permit.issue_date)));
+      Utilities.Show("PermitPrintButton");
     }
     else
     {
       permitHeading.appendChild(CreateLevelItem("ISSUE DATE", "Not Issued"));
+      Utilities.Hide("PermitPrintButton");
     }
 
     if (new Date(permit.void_date).getFullYear() !== 1)
@@ -674,6 +854,7 @@ namespace PermitSearch
   {
     Utilities.Set_Value("permitCompleted", permit.is_closed ? "Yes" : "No");
     Utilities.Set_Value("permitFinalInspection", permit.passed_final_inspection ? "Yes" : "No");
+
     let permitInspectionButton = <HTMLAnchorElement>document.getElementById("permitInspectionSchedulerLink");
     let inspectionLink = "https://public.claycountygov.com/inspectionscheduler/#permit=" + permit.permit_number.toString();
     permitInspectionButton.href = inspectionLink;

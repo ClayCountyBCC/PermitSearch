@@ -1,8 +1,8 @@
 var PermitSearch;
 (function (PermitSearch) {
     "use strict";
-    var PrintedAssociatedPermit = /** @class */ (function () {
-        function PrintedAssociatedPermit() {
+    var AssociatedPermit = /** @class */ (function () {
+        function AssociatedPermit() {
             this.permit_number = 0;
             this.address = "";
             this.issue_date = new Date();
@@ -21,8 +21,8 @@ var PermitSearch;
             this.parcel_number = "";
             this.pin_complete = "";
         }
-        return PrintedAssociatedPermit;
+        return AssociatedPermit;
     }());
-    PermitSearch.PrintedAssociatedPermit = PrintedAssociatedPermit;
+    PermitSearch.AssociatedPermit = AssociatedPermit;
 })(PermitSearch || (PermitSearch = {}));
 //# sourceMappingURL=PrintedAssociatedPermit.js.map

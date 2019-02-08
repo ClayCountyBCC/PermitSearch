@@ -46,28 +46,46 @@ namespace PermitSearch.Models
     }
 
 
-    public static string GetAssocPermitFeesDue(string permit_number)
+    public static List<charge> GetMasterPermitCharges(int permit_number)
     {
 
       var dp = new DynamicParameters();
       dp.Add("@permit_number", permit_number);
       string sql = @"
+        USE PermitSearch;
 
-          WITH ASSOC_PERMITS AS (
-          SELECT PermitNo
-          FROM bpASSOC_PERMIT
-          WHERE BaseId = @BaseId)
+        WITH TOTAL_FEES_PER_PERMIT AS (
+          SELECT
+            RP.permit_number,
+            SUM(C.amount) fees_due
+          FROM charge C
+          INNER JOIN related_permit RP ON C.permit_number = RP.permit_number 
+            AND RP.master_permit_number = CAST(@permit_number AS INT)
+            AND C.cashier_id =''
+          GROUP BY RP.permit_number
+        )
 
-          SELECT 'Assoc Permit Fee Due', COUNT(*), SUM(TOTAL) FROM (
-            SELECT * FROM ccCashierItem CI
-            INNER JOIN ASSOC_PERMITS A ON CI.AssocKey = A.PermitNo
-            WHERE CatCode IS NOT NULL
-              AND CashierId IS NULL
-          ) AS TMP
-          having count(*) > 0
+        SELECT
+          item_id,
+          permit_number,
+          charge_description,
+          narrative,
+          amount,
+          cashier_id
+        FROM charge
+        WHERE permit_number= CAST(@permit_number AS INT)
+        UNION ALL
+        SELECT 
+          0,
+          permit_number,
+          '',
+          'ASSOC PERMIT FEES DUE',
+          fees_due,
+          ''
+        FROM TOTAL_FEES_PER_PERMIT
+        ORDER BY item_id DESC, permit_number ASC";
 
-       ";
-      return Constants.Get_Data<string>("Production", sql, dp).FirstOrDefault();
+      return Constants.Get_Data<charge>("Production", sql, dp);
 
     }
   }

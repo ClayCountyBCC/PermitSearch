@@ -402,27 +402,92 @@ namespace PermitSearch.Models
       var query = @"
         USE WATSC;
 
-        WITH Notes AS (
-        SELECT
-          CAST(Note AS VARCHAR(MAX)) note
-        FROM bpNotes n
-        WHERE 
-          permitno = @permit_number
-          AND INFOTYPE =  'T'
+        WITH ClearanceSheets AS (
+          SELECT DISTINCT ClrSht, CodeEdition, OccLoad, ConstrType, FireSprinkler
+          FROM bpBASE_PERMIT B
+          INNER JOIN bpMASTER_PERMIT M ON M.BaseID = B.BaseId
+          WHERE M.PermitNo = @permit_number
+        ), BasicData AS (
+          SELECT
+            0 ord, 
+            CC.Description note
+          FROM bpCategory_Codes CC 
+          INNER JOIN ClearanceSheets CS ON CS.CodeEdition = CC.Code AND CC.Type_Code = 107
+          WHERE CC.Description IS NOT NULL
+          UNION
+          SELECT
+            1, 
+            CC.Description note
+          FROM bpOccClass O
+          INNER JOIN bpCategory_Codes CC ON O.Code = CC.Code AND CC.Type_Code = 108
+          INNER JOIN ClearanceSheets CS ON O.Clrsht = CS.ClrSht
+          WHERE CC.Description IS NOT NULL
+          UNION
+          SELECT
+            3, 
+            'Occupancy Load: ' + CAST(OccLoad AS VARCHAR(5))
+          FROM ClearanceSheets
+          WHERE OccLoad IS NOT NULL
+          UNION
+          SELECT 
+            4, 
+            'Fire Sprinklers Required'
+          FROM ClearanceSheets
+          WHERE FireSprinkler = 1
+          UNION
+          SELECT
+            2, 
+            ConstrType
+          FROM ClearanceSheets
+          WHERE ConstrType IS NOT NULL
+
+        ), ChargeData AS (
+
+          SELECT 
+            99 ord,
+            CAST(ChrgDesc + ' ' + 
+            ISNULL(UnitPrompt,'') + ' ' + 
+            CAST(UNIT AS VARCHAR(10)) AS VARCHAR(MAX)) + ' ' + 
+            CAST(DESCRIPTION AS VARCHAR(100)) note
+          FROM bpAssocChrg AC
+          INNER JOIN bpAssocChrgType_Ref ACT ON ACT.ChrgCd = AC.ChrgCd AND PermitType = @permit_type
+          WHERE PermitNo = @permit_number
+
+          ), NoteData AS (
+
+          SELECT DISTINCT
+            999 ord,
+            CAST(Note AS VARCHAR(MAX)) note
+          FROM bpNotes n
+          WHERE 
+            permitno = @permit_number
+            AND INFOTYPE =  'T'
+
+        ), FinalData AS (
+
+          SELECT
+            ord,
+            note
+          FROM ChargeData
+
+          UNION ALL
+
+          SELECT
+            ord,
+            note
+          FROM NoteData
+          UNION ALL
+
+          SELECT
+            ord,
+            note
+          FROM BasicData
         )
 
-        SELECT 
-          CAST(ChrgDesc + ' ' + 
-          ISNULL(UnitPrompt,'') + ' ' + 
-          CAST(UNIT AS VARCHAR(10)) AS VARCHAR(MAX)) + ' ' + 
-          CAST(DESCRIPTION AS VARCHAR(100)) NOTE
-        FROM bpAssocChrg AC
-        INNER JOIN bpAssocChrgType_Ref ACT ON ACT.ChrgCd = AC.ChrgCd AND PermitType = @permit_type
-        WHERE PermitNo = @permit_number
-        UNION ALL
-        SELECT DISTINCT
-          Note
-        FROM Notes N
+        SELECT
+          note
+        FROM FinalData
+        ORDER BY ord
 
         ";
       var notes = new List<string>();

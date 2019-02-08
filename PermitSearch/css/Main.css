@@ -21,3 +21,24 @@ nav ul li {
 
 input[readonly] {
   background-color: #eee; }
+
+#printablePermit fieldset {
+  border: none;
+  border-top: 2px solid #0a0a0a;
+  padding: 1.0rem; }
+
+#printablePermit fieldset legend {
+  padding-left: 1em;
+  padding-right: 1em; }
+
+@media print {
+  @page {
+    margin: 2em;
+    size: portrait; }
+  body {
+    display: block; }
+  #printablePermit fieldset {
+    display: block;
+    /*margin-top: -1em;*/
+    page-break-inside: avoid !important;
+    break-inside: avoid !important; } }

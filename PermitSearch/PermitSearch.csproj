@@ -294,8 +294,9 @@
     <TypeScriptCompile Include="Scripts\app\app.ts" />
     <TypeScriptCompile Include="Scripts\app\charge.ts" />
     <TypeScriptCompile Include="Scripts\app\document.ts" />
-    <TypeScriptCompile Include="Scripts\app\PrintedAssociatedPermit.ts" />
-    <TypeScriptCompile Include="Scripts\app\PrintedMasterPermit.ts" />
+    <TypeScriptCompile Include="Scripts\app\AssociatedPermit.ts" />
+    <TypeScriptCompile Include="Scripts\app\FloodData.ts" />
+    <TypeScriptCompile Include="Scripts\app\MasterPermit.ts" />
     <TypeScriptCompile Include="Scripts\app\string.ts" />
     <TypeScriptCompile Include="Scripts\app\hold.ts" />
     <TypeScriptCompile Include="Scripts\app\LocationHash.ts" />

@@ -22,19 +22,29 @@ var PermitSearch;
                     PermitSearch.CreateMessageRow(Charge.charges_container, 4, "No charges were found for this permit.");
                 }
                 else {
-                    Charge.CreateTable(charges);
+                    Charge.CreateTable(charges, Charge.charges_container);
                 }
             }, function (e) {
                 console.log('error getting charges', e);
             });
         };
-        Charge.CreateTable = function (charges) {
+        Charge.CreateTable = function (charges, container) {
             var df = document.createDocumentFragment();
             for (var _i = 0, charges_1 = charges; _i < charges_1.length; _i++) {
                 var c = charges_1[_i];
                 df.appendChild(Charge.CreateRow(c));
             }
-            var tbody = document.getElementById(Charge.charges_container);
+            var tbody = document.getElementById(container);
+            Utilities.Clear_Element(tbody);
+            tbody.appendChild(df);
+        };
+        Charge.CreatePrintableViewTable = function (charges, container) {
+            var df = document.createDocumentFragment();
+            for (var _i = 0, charges_2 = charges; _i < charges_2.length; _i++) {
+                var c = charges_2[_i];
+                df.appendChild(Charge.CreatePrintablePermitRow(c));
+            }
+            var tbody = document.getElementById(container);
             Utilities.Clear_Element(tbody);
             tbody.appendChild(df);
         };
@@ -60,6 +70,21 @@ var PermitSearch;
                 tr.appendChild(Charge.CreateCellLink("View Receipt", "has-text-centered", receiptLink));
             }
             //tr.appendChild(Charge.CreateCell("View", "has-text-centered"));
+            return tr;
+        };
+        Charge.CreatePrintablePermitRow = function (c) {
+            var tr = document.createElement("tr");
+            tr.appendChild(Charge.CreateCell(c.permit_number.toString()));
+            tr.appendChild(Charge.CreateCell(c.charge_description));
+            var narrative = c.narrative !== c.charge_description ? c.narrative : "";
+            tr.appendChild(Charge.CreateCell(narrative));
+            tr.appendChild(Charge.CreateCell(Utilities.Format_Amount(c.amount), "has-text-right"));
+            if (c.cashier_id.length === 0) {
+                tr.appendChild(Charge.CreateCell(""));
+            }
+            else {
+                tr.appendChild(Charge.CreateCell(c.cashier_id, "has-text-centered"));
+            }
             return tr;
         };
         Charge.CreateCell = function (value, className) {

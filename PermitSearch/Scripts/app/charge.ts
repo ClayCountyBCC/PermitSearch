@@ -41,7 +41,7 @@ namespace PermitSearch
           }
           else
           {
-            Charge.CreateTable(charges);
+            Charge.CreateTable(charges, Charge.charges_container);
           }
 
         }, function (e)
@@ -50,14 +50,26 @@ namespace PermitSearch
           });
     }
 
-    static CreateTable(charges: Array<Charge>): void
+    static CreateTable(charges: Array<Charge>, container: string): void
     {
       let df = document.createDocumentFragment();
       for (let c of charges)
       {
         df.appendChild(Charge.CreateRow(c));
       }
-      let tbody = (<HTMLTableSectionElement>document.getElementById(Charge.charges_container));
+      let tbody = (<HTMLTableSectionElement>document.getElementById(container));
+      Utilities.Clear_Element(tbody);
+      tbody.appendChild(df);
+    }
+
+    static CreatePrintableViewTable(charges: Array<Charge>, container: string): void
+    {
+      let df = document.createDocumentFragment();
+      for (let c of charges)
+      {
+        df.appendChild(Charge.CreatePrintablePermitRow(c));
+      }
+      let tbody = (<HTMLTableSectionElement>document.getElementById(container));
       Utilities.Clear_Element(tbody);
       tbody.appendChild(df);
     }
@@ -89,6 +101,25 @@ namespace PermitSearch
         tr.appendChild(Charge.CreateCellLink("View Receipt", "has-text-centered", receiptLink));
       }
       //tr.appendChild(Charge.CreateCell("View", "has-text-centered"));
+      return tr;
+    }
+
+    static CreatePrintablePermitRow(c: Charge): HTMLTableRowElement
+    {
+      let tr = document.createElement("tr");
+      tr.appendChild(Charge.CreateCell(c.permit_number.toString()));
+      tr.appendChild(Charge.CreateCell(c.charge_description));
+      let narrative = c.narrative !== c.charge_description ? c.narrative : "";
+      tr.appendChild(Charge.CreateCell(narrative));
+      tr.appendChild(Charge.CreateCell(Utilities.Format_Amount(c.amount), "has-text-right"));
+      if (c.cashier_id.length === 0)
+      {
+        tr.appendChild(Charge.CreateCell(""));
+      }
+      else
+      {
+        tr.appendChild(Charge.CreateCell(c.cashier_id, "has-text-centered"));
+      }
       return tr;
     }
 

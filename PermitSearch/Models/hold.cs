@@ -15,7 +15,7 @@ namespace PermitSearch.Models
     {
     }
 
-    public static List<string> GetHolds(int permit_number)
+    public static List<hold> GetHolds(int permit_number)
     {
       var dp = new DynamicParameters();
       dp.Add("@permit_number", permit_number);
@@ -29,7 +29,7 @@ namespace PermitSearch.Models
         FROM hold
         WHERE permit_number=@permit_number
         ORDER BY hold_id DESC";
-      return Constants.Get_Data<string>("Production", sql, dp);
+      return Constants.Get_Data<hold>("Production", sql, dp);
     }
   }
 }
