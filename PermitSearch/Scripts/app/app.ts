@@ -553,7 +553,7 @@ namespace PermitSearch
     // clear and populate the table body with table rows.
     let currentHash = new LocationHash(location.hash.substring(1));
     let df = document.createDocumentFragment();
-    CreateResultsHeaderRow(currentHash.tab, headerContainer);
+    CreateResultsHeaderRow(currentHash.tab, headerContainer, relatedPermit);
     for (let p of permits)
     {
       df.appendChild(CreateResultsRow(p, currentHash, relatedPermit));
@@ -568,39 +568,39 @@ namespace PermitSearch
     }
   }
 
-  function CreateResultsHeaderRow(rowType: string, container: string)
+  function CreateResultsHeaderRow(rowType: string, container: string, relatedPermit: boolean)
   {
     
     let df = document.createDocumentFragment();
     let tr = document.createElement("tr");
-    tr.appendChild(CreateResultsHeaderCell("Permit", "", "8.5%", "permit"));
-    tr.appendChild(CreateResultsHeaderCell("Status", "", "9%", "status"));
-    tr.appendChild(CreateResultsHeaderCell("Issued", "", "7.5%", "issuedate"));
-    tr.appendChild(CreateResultsHeaderCell("Address", "has-text-left", "30%", "address"));
+    tr.appendChild(CreateResultsHeaderCell("Permit", "", "8.5%", !relatedPermit ? "permit" : ""));
+    tr.appendChild(CreateResultsHeaderCell("Status", "", "9%", !relatedPermit ? "status" : ""));
+    tr.appendChild(CreateResultsHeaderCell("Issued", "", "7.5%", !relatedPermit ? "issuedate" : ""));
+    tr.appendChild(CreateResultsHeaderCell("Address", "has-text-left", "30%", !relatedPermit ? "address" : ""));
 
     switch (rowType.toLowerCase())
     {
       case "contractor":
-        tr.appendChild(CreateResultsHeaderCell("Contractor", "", "12%", "contractorname"));
-        tr.appendChild(CreateResultsHeaderCell("Company", "", "15%", "company"));
-        tr.appendChild(CreateResultsHeaderCell("Age", "has-text-right", "8%", "age"));
+        tr.appendChild(CreateResultsHeaderCell("Contractor", "", "12%", !relatedPermit ? "contractorname" : ""));
+        tr.appendChild(CreateResultsHeaderCell("Company", "", "15%", !relatedPermit ? "company" : ""));
+        tr.appendChild(CreateResultsHeaderCell("Age", "has-text-right", "8%", !relatedPermit ? "age" : ""));
         break;
 
       case "owner":
-        tr.appendChild(CreateResultsHeaderCell("Owner Name", "", "15%", "owner"));
-        tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", "charges"));
+        tr.appendChild(CreateResultsHeaderCell("Owner Name", "", "15%", !relatedPermit ? "owner" : ""));
+        tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", !relatedPermit ? "charges" : ""));
         break;
       case "parcel":
-        tr.appendChild(CreateResultsHeaderCell("Parcel #", "", "15%", "parcel"));
-        tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", "charges"));
+        tr.appendChild(CreateResultsHeaderCell("Parcel #", "", "15%", !relatedPermit ? "parcel" : ""));
+        tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", !relatedPermit ? "charges" : ""));
         break;
 
       case "permit":
       case "address":
       default:
         // we want permit / address to be the default
-        tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", "charges"));
-        tr.appendChild(CreateResultsHeaderCell("Documents", "", "15%", "documents"));
+        tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", !relatedPermit ? "charges" : ""));
+        tr.appendChild(CreateResultsHeaderCell("Documents", "", "15%", !relatedPermit ? "documents" : ""));
     }
     tr.appendChild(CreateResultsHeaderCell("Inspections", "", "10%", ""));
 

@@ -437,7 +437,7 @@ var PermitSearch;
         // clear and populate the table body with table rows.
         var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
         var df = document.createDocumentFragment();
-        CreateResultsHeaderRow(currentHash.tab, headerContainer);
+        CreateResultsHeaderRow(currentHash.tab, headerContainer, relatedPermit);
         for (var _i = 0, permits_1 = permits; _i < permits_1.length; _i++) {
             var p = permits_1[_i];
             df.appendChild(CreateResultsRow(p, currentHash, relatedPermit));
@@ -451,33 +451,33 @@ var PermitSearch;
         }
     }
     PermitSearch.CreateResultsTable = CreateResultsTable;
-    function CreateResultsHeaderRow(rowType, container) {
+    function CreateResultsHeaderRow(rowType, container, relatedPermit) {
         var df = document.createDocumentFragment();
         var tr = document.createElement("tr");
-        tr.appendChild(CreateResultsHeaderCell("Permit", "", "8.5%", "permit"));
-        tr.appendChild(CreateResultsHeaderCell("Status", "", "9%", "status"));
-        tr.appendChild(CreateResultsHeaderCell("Issued", "", "7.5%", "issuedate"));
-        tr.appendChild(CreateResultsHeaderCell("Address", "has-text-left", "30%", "address"));
+        tr.appendChild(CreateResultsHeaderCell("Permit", "", "8.5%", !relatedPermit ? "permit" : ""));
+        tr.appendChild(CreateResultsHeaderCell("Status", "", "9%", !relatedPermit ? "status" : ""));
+        tr.appendChild(CreateResultsHeaderCell("Issued", "", "7.5%", !relatedPermit ? "issuedate" : ""));
+        tr.appendChild(CreateResultsHeaderCell("Address", "has-text-left", "30%", !relatedPermit ? "address" : ""));
         switch (rowType.toLowerCase()) {
             case "contractor":
-                tr.appendChild(CreateResultsHeaderCell("Contractor", "", "12%", "contractorname"));
-                tr.appendChild(CreateResultsHeaderCell("Company", "", "15%", "company"));
-                tr.appendChild(CreateResultsHeaderCell("Age", "has-text-right", "8%", "age"));
+                tr.appendChild(CreateResultsHeaderCell("Contractor", "", "12%", !relatedPermit ? "contractorname" : ""));
+                tr.appendChild(CreateResultsHeaderCell("Company", "", "15%", !relatedPermit ? "company" : ""));
+                tr.appendChild(CreateResultsHeaderCell("Age", "has-text-right", "8%", !relatedPermit ? "age" : ""));
                 break;
             case "owner":
-                tr.appendChild(CreateResultsHeaderCell("Owner Name", "", "15%", "owner"));
-                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", "charges"));
+                tr.appendChild(CreateResultsHeaderCell("Owner Name", "", "15%", !relatedPermit ? "owner" : ""));
+                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", !relatedPermit ? "charges" : ""));
                 break;
             case "parcel":
-                tr.appendChild(CreateResultsHeaderCell("Parcel #", "", "15%", "parcel"));
-                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", "charges"));
+                tr.appendChild(CreateResultsHeaderCell("Parcel #", "", "15%", !relatedPermit ? "parcel" : ""));
+                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", !relatedPermit ? "charges" : ""));
                 break;
             case "permit":
             case "address":
             default:
                 // we want permit / address to be the default
-                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", "charges"));
-                tr.appendChild(CreateResultsHeaderCell("Documents", "", "15%", "documents"));
+                tr.appendChild(CreateResultsHeaderCell("Unpaid Charges", "has-text-right", "20%", !relatedPermit ? "charges" : ""));
+                tr.appendChild(CreateResultsHeaderCell("Documents", "", "15%", !relatedPermit ? "documents" : ""));
         }
         tr.appendChild(CreateResultsHeaderCell("Inspections", "", "10%", ""));
         df.appendChild(tr);
