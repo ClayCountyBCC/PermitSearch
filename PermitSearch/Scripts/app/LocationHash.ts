@@ -6,6 +6,7 @@ namespace PermitSearch
   {
     permit_number: string;
     permit_display: string; // this will be used to indicate that a permit should be shown on the modal.
+    permit_print: string; // this will be used to indicate we should show the printable permit view.
     permit_status: string;
     contractor_number: string;
     contractor_name: string;
@@ -24,6 +25,7 @@ namespace PermitSearch
   {
     public permit_number: string = "";
     public permit_display: string = "";
+    public permit_print: string = "";
     public permit_status: string = "all";
     public contractor_number: string = "";
     public contractor_name: string = "";
@@ -53,6 +55,10 @@ namespace PermitSearch
 
             case "permitdisplay":
               this.permit_display = k[1];
+              break;
+
+            case "permitprint":
+              this.permit_print = k[1];
               break;
 
             case "status":
@@ -172,6 +178,7 @@ namespace PermitSearch
       let h: string = "";
       h += LocationHash.AddToHash(this.tab, "tab");
       h += LocationHash.AddToHash(this.permit_display, "permitdisplay");
+      h += LocationHash.AddToHash(this.permit_print, "permitprint");
       h += LocationHash.AddToHash(this.sort_on, "sortfield");
       h += LocationHash.AddToHash(this.sort_direction, "sortdirection");
 
@@ -210,16 +217,16 @@ namespace PermitSearch
       return h;
     }
 
-    ReadyToTogglePermit(oldHash: LocationHash): boolean
+    ReadyToTogglePermitDisplay(oldHash: LocationHash): boolean
     {
       // This function simply checks to see if the old search
       // is identical to the new search with the exception of the permit_display
       // argument.  If it is, then we just toggle display of the permit detail,
       // and we don't actually hit the database again.
-      if (oldHash === null) return false;
+      if (oldHash === null || this.permit_print.length > 0) return false; // if we're loading this as a fresh page, oldHash will be null.
 
       if ((this.permit_display.length > 0 && oldHash.permit_display.length === 0)
-        || this.permit_display.length === 0 && oldHash.permit_display.length > 0)
+        || (this.permit_display.length === 0 && oldHash.permit_display.length > 0)) // if they are returning from the permit print modal
       {
         return this.permit_number === oldHash.permit_number && 
           this.company_name === oldHash.company_name &&
@@ -235,6 +242,28 @@ namespace PermitSearch
       return false;
     }
 
+    ReadyToTogglePermitPrint(oldHash: LocationHash): boolean
+    {
+      if (oldHash === null) return false;
+
+      if ((this.permit_print.length > 0 && oldHash.permit_print.length === 0)
+        || this.permit_print.length === 0 && oldHash.permit_print.length > 0)
+      {
+        return this.permit_number === oldHash.permit_number &&
+          this.company_name === oldHash.company_name &&
+          this.contractor_name === oldHash.contractor_name &&
+          this.contractor_number === oldHash.contractor_number &&
+          this.owner_name === oldHash.owner_name &&
+          this.page === oldHash.page &&
+          this.parcel_number === oldHash.parcel_number &&
+          this.permit_status === oldHash.permit_status &&
+          this.street_name === oldHash.street_name &&
+          this.street_number === oldHash.street_number &&
+          this.permit_display === oldHash.permit_display;
+      }
+      return false;
+    }
+
     static AddToHash(field: string, arg: string):string
     {
       if (field.length > 0) return "&" + arg + "=" + field;
@@ -242,6 +271,4 @@ namespace PermitSearch
     }
 
   }
-
-
 }

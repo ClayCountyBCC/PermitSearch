@@ -5,11 +5,11 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=11">
   <title>Clay County Building Permit Search</title>
-  <link href="css/darkergreenBulma.min.css" rel="stylesheet" />
-  <!--<link href="css/bulma.min.css" rel="stylesheet" />-->
+  <!--<link href="css/darkergreenBulma.min.css" rel="stylesheet" />
   <link href="css/Utilities.min.css" rel="stylesheet" />
   <link href="css/Fontawesome/css/fontawesome-all.min.css" rel="stylesheet" />
-  <link href="css/Main.css" rel="stylesheet" />
+  <link href="css/Main.css" rel="stylesheet" />-->
+  <link href="css/bundle.min.css" rel="stylesheet" />
   <link rel="icon" type="image/png" sizes="32x32" href="content/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="content/favicon-16x16.png">
 </head>
@@ -56,7 +56,8 @@
        style="margin-top: 1em;"
        class="container">
 
-    <div id="advancedSearchOptions"
+    <div class="hide-for-print"
+         id="advancedSearchOptions"
          style="margin-bottom: .75em;">
 
       <div class="field is-horizontal">
@@ -259,6 +260,7 @@
     </section>
 
     <div id="searchButtons"
+         class="hide-for-print"
          style="margin-top: .75em; margin-bottom: .75em;">
       <div class="field is-horizontal">
         <div class="field-label is-medium">
@@ -282,13 +284,14 @@
       </div>
     </div>
 
-    <div id="permitSearchError"
+    <div class="hide-for-print"
+         id="permitSearchError"
          style="margin-bottom: .75em; margin-top: .75em;">
 
     </div>
 
     <div style="margin-top: 1em;"
-         class="hide"
+         class="hide hide-for-print"
          id="searchResults">
 
       <table class="table is-fullwidth">
@@ -307,11 +310,11 @@
       </nav>
     </div>
 
-    <div class="modal"
+    <div class="modal hide-for-print"
          id="selectedPermit">
       <div onclick="PermitSearch.ClosePermitModal();"
-           class="modal-background"></div>
-      <div class="modal-card container">
+           class="modal-background hide-for-print"></div>
+      <div class="modal-card container hide-for-print">
 
         <section class="modal-card-body">
           <div id="permitHeading"
@@ -330,16 +333,27 @@
                 <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitDocuments');">Documents</a>
               </li>
               <li id="nav-permitCharges">
-                <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitCharges');">
-                  Charges
-                </a>
-
+                <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitCharges');">Charges</a>
               </li>
               <li id="nav-permitHolds">
                 <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitHolds');">Holds</a>
               </li>
+              <li id="nav-relatedPermits">
+                <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'relatedPermits');">Related Permits</a>
+              </li>
             </ul>
           </nav>
+
+          <section class="hide"
+                   id="relatedPermits">
+            <table class="table is-fullwidth">
+              <thead id="relatedPermitsResultsHead">
+
+              </thead>
+              <tbody id="relatedPermitsResultsBody"></tbody>
+            </table>
+          </section>
+
           <section id="permitInformation">
             <fieldset style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;">
               <legend class="label">Permit Status</legend>
@@ -445,6 +459,7 @@
           </section>
 
         </section>
+
         <footer style="justify-content: flex-end;"
                 class="modal-card-foot">
           <button type="button"
@@ -456,11 +471,11 @@
       </div>
     </div>
 
-    <div class="modal"
+    <div class="modal hide-for-print"
          id="selectedPermitError">
       <div onclick="PermitSearch.ClosePermitModal();"
-           class="modal-background"></div>
-      <div class="modal-card container">
+           class="modal-background hide-for-print"></div>
+      <div class="modal-card container hide-for-print">
         <header class="modal-card-head">
           <p class="modal-card-title">
             Permit Number Not Found
@@ -477,7 +492,7 @@
           </p>
         </section>
         <footer style="justify-content: flex-end;"
-                class="modal-card-foot">
+                class="modal-card-foot hide-for-print">
           <button type="button"
                   onclick="PermitSearch.ClosePermitModal();"
                   class="button is-success">
@@ -487,218 +502,255 @@
       </div>
     </div>
 
-  </div>
+    <div id="selectedPermitPrint"
+         class="modal">
+      <div onclick="PermitSearch.ClosePermitPrintModal();"
+           class="modal-background hide-for-print"></div>
 
-  <div class="hide container has-text-black"
-       id="printablePermit">
-
-    <p class="has-text-centered is-size-3 has-text-weight-semibold">
-      Clay County
-    </p>
-
-    <p id="printablePermitTitle"
-       class="has-text-centered is-size-4 has-text-weight-semibold">      
-    </p>
-
-    <p class="assoc-permit-only has-text-centered is-size-5 has-text-weight-semibold"
-       id="printablePermitMasterPermitTitle">      
-    </p>
-
-    <p class="master-permit-only has-text-centered is-size-6 has-text-weight-semibold"
-       style="font-style: italic; text-decoration: underline;">
-      Does not include Electrical, Mechanical, Plumbing
-    </p>
-
-    <p class="has-text-justified is-size-7 has-text-weight-semibold">
-      NOTICE: Permits become null and void if work or construction authorized is not commenced within 180 days or if
-      construction or work is suspended or abandoned for a period of 180 days at any time after work is commenced.
-    </p>
-
-    <p class="has-text-justified is-size-5 has-text-weight-bold"
-       style="border-top: 4px solid black; border-bottom: 4px solid black; padding-top: 1em; padding-bottom: 1em;">
-      WARNING TO OWNER: YOUR FAILURE TO RECORD A NOTICE OF
-      COMMENCEMENT MAY RESULT IN YOUR PAYING TWICE FOR
-      IMPROVEMENTS TO YOUR PROPERTY. A NOTICE OF COMMENCEMENT
-      MUST BE RECORDED AND POSTED ON THE JOB SITE BEFORE THE FIRST
-      INSPECTION. IF YOU INTEND TO OBTAIN FINANCING, CONSULT WITH YOUR
-      LENDER OR AN ATTORNEY BEFORE RECORDING YOUR NOTICE OF
-      COMMENCEMENT.
-    </p>
-
-    <p class="has-text-justified is-size-7 has-text-weight-semibold">
-      NOTICE: In addition to the requirements of this permit, there may be additional restrictions applicable to this property that
-      may be found in the public records of this county, and there may be additional permits required from other governmental
-      entities such as water management districts, state agencies, or federal agencies.
-    </p>
-
-    <div style="margin-top: 1em;"
-         class="level">
-      <div class="level-item has-text-centered">
-        <div class="is-size-5">
-          <p class="has-text-weight-bold">
-            Issue Date
+      <div class="modal-card container">
+        <header class="modal-card-head hide-for-print">
+          <p class="modal-card-title">
+            Printable Permit View
           </p>
-          <p id="printablePermitIssueDate">
-          </p>
-        </div>
-      </div>
-      <div class="level-item has-text-centered">
-        <div class="is-size-5">
-          <p class="has-text-weight-bold">Parcel #</p>
-          <p id="printablePermitParcel"></p>
-        </div>
-      </div>
-      <div class="level-item has-text-centered">
-        <div class="is-size-5">
-          <p class="has-text-weight-bold">Proposed Use</p>
-          <p id="printablePermitProposedUse"></p>
-        </div>
-      </div>
-      <div class="level-item has-text-centered">
-        <div class="is-size-5">
-          <p class="has-text-weight-bold">Valuation</p>
-          <p id="printablePermitValuation"></p>
-        </div>
+          <button onclick="PermitSearch.ClosePermitPrintModal();"
+                  type="button"
+                  class="delete"
+                  aria-label="close"></button>
+        </header>
+
+        <section class="modal-card-body">
+
+          <div class="has-text-black"
+               id="printablePermit">
+
+            <p class="has-text-centered is-size-3 has-text-weight-semibold">
+              Clay County
+            </p>
+
+            <p id="printablePermitTitle"
+               class="has-text-centered is-size-4 has-text-weight-semibold">
+            </p>
+
+            <p class="assoc-permit-only has-text-centered is-size-5 has-text-weight-semibold"
+               id="printablePermitMasterPermitTitle">
+            </p>
+
+            <p class="master-permit-only has-text-centered is-size-6 has-text-weight-semibold"
+               style="font-style: italic; text-decoration: underline;">
+              Does not include Electrical, Mechanical, Plumbing
+            </p>
+
+            <p class="has-text-justified is-size-7 has-text-weight-semibold">
+              NOTICE: Permits become null and void if work or construction authorized is not commenced within 180 days or if
+              construction or work is suspended or abandoned for a period of 180 days at any time after work is commenced.
+            </p>
+
+            <p class="has-text-justified is-size-5 has-text-weight-bold"
+               style="border-top: 4px solid black; border-bottom: 4px solid black; padding-top: 1em; padding-bottom: 1em;">
+              WARNING TO OWNER: YOUR FAILURE TO RECORD A NOTICE OF
+              COMMENCEMENT MAY RESULT IN YOUR PAYING TWICE FOR
+              IMPROVEMENTS TO YOUR PROPERTY. A NOTICE OF COMMENCEMENT
+              MUST BE RECORDED AND POSTED ON THE JOB SITE BEFORE THE FIRST
+              INSPECTION. IF YOU INTEND TO OBTAIN FINANCING, CONSULT WITH YOUR
+              LENDER OR AN ATTORNEY BEFORE RECORDING YOUR NOTICE OF
+              COMMENCEMENT.
+            </p>
+
+            <p class="has-text-justified is-size-7 has-text-weight-semibold">
+              NOTICE: In addition to the requirements of this permit, there may be additional restrictions applicable to this property that
+              may be found in the public records of this county, and there may be additional permits required from other governmental
+              entities such as water management districts, state agencies, or federal agencies.
+            </p>
+
+            <div style="margin-top: 1em;"
+                 class="level">
+              <div class="level-item has-text-centered">
+                <div class="is-size-5">
+                  <p class="has-text-weight-bold">
+                    Issue Date
+                  </p>
+                  <p id="printablePermitIssueDate">
+                  </p>
+                </div>
+              </div>
+              <div class="level-item has-text-centered">
+                <div class="is-size-5">
+                  <p class="has-text-weight-bold">Parcel #</p>
+                  <p id="printablePermitParcel"></p>
+                </div>
+              </div>
+              <div class="level-item has-text-centered">
+                <div class="is-size-5">
+                  <p class="has-text-weight-bold">Proposed Use</p>
+                  <p id="printablePermitProposedUse"></p>
+                </div>
+              </div>
+              <div class="level-item has-text-centered">
+                <div class="is-size-5">
+                  <p class="has-text-weight-bold">Valuation</p>
+                  <p id="printablePermitValuation"></p>
+                </div>
+              </div>
+            </div>
+
+            <fieldset>
+              <legend class="has-text-weight-bold is-size-5"
+                      align="center">
+                Legal
+              </legend>
+              <p id="printablePermitLegal"
+                 class="has-text-centered">
+              </p>
+            </fieldset>
+
+            <fieldset>
+              <legend class="has-text-weight-bold is-size-5"
+                      align="center">
+                Project Address
+              </legend>
+              <div id="printablePermitProjectAddress"
+                   class="has-text-centered">
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend class="has-text-weight-bold is-size-5"
+                      align="center">
+                Owner
+              </legend>
+              <div class="has-text-centered">
+                <p id="printablePermitOwner"></p>
+                <p id="printablePermitOwnerAddress"></p>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend class="has-text-weight-bold is-size-5"
+                      align="center">
+                Contractor
+              </legend>
+              <div class="has-text-centered">
+                <p id="printablePermitContractor1"></p>
+                <p id="printablePermitContractor2"></p>
+                <p id="printablePermitContractor3"></p>
+              </div>
+            </fieldset>
+
+            <fieldset class="assoc-permit-only"
+                      id="master-permit-container">
+              <legend class="has-text-weight-bold is-size-5"
+                      align="center">
+                Master Permit
+              </legend>
+              <div class="level">
+                <div class="level-item has-text-centered">
+                  <div class="is-size-5">
+                    <p class="has-text-weight-bold">
+                      Master Permit #
+                    </p>
+                    <p id="printablePermitMasterPermitNumber">
+                    </p>
+                  </div>
+                </div>
+                <div class="level-item has-text-centered">
+                  <div class="is-size-5">
+                    <p class="has-text-weight-bold">General Contractor #</p>
+                    <p id="printablePermitMasterContractorNumber"></p>
+                  </div>
+                </div>
+                <div class="level-item has-text-centered">
+                  <div class="is-size-5">
+                    <p class="has-text-weight-bold">General Contractor</p>
+                    <p id="printablePermitMasterContractorName"></p>
+                  </div>
+                </div>
+
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend class="has-text-weight-bold is-size-5"
+                      align="center">
+                Information
+              </legend>
+              <div id="printablePermitInformation"
+                   style="width: 100%;"
+                   class="columns is-multiline is-gapless">
+              </div>
+            </fieldset>
+
+            <fieldset class="master-permit-only">
+              <legend class="has-text-weight-bold is-size-5"
+                      align="center">
+                Flood Zone Information
+              </legend>
+              <div id="printablePermitFloodData"
+                   style="width: 100%;"
+                   class="columns is-multiline is-gapless">
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend class="has-text-weight-bold is-size-5"
+                      align="center">
+                Holds
+              </legend>
+              <div id="printablePermitHolds"
+                   class="has-text-centered">
+                <table class="table is-fullwidth">
+                  <tbody id="printablePermitHoldContainer"></tbody>
+                </table>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend class="has-text-weight-bold is-size-5"
+                      align="center">
+                Permit Fees
+              </legend>
+              <div id="printablePermitFees"
+                   class="has-text-centered">
+
+                <table class="table is-fullwidth">
+                  <thead>
+                    <tr>
+                      <th style="width: 10%;">Permit #</th>
+                      <th style="width: 25%;">Charge Description</th>
+                      <th style="width: 25%;">Narrative</th>
+                      <th style="width: 20%; text-align: right;">Amount</th>
+                      <th style="width: 20%; text-align: center;">Receipt</th>
+                    </tr>
+                  </thead>
+                  <tbody id="printablePermitFeeContainer"></tbody>
+                </table>
+
+              </div>
+            </fieldset>
+
+            <footer style="margin-top: 1em; margin-bottom: 0;"
+                    class="master-permit-only is-size-7">
+              Permit requires compliance with all codes and laws for the Type of Work above. ANY violations shall justify
+              immediate revocation of this Permit. The Permit DOES NOT include Electric, Plumbing, Mechanical, Gas,
+              Septic Systems or Wells. Contractor is required to obtain County approvals BEFORE placing any concrete,
+              covering any framework or sheathing, applying any interior wall covering AND upon completion of the work.
+              Any power release is also contingent upon approvals by Clay County Health Department and satisfaction of all
+              Clearance Guidesheet conditions. It is unlawful to occupy this building before a Certificate of Occupancy has
+              been issued under $500/day and/or 60 days imprisonment penalty, and loss of future early power privileges.
+            </footer>
+          </div>
+
+        </section>
+        <footer style="justify-content: flex-end;"
+                class="modal-card-foot hide-for-print">
+          <button type="button"
+                  onclick="PermitSearch.ClosePermitPrintModal();"
+                  class="button is-success">
+            Close
+          </button>
+        </footer>
       </div>
     </div>
-
-    <fieldset>
-      <legend class="has-text-weight-bold is-size-5"
-              align="center">
-        Legal
-      </legend>
-      <p id="printablePermitLegal"
-         class="has-text-centered">
-      </p>
-    </fieldset>
-
-    <fieldset>
-      <legend class="has-text-weight-bold is-size-5"
-              align="center">
-        Project Address
-      </legend>
-      <div id="printablePermitProjectAddress"
-           class="has-text-centered">
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend class="has-text-weight-bold is-size-5"
-              align="center">
-        Owner
-      </legend>
-      <div class="has-text-centered">
-        <p id="printablePermitOwner"></p>
-        <p id="printablePermitOwnerAddress"></p>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend class="has-text-weight-bold is-size-5"
-              align="center">
-        Contractor
-      </legend>
-      <div
-           class="has-text-centered">
-        <p id="printablePermitContractor1"></p>
-        <p id="printablePermitContractor2"></p>
-        <p id="printablePermitContractor3"></p>
-      </div>
-    </fieldset>
-
-    <fieldset class="assoc-permit-only"
-              id="master-permit-container">
-      <legend class="has-text-weight-bold is-size-5"
-              align="center">
-        Master Permit
-      </legend>
-      <div class="level">
-        <div class="level-item has-text-centered">
-          <div class="is-size-5">
-            <p class="has-text-weight-bold">
-              Master Permit #
-            </p>
-            <p id="printablePermitMasterPermitNumber">
-            </p>
-          </div>
-        </div>
-        <div class="level-item has-text-centered">
-          <div class="is-size-5">
-            <p class="has-text-weight-bold">General Contractor #</p>
-            <p id="printablePermitMasterContractorNumber"></p>
-          </div>
-        </div>
-        <div class="level-item has-text-centered">
-          <div class="is-size-5">
-            <p class="has-text-weight-bold">General Contractor</p>
-            <p id="printablePermitMasterContractorName"></p>
-          </div>
-        </div>
-
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend class="has-text-weight-bold is-size-5"
-              align="center">
-        Information
-      </legend>
-      <div id="printablePermitInformation"
-           class="has-text-left">
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend class="has-text-weight-bold is-size-5"
-              align="center">
-        Holds
-      </legend>
-      <div id="printablePermitHolds"
-           class="has-text-centered">
-        <table class="table is-fullwidth">
-          <tbody id="printablePermitHoldContainer">
-
-          </tbody>
-        </table>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend class="has-text-weight-bold is-size-5"
-              align="center">
-        Permit Fees
-      </legend>
-      <div id="printablePermitFees"
-           class="has-text-centered">
-
-        <table class="table is-fullwidth">
-          <thead>
-            <tr>
-              <th style="width: 10%;">Permit #</th>
-              <th style="width: 25%;">Charge Description</th>
-              <th style="width: 25%;">Narrative</th>
-              <th style="width: 20%; text-align: right;">Amount</th>
-              <th style="width: 20%; text-align: center;">Receipt</th>
-            </tr>
-          </thead>
-          <tbody id="printablePermitFeeContainer"></tbody>
-        </table>
-
-      </div>
-    </fieldset>
-
-    <footer style="margin-top: 1em; margin-bottom: 0;"
-            class="master-permit-only is-size-7">
-      Permit requires compliance with all codes and laws for the Type of Work above. ANY violations shall justify
-      immediate revocation of this Permit. The Permit DOES NOT include Electric, Plumbing, Mechanical, Gas,
-      Septic Systems or Wells. Contractor is required to obtain County approvals BEFORE placing any concrete,
-      covering any framework or sheathing, applying any interior wall covering AND upon completion of the work.
-      Any power release is also contingent upon approvals by Clay County Health Department and satisfaction of all
-      Clearance Guidesheet conditions. It is unlawful to occupy this building before a Certificate of Occupancy has
-      been issued under $500/day and/or 60 days imprisonment penalty, and loss of future early power privileges.
-    </footer>
   </div>
-
 
   <footer style="margin: auto auto 0 auto; padding: 3rem 1.5rem 3rem;"
           class="has-text-right hide-for-print">

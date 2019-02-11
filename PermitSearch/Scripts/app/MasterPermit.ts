@@ -64,7 +64,6 @@
       Utilities.Get<MasterPermit>(path + "API/Permit/PrintPermit?permit_number=" + permit_number)
         .then(function (permit: MasterPermit)
         {
-          console.log("master permit", permit);          
           PermitSearch.LoadMasterPermit(permit);          
         }, function (e)
           {

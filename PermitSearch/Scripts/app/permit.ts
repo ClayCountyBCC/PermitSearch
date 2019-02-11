@@ -51,6 +51,30 @@ namespace PermitSearch
     public pin_complete: string = "";
 
     constructor() { }
+
+    public static QueryRelatedPermits(permit_number: number): void
+    {
+      let path = PermitSearch.GetPath();
+      Utilities.Get<Array<Permit>>(path + "API/Permit/Related?permitnumber=" + permit_number.toString())
+        .then(function (permits: Array<Permit>)
+        {
+          console.log("related permits", permits);
+          if (permits.length === 0)
+          {
+            PermitSearch.CreateMessageRow("relatedPermitsResultsBody", 4, "No documents were found for this permit.");
+          }
+          else
+          {
+            CreateResultsTable(permits, "relatedPermitsResultsHead", "relatedPermitsResultsBody", true);
+            //Document.CreateDocumentsTable(permits);
+            //Document.PopulateDocumentTypeFilter(permits);
+          }
+        }, function (e)
+          {
+          PermitSearch.CreateMessageRow("relatedPermitsResultsBody", 4, "There was an issue retrieving the related permits for this permit.  Please refresh this page to try again.");
+            console.log('error getting permits', e);
+          });
+    }
   }
 
 }

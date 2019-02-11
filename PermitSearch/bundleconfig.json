@@ -16,5 +16,14 @@
       "Scripts/app/locationhash.js",
       "Scripts/app/app.js"
     ]
+  },
+  {
+    "outputFileName": "css/bundle.css",
+    "inputFiles": [
+      "css/darkergreenBulma.css",
+      "css/Utilities.css",
+      "css/Fontawesome/css/fontawesome-all.css",
+      "css/Main.css"
+    ]
   }
 ]

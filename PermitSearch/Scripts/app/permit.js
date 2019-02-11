@@ -24,6 +24,24 @@ var PermitSearch;
             this.parcel_number = "";
             this.pin_complete = "";
         }
+        Permit.QueryRelatedPermits = function (permit_number) {
+            var path = PermitSearch.GetPath();
+            Utilities.Get(path + "API/Permit/Related?permitnumber=" + permit_number.toString())
+                .then(function (permits) {
+                console.log("related permits", permits);
+                if (permits.length === 0) {
+                    PermitSearch.CreateMessageRow("relatedPermitsResultsBody", 4, "No documents were found for this permit.");
+                }
+                else {
+                    PermitSearch.CreateResultsTable(permits, "relatedPermitsResultsHead", "relatedPermitsResultsBody", true);
+                    //Document.CreateDocumentsTable(permits);
+                    //Document.PopulateDocumentTypeFilter(permits);
+                }
+            }, function (e) {
+                PermitSearch.CreateMessageRow("relatedPermitsResultsBody", 4, "There was an issue retrieving the related permits for this permit.  Please refresh this page to try again.");
+                console.log('error getting permits', e);
+            });
+        };
         return Permit;
     }());
     PermitSearch.Permit = Permit;

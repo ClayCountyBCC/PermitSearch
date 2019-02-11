@@ -8,7 +8,6 @@ var PermitSearch;
             var path = PermitSearch.GetPath();
             Utilities.Get(path + "API/Permit/PrintPermit?permit_number=" + permit_number)
                 .then(function (permit) {
-                console.log("master permit", permit);
                 PermitSearch.LoadMasterPermit(permit);
             }, function (e) {
                 console.log('error getting master permit ' + permit_number, e);

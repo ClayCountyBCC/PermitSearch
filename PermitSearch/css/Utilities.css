@@ -16,31 +16,43 @@
 @media print {
   @page {
     margin: .5em; }
-  a {
+  /*a 
+  {
     text-decoration: none;
-    color: black; }
-  .print-title-size {
+    color: black;
+  }
+  .print-title-size{
     font-size: 24px;
-    line-height: 2em; }
+    line-height: 2em;
+  }
   table.print-with-no-border {
     align-self: center;
-    text-align: left; }
+    text-align: left;
+  }
   table.print-with-no-border th,
-  table.print-with-no-border td {
+  table.print-with-no-border td{
     text-align: left;
     line-height: 1em;
     border: none;
     margin-top: 0;
-    margin-bottom: 0; }
+    margin-bottom: 0;
+   
+
+  }
   .pagebreak {
-    page-break-before: always; }
+    page-break-before: always;
+  }
+
+  
   table.pagebreak td {
     font-size: smaller;
-    line-height: 1em;
+    line-height:1em;
     text-align: left;
     width: auto;
-    margin: 0; }
-  .show-for-print {
-    display: flex; }
+    margin: 0;
+  }
+  .show-for-print{
+    display: flex;
+  }*/
   .hide-for-print {
     display: none; } }

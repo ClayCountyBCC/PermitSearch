@@ -8,7 +8,6 @@ var PermitSearch;
             var path = PermitSearch.GetPath();
             Utilities.Get(path + "API/Permit/PrintPermit?permit_number=" + permit_number)
                 .then(function (permit) {
-                console.log("assoc permit", permit);
                 PermitSearch.LoadAssocPermit(permit);
             }, function (e) {
                 console.log('error getting assoc permit ' + permit_number, e);

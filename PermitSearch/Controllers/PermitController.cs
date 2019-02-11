@@ -66,5 +66,12 @@ namespace PermitSearch.Controllers
       return Ok(BadRequest("Not a valid Permit Number"));
     }
 
+    [HttpGet]
+    [Route("Related")]
+    public IHttpActionResult RelatedPermits(int permitnumber)
+    {
+      return Ok(permit.GetRelatedPermits(permitnumber));
+    }
+
   }
 }

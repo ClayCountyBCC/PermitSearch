@@ -5,6 +5,7 @@ var PermitSearch;
         function LocationHash(locationHash) {
             this.permit_number = "";
             this.permit_display = "";
+            this.permit_print = "";
             this.permit_status = "all";
             this.contractor_number = "";
             this.contractor_name = "";
@@ -27,6 +28,9 @@ var PermitSearch;
                             break;
                         case "permitdisplay":
                             this.permit_display = k[1];
+                            break;
+                        case "permitprint":
+                            this.permit_print = k[1];
                             break;
                         case "status":
                             this.permit_status = k[1];
@@ -118,6 +122,7 @@ var PermitSearch;
             var h = "";
             h += LocationHash.AddToHash(this.tab, "tab");
             h += LocationHash.AddToHash(this.permit_display, "permitdisplay");
+            h += LocationHash.AddToHash(this.permit_print, "permitprint");
             h += LocationHash.AddToHash(this.sort_on, "sortfield");
             h += LocationHash.AddToHash(this.sort_direction, "sortdirection");
             switch (this.tab.toLowerCase()) {
@@ -149,15 +154,16 @@ var PermitSearch;
             }
             return h;
         };
-        LocationHash.prototype.ReadyToTogglePermit = function (oldHash) {
+        LocationHash.prototype.ReadyToTogglePermitDisplay = function (oldHash) {
             // This function simply checks to see if the old search
             // is identical to the new search with the exception of the permit_display
             // argument.  If it is, then we just toggle display of the permit detail,
             // and we don't actually hit the database again.
-            if (oldHash === null)
-                return false;
+            if (oldHash === null || this.permit_print.length > 0)
+                return false; // if we're loading this as a fresh page, oldHash will be null.
             if ((this.permit_display.length > 0 && oldHash.permit_display.length === 0)
-                || this.permit_display.length === 0 && oldHash.permit_display.length > 0) {
+                || (this.permit_display.length === 0 && oldHash.permit_display.length > 0)) // if they are returning from the permit print modal
+             {
                 return this.permit_number === oldHash.permit_number &&
                     this.company_name === oldHash.company_name &&
                     this.contractor_name === oldHash.contractor_name &&
@@ -168,6 +174,25 @@ var PermitSearch;
                     this.permit_status === oldHash.permit_status &&
                     this.street_name === oldHash.street_name &&
                     this.street_number === oldHash.street_number;
+            }
+            return false;
+        };
+        LocationHash.prototype.ReadyToTogglePermitPrint = function (oldHash) {
+            if (oldHash === null)
+                return false;
+            if ((this.permit_print.length > 0 && oldHash.permit_print.length === 0)
+                || this.permit_print.length === 0 && oldHash.permit_print.length > 0) {
+                return this.permit_number === oldHash.permit_number &&
+                    this.company_name === oldHash.company_name &&
+                    this.contractor_name === oldHash.contractor_name &&
+                    this.contractor_number === oldHash.contractor_number &&
+                    this.owner_name === oldHash.owner_name &&
+                    this.page === oldHash.page &&
+                    this.parcel_number === oldHash.parcel_number &&
+                    this.permit_status === oldHash.permit_status &&
+                    this.street_name === oldHash.street_name &&
+                    this.street_number === oldHash.street_number &&
+                    this.permit_display === oldHash.permit_display;
             }
             return false;
         };

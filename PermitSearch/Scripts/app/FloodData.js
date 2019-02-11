@@ -7,7 +7,7 @@ var PermitSearch;
             this.fema_map = "";
             this.special_flood_hazard_area = false;
             this.flood_zone_id = "";
-            this.fema_elevation = "";
+            this.fema_elevation = 0;
             this.conditional_letter_of_map_revision = false;
         }
         return FloodData;

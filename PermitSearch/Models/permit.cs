@@ -220,6 +220,59 @@ namespace PermitSearch.Models
       return sbJoin.ToString();
     }
 
+    public static List<permit> GetRelatedPermits(int permit_number)
+    {
+      var dp = new DynamicParameters();
+      dp.Add("@permit_number", permit_number);
+
+      string sql = @"
+        USE PermitSearch;
+
+        WITH MasterPermit AS (
+          SELECT master_permit_number permit_number
+          FROM related_permit
+          WHERE permit_number=@permit_number OR master_permit_number = @permit_number
+        ), BasePermits AS (
+          SELECT
+            permit_number
+          FROM MasterPermit
+          UNION
+          SELECT RP.permit_number
+          FROM related_permit RP
+          INNER JOIN MasterPermit M ON RP.master_permit_number = M.permit_number
+        )
+
+        SELECT
+          P.permit_number,
+          ISNULL(P.permit_type, '') permit_type,
+          P.days_since_last_passed_inspection,
+          ISNULL(P.address, '') address,
+          P.issue_date,
+          P.void_date,
+          P.co_date,
+          P.is_closed,
+          P.passed_final_inspection,
+          P.total_charges,
+          P.paid_charges,
+          P.document_count,
+          P.has_related_permits,
+          ISNULL(PA.parcel_number, '') parcel_number,
+          ISNULL(PA.pin_complete, '') pin_complete,
+          ISNULL(O.owner_name, '') owner_name,
+          ISNULL(P.contractor_number, '') contractor_number,
+          ISNULL(C.contractor_name, '') contractor_name,
+          ISNULL(C.company_name, '') company_name
+        FROM permit P
+        INNER JOIN BasePermits B ON P.permit_number=B.permit_number
+        LEFT OUTER JOIN permit_contractor PC ON PC.permit_number = P.permit_number
+        LEFT OUTER JOIN contractor C ON C.contractor_number = PC.contractor_number
+        LEFT OUTER JOIN permit_parcel PP ON PP.permit_number = P.permit_number
+        LEFT OUTER JOIN parcel PA ON PA.ID = PP.parcel_id
+        LEFT OUTER JOIN permit_owner PO ON P.permit_number = PO.permit_number
+        LEFT OUTER JOIN owner O ON O.id = PO.owner_id";
+      return Constants.Get_Data<permit>("Production", sql, dp);
+    }
+
     public static List<permit> Search(
       int permitnumber,
       string status,

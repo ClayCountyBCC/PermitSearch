@@ -60,7 +60,6 @@
       Utilities.Get<AssociatedPermit>(path + "API/Permit/PrintPermit?permit_number=" + permit_number)
         .then(function (permit: AssociatedPermit)
         {
-          console.log("assoc permit", permit);
           PermitSearch.LoadAssocPermit(permit);
         }, function (e)
           {

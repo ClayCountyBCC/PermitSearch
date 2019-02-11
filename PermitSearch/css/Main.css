@@ -35,8 +35,28 @@ input[readonly] {
   @page {
     margin: 2em;
     size: portrait; }
+  html {
+    display: block !important; }
   body {
+    display: block;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important; }
+  #views section {
+    display: none; }
+  #selectedPermitPrint {
+    margin: 0;
     display: block; }
+  #printablePermit, #selectedPermitPrint .modal-card-body,
+  #selectedPermitPrint .modal, #selectedPermitPrint,
+  #selectedPermitPrint .modal-card {
+    overflow: auto !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    display: block !important;
+    /*position: initial;*/
+    position: unset !important;
+    max-height: none !important; }
   #printablePermit fieldset {
     display: block;
     /*margin-top: -1em;*/

@@ -50,19 +50,20 @@ namespace PermitSearch.Models
         var notes = permit.GetPermitNotes(permit_number);
         if(square_footage > 0)
         {
-          notes.Add("Square Footage: " + square_footage.ToString());
+          notes.Insert(0, "Square Footage: " + square_footage.ToString());
         }
         if (stories > 0)
         {
-          notes.Add("Stories: " + stories.ToString());
+          notes.Insert(0, "Stories: " + stories.ToString());
         }
         else
         {
-          notes.Add("Stories: None");
+          notes.Insert(0, "Stories: None");
         }
-        if (front.Length > 0) notes.Add("Front: " + front);
-        if (side.Length > 0) notes.Add("Side: " + side);
-        if (rear.Length > 0) notes.Add("Rear: " + rear);
+        if (front.Length > 0) notes.Insert(0, "Front: " + front);
+        if (side.Length > 0) notes.Insert(0, "Side: " + side);
+        if (rear.Length > 0) notes.Insert(0, "Rear: " + rear);
+        
         return notes;
       }
     }
@@ -107,21 +108,10 @@ namespace PermitSearch.Models
             M.IssueDate issue_date, 
             B.ParcelNo parcel_number, 
             B.valuation, 
-            --B.ClrSht clearance_sheet, 
             B.legal, 
             B.SqFt square_footage,
             ISNULL(stories, 0) stories,
-
-            --B.MaxHeight max_height,
-
-            --B.PropUseCode prop_use_code,
-            --ISNULL(M.PropUseDesc,PR.UseDescription) prop_use_description, 
             B.PropUseCode + ' ' + ISNULL(M.PropUseDesc,PR.UseDescription) proposed_use,
-            --PR.CO prop_use_co, 
-            --M.TempCoDate temp_co_date, 
-
-            --ISNULL(M.TempCoDateDays, -1) temp_co_date_days, 
-
             CASE WHEN confidential = 1 THEN 'Confidential' 
               ELSE ISNULL(B.ProjName, '') END  project_name, 
 
@@ -132,22 +122,36 @@ namespace PermitSearch.Models
             CASE WHEN confidential = 1 THEN 'Confidential' 
               ELSE B.OwnerName END owner_name, 
             CASE WHEN confidential = 1 THEN 'Confidential' 
-              ELSE RTRIM(ISNULL(B.OwnerStreet, '')) + ', ' + 
-                   RTRIM(ISNULL(B.OwnerCity, '')) + '  ' + 
-                   RTRIM(ISNULL(B.OwnerState, ''))+ '  ' + 
-                   RTRIM(ISNULL(B.OwnerZip, '')) END owner_address, 
+              ELSE LTRIM(RTRIM(ISNULL(B.OwnerStreet, ''))) + ', ' + 
+                   LTRIM(RTRIM(ISNULL(B.OwnerCity, ''))) + '  ' + 
+                   LTRIM(RTRIM(ISNULL(B.OwnerState, '')))+ '  ' + 
+                   LTRIM(RTRIM(ISNULL(B.OwnerZip, ''))) END owner_address, 
             
-	          RTRIM(ISNULL(C1.CustomerName,'')) contractor_data_line1, 
+	          CASE WHEN UPPER(B.ContractorId) = 'OWNER'
+            THEN 'OWNER'
+            ELSE RTRIM(ISNULL(C1.CustomerName,'')) END contractor_data_line1, 
 
-            RTRIM(ISNULL(C1.Address1, '')) + ' ' + 
-              RTRIM(ISNULL(C1.Address2, '')) + ' ' + 
-              RTRIM(ISNULL(C1.City, '')) + ' ' + 
-              RTRIM(ISNULL(C1.State, '')) + ' ' + 
-              RTRIM(ISNULL(C1.Zip, '')) contractor_data_line2, 
+            CASE WHEN UPPER(B.ContractorId) = 'OWNER'
+            THEN ''
+            ELSE 
+              RTRIM(ISNULL(C1.Address1, '')) + ' ' + 
+                RTRIM(ISNULL(C1.Address2, '')) + ' ' + 
+                RTRIM(ISNULL(C1.City, '')) + ' ' + 
+                RTRIM(ISNULL(C1.State, '')) + ' ' + 
+                RTRIM(ISNULL(C1.Zip, '')) END contractor_data_line2, 
+             
+            CASE WHEN UPPER(B.ContractorId) = 'OWNER'
+            THEN ''
+            ELSE RTRIM(ISNULL(B.ContractorId,'')) +
+              CASE WHEN ISNULL(C1.Phone1, '') = '' 
+                THEN ''
+                ELSE ' Phone: '+ LTRIM(RTRIM(C1.Phone1)) 
+                END +
+              CASE WHEN ISNULL(C1.Fax, '') = '' 
+                THEN '' 
+                ELSE ' Fax: ' + LTRIM(RTRIM(C1.Fax)) END 
+              END contractor_data_line3,
 
-            RTRIM(ISNULL(B.ContractorId, '')) + ' Phone: ' + 
-              RTRIM(ISNULL(C1.Phone1, '')) + ' Fax: ' + 
-              RTRIM(ISNULL(C1.Fax, '')) contractor_data_line3, 
 
             B.SetbackType set_back_type, 
             B.Setback set_back, 

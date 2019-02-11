@@ -115,20 +115,11 @@ var PermitSearch;
     }
     PermitSearch.Search = Search;
     function CreatePrintPermitPreview() {
+        Utilities.Toggle_Loading_Button("PermitPrintButton", true);
         var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
-        var permit_number = parseInt(currentHash.permit_display);
-        console.log('permit number we want to print', permit_number);
-        var path = GetPath();
-        if ((permit_number > 10000 && permit_number < 20000000 /* LOWEST PERMITNUMBER FOUND is 00010001 */) ||
-            (permit_number > 89999999 && permit_number < 100000000)) {
-            console.log('getting master permit');
-            //Utilities.Get<MasterPermit>(path + "API/Permit/PrintPermit?permit_number=" + permit_number);
-            PermitSearch.MasterPermit.Get(permit_number.toString());
-        }
-        else {
-            console.log('getting assoc permit');
-            PermitSearch.AssociatedPermit.Get(permit_number.toString());
-        }
+        currentHash.permit_print = currentHash.permit_display;
+        currentHash.permit_display = "";
+        location.hash = currentHash.ToHash();
     }
     PermitSearch.CreatePrintPermitPreview = CreatePrintPermitPreview;
     function LoadMasterPermit(permit) {
@@ -148,16 +139,18 @@ var PermitSearch;
         Utilities.Set_Text("printablePermitOwner", permit.owner_name);
         Utilities.Set_Text("printablePermitOwnerAddress", permit.owner_address);
         Utilities.Set_Text("printablePermitContractor1", permit.contractor_data_line1);
-        Utilities.Set_Text("printablePermitContractor2", permit.contractor_data_line2);
-        Utilities.Set_Text("printablePermitContractor3", permit.contractor_data_line3);
-        var info = document.getElementById("printablePermitInformation");
-        Utilities.Clear_Element(info);
-        for (var _i = 0, _a = permit.notes; _i < _a.length; _i++) {
-            var n = _a[_i];
-            var p = document.createElement("p");
-            p.appendChild(document.createTextNode(n));
-            info.appendChild(p);
+        if (permit.contractor_data_line1 === "OWNER") {
+            Utilities.Hide("printablePermitContractor2");
+            Utilities.Hide("printablePermitContractor3");
         }
+        else {
+            Utilities.Show("printablePermitContractor2");
+            Utilities.Show("printablePermitContractor3");
+            Utilities.Set_Text("printablePermitContractor2", permit.contractor_data_line2);
+            Utilities.Set_Text("printablePermitContractor3", permit.contractor_data_line3);
+        }
+        LoadPermitPrintNotes(permit.notes);
+        LoadFloodZoneData(permit.flood_data);
         if (permit.outstanding_holds.length === 0) {
             PermitSearch.CreateMessageRow("printablePermitHoldContainer", 1, "No outstanding holds were found for this permit.");
         }
@@ -173,6 +166,54 @@ var PermitSearch;
         FinalizePrintablePermit();
     }
     PermitSearch.LoadMasterPermit = LoadMasterPermit;
+    function LoadFloodZoneData(data) {
+        var container = document.getElementById("printablePermitFloodData");
+        Utilities.Clear_Element(container);
+        if (data.length == 0) {
+            container.appendChild(CreateNoteElement("No Flood data found."));
+            return;
+        }
+        var elevation = 0;
+        var floodzones = [];
+        var hazard_area = false;
+        var letter = false;
+        for (var _i = 0, data_1 = data; _i < data_1.length; _i++) {
+            var d = data_1[_i];
+            if (d.fema_elevation > elevation)
+                elevation = d.fema_elevation;
+            if (floodzones.indexOf(d.flood_zone_code) === -1)
+                floodzones.push(d.flood_zone_code);
+            if (d.conditional_letter_of_map_revision)
+                letter = true;
+            if (d.special_flood_hazard_area)
+                hazard_area = true;
+        }
+        container.appendChild(CreateNoteElement("First Floor Elevation: " + elevation.toFixed(2)));
+        container.appendChild(CreateNoteElement("Flood Zone: " + floodzones.join(",")));
+        var area = "Special Flood Hazard Area: " + (hazard_area ? "Yes" : "No");
+        container.appendChild(CreateNoteElement(area));
+        var clomr = "Conditional Letter of Map Revision: " + (letter ? "Yes" : "No");
+        container.appendChild(CreateNoteElement(clomr));
+    }
+    function CreateNoteElement(value) {
+        var p = document.createElement("p");
+        p.classList.add("column");
+        p.classList.add("is-half");
+        p.appendChild(document.createTextNode(value));
+        return p;
+    }
+    function LoadPermitPrintNotes(notes) {
+        var info = document.getElementById("printablePermitInformation");
+        Utilities.Clear_Element(info);
+        for (var _i = 0, notes_1 = notes; _i < notes_1.length; _i++) {
+            var n = notes_1[_i];
+            info.appendChild(CreateNoteElement(stripHtml(n)));
+        }
+    }
+    function stripHtml(html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        return doc.body.textContent || "";
+    }
     function LoadAssocPermit(permit) {
         // don't forget to do something with flood data
         Toggle_Master_Permit_Only(false);
@@ -214,14 +255,7 @@ var PermitSearch;
             Utilities.Set_Text("printablePermitMasterContractorNumber", permit.general_contractor_license_number);
             Utilities.Set_Text("printablePermitMasterContractorName", permit.general_contractor_name);
         }
-        var info = document.getElementById("printablePermitInformation");
-        Utilities.Clear_Element(info);
-        for (var _i = 0, _a = permit.notes; _i < _a.length; _i++) {
-            var n = _a[_i];
-            var p = document.createElement("p");
-            p.appendChild(document.createTextNode(n));
-            info.appendChild(p);
-        }
+        LoadPermitPrintNotes(permit.notes);
         if (permit.outstanding_holds.length === 0) {
             PermitSearch.CreateMessageRow("printablePermitHoldContainer", 1, "No outstanding holds were found for this permit.");
         }
@@ -238,9 +272,12 @@ var PermitSearch;
     }
     PermitSearch.LoadAssocPermit = LoadAssocPermit;
     function FinalizePrintablePermit() {
-        PermitSearch.CloseModals();
-        Utilities.Hide("views");
-        Utilities.Show("printablePermit");
+        //PermitSearch.CloseModals();
+        //Utilities.Hide("views");
+        //Utilities.Show("printablePermit");
+        var printModal = document.getElementById("selectedPermitPrint");
+        printModal.classList.add("is-active");
+        Utilities.Toggle_Loading_Button("PermitPrintButton", false);
     }
     function Toggle_Loading_Search_Buttons(disabled) {
         var sections = document.querySelectorAll("#views > section button");
@@ -293,23 +330,28 @@ var PermitSearch;
         else {
             currentHash.UpdateInputs();
         }
-        if (newHash.ReadyToTogglePermit(oldHash)) {
+        if (newHash.ReadyToTogglePermitDisplay(oldHash)) {
             TogglePermitDisplay(newHash.permit_display);
             Toggle_Loading_Search_Buttons(false);
+            return;
+        }
+        if (newHash.ReadyToTogglePermitPrint(oldHash)) {
+            TogglePermitPrint(newHash.permit_print);
+            return;
+        }
+        if (currentHash.ReadyToSearch()) {
+            Query(currentHash);
         }
         else {
-            if (currentHash.ReadyToSearch()) {
-                Query(currentHash);
-            }
-            else {
-                Toggle_Loading_Search_Buttons(false);
-            }
+            Toggle_Loading_Search_Buttons(false);
         }
     }
     PermitSearch.HandleHash = HandleHash;
     function TogglePermitDisplay(permit_number) {
         // this function will either hide or show the the permit modals
         // based on if the permit number has a length or not.
+        var permitPrint = document.getElementById("selectedPermitPrint");
+        permitPrint.classList.remove("is-active");
         var permitModal = document.getElementById("selectedPermit");
         var permitErrorModal = document.getElementById("selectedPermitError");
         if (permit_number.length === 0) {
@@ -329,22 +371,42 @@ var PermitSearch;
             permitErrorModal.classList.add("is-active");
         }
     }
+    function TogglePermitPrint(permit_number) {
+        var printModal = document.getElementById("selectedPermitPrint");
+        if (permit_number.length === 0) {
+            printModal.classList.remove("is-active");
+            return;
+        }
+        var permit = parseInt(permit_number);
+        if ((permit > 10000 && permit < 20000000 /* LOWEST PERMITNUMBER FOUND is 00010001 */) ||
+            (permit > 89999999 && permit < 100000000)) {
+            PermitSearch.MasterPermit.Get(permit_number.toString());
+        }
+        else {
+            PermitSearch.AssociatedPermit.Get(permit_number.toString());
+        }
+    }
     function Query(currentHash) {
         var path = GetPath();
+        var permitPrint = currentHash.permit_print;
+        var permitDisplay = currentHash.permit_display;
         var newHash = currentHash.ToHash();
         var searchHash = "?" + newHash.substring(1);
-        console.log('hash', newHash);
         // Get the list of permits for this search
         Utilities.Get(path + "API/Search/Permit" + searchHash)
             .then(function (permits) {
             console.log("permits", permits);
             PermitSearch.search_results = permits;
             if (PermitSearch.search_results.length > 0) {
-                console.log('permits found');
                 Utilities.Show("searchResults");
-                CreateResultsTable(PermitSearch.search_results);
-                if (currentHash.permit_display.length > 0) {
-                    TogglePermitDisplay(currentHash.permit_display);
+                CreateResultsTable(PermitSearch.search_results, "resultsHead", "resultsBody", false);
+                if (permitPrint.length > 0) {
+                    TogglePermitPrint(permitPrint);
+                }
+                else {
+                    if (permitDisplay.length > 0) {
+                        TogglePermitDisplay(permitDisplay);
+                    }
                 }
             }
             else {
@@ -370,23 +432,26 @@ var PermitSearch;
             console.log('error getting permit count', e);
         });
     }
-    function CreateResultsTable(permits) {
+    function CreateResultsTable(permits, headerContainer, bodyContainer, relatedPermit) {
         // The table and headers will already exist, we'll just
         // clear and populate the table body with table rows.
         var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
         var df = document.createDocumentFragment();
-        CreateResultsHeaderRow(currentHash.tab);
+        CreateResultsHeaderRow(currentHash.tab, headerContainer);
         for (var _i = 0, permits_1 = permits; _i < permits_1.length; _i++) {
             var p = permits_1[_i];
-            df.appendChild(CreateResultsRow(p, currentHash));
+            df.appendChild(CreateResultsRow(p, currentHash, relatedPermit));
         }
-        var tbody = document.getElementById("resultsBody");
+        var tbody = document.getElementById(bodyContainer);
         Utilities.Clear_Element(tbody);
         tbody.appendChild(df);
-        var results = document.getElementById("searchResults");
-        results.scrollIntoView();
+        if (bodyContainer === "resultsBody") {
+            var results = document.getElementById("searchResults");
+            results.scrollIntoView();
+        }
     }
-    function CreateResultsHeaderRow(rowType) {
+    PermitSearch.CreateResultsTable = CreateResultsTable;
+    function CreateResultsHeaderRow(rowType, container) {
         var df = document.createDocumentFragment();
         var tr = document.createElement("tr");
         tr.appendChild(CreateResultsHeaderCell("Permit", "", "8.5%", "permit"));
@@ -416,15 +481,25 @@ var PermitSearch;
         }
         tr.appendChild(CreateResultsHeaderCell("Inspections", "", "10%", ""));
         df.appendChild(tr);
-        var head = document.getElementById("resultsHead");
+        var head = document.getElementById(container);
         Utilities.Clear_Element(head);
         head.appendChild(df);
     }
-    function CreateResultsRow(p, currentHash) {
-        currentHash.permit_display = p.permit_number.toString();
+    function CreateResultsRow(p, currentHash, relatedPermit) {
+        var tab = currentHash.tab;
+        if (relatedPermit) {
+            currentHash = new PermitSearch.LocationHash("");
+            currentHash.tab = tab;
+            currentHash.permit_number = p.permit_number.toString();
+            currentHash.permit_display = p.permit_number.toString();
+        }
+        else {
+            currentHash.permit_display = p.permit_number.toString();
+            currentHash.permit_print = "";
+        }
         var inspectionLink = "https://public.claycountygov.com/inspectionscheduler/#permit=" + p.permit_number.toString();
         var tr = document.createElement("tr");
-        tr.appendChild(CreateResultsCellLink(p.permit_number.toString().padStart(8, "0"), "", currentHash.ToHash()));
+        tr.appendChild(CreateResultsCellLink(p.permit_number.toString().padStart(8, "0"), "", currentHash.ToHash(), relatedPermit));
         tr.appendChild(CreateResultsCell(p.is_closed ? "Closed" : "Open"));
         if (new Date(p.issue_date).getFullYear() !== 1) {
             tr.appendChild(CreateResultsCell(Utilities.Format_Date(p.issue_date)));
@@ -514,6 +589,8 @@ var PermitSearch;
     function HandlePagination(totalCount, currentPage, pageSize, currentHash) {
         // we'll need to enable/disable the previous / next buttons based on 
         // if we're on the first/last page
+        currentHash.permit_display = "";
+        currentHash.permit_print = "";
         var totalPages = Math.ceil(totalCount / pageSize);
         // Handle next/previous pages
         var previousPage = document.getElementById("resultsPreviousPage");
@@ -610,6 +687,8 @@ var PermitSearch;
     function CreatePaginationLink(page, isSelected, currentHash) {
         // scroll back up to the top when a page is clicked
         currentHash.page = page.toString();
+        currentHash.permit_display = "";
+        currentHash.permit_print = "";
         var li = document.createElement("li");
         var a = document.createElement("a");
         a.classList.add("pagination-link");
@@ -647,12 +726,20 @@ var PermitSearch;
         location.hash = currentHash.ToHash();
     }
     PermitSearch.ClosePermitModal = ClosePermitModal;
+    function ClosePermitPrintModal() {
+        var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
+        currentHash.permit_display = currentHash.permit_print;
+        currentHash.permit_print = "";
+        location.hash = currentHash.ToHash();
+    }
+    PermitSearch.ClosePermitPrintModal = ClosePermitPrintModal;
     function ViewPermitDetail(permit) {
         PopulatePermitHeading(permit);
         PopulatePermitInformation(permit);
         PermitSearch.Document.QueryDocuments(permit.permit_number);
         PermitSearch.Hold.QueryHolds(permit.permit_number);
         PermitSearch.Charge.QueryCharges(permit.permit_number);
+        PermitSearch.Permit.QueryRelatedPermits(permit.permit_number);
     }
     function PopulatePermitHeading(permit) {
         var permitHeading = document.getElementById("permitHeading");
@@ -760,13 +847,6 @@ var PermitSearch;
         control.appendChild(input);
         field.appendChild(control);
         return field;
-        //<div class="field" >
-        //  <label class="label is-medium" > Contractor Number < /label>
-        //    < div class="control" >
-        //      <input id="permitContractorNumber"
-        //class="input is-medium" type = "text" disabled value = "" />
-        //  </div>
-        //  < /div>
     }
     function Create_Field_Link(label, value, buttonLabel, link) {
         var field = document.createElement("div");
