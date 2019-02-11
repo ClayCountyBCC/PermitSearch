@@ -44,11 +44,17 @@ input[readonly] {
     overflow-y: visible !important; }
   #views section {
     display: none; }
-  #selectedPermitPrint {
+  #selectedPermitPrint.modal.is-active {
     margin: 0;
-    display: block; }
-  #printablePermit, #selectedPermitPrint .modal-card-body,
-  #selectedPermitPrint .modal, #selectedPermitPrint,
+    overflow: auto !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    display: block !important;
+    /*position: initial;*/
+    position: unset !important;
+    max-height: none !important; }
+  #printablePermit,
+  #selectedPermitPrint .modal-card-body,
   #selectedPermitPrint .modal-card {
     overflow: auto !important;
     overflow-x: auto !important;
