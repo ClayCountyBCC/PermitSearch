@@ -16,7 +16,7 @@ namespace PermitSearch.Models
     //public string clearance_sheet { get; set; } = "";
     public string legal { get; set; } = "";
     public int square_footage { get; set; } = -1;
-    public int stories { get; set; } = -1;
+    public string stories { get; set; } = "";
     public string proposed_use { get; set; } = "";
     //public string max_height { get; set; } = "";
     //public string prop_use_code { get; set; } = "";
@@ -52,7 +52,7 @@ namespace PermitSearch.Models
         {
           notes.Insert(0, "Square Footage: " + square_footage.ToString());
         }
-        if (stories > 0)
+        if (stories.Length > 0)
         {
           notes.Insert(0, "Stories: " + stories.ToString());
         }
@@ -110,7 +110,7 @@ namespace PermitSearch.Models
             B.valuation, 
             B.legal, 
             B.SqFt square_footage,
-            ISNULL(stories, 0) stories,
+            ISNULL(stories, '0') stories,
             B.PropUseCode + ' ' + ISNULL(M.PropUseDesc,PR.UseDescription) proposed_use,
             CASE WHEN confidential = 1 THEN 'Confidential' 
               ELSE ISNULL(B.ProjName, '') END  project_name, 
