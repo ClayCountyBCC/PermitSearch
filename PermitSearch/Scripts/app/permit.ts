@@ -61,7 +61,7 @@ namespace PermitSearch
           console.log("related permits", permits);
           if (permits.length === 0)
           {
-            PermitSearch.CreateMessageRow("relatedPermitsResultsBody", 4, "No documents were found for this permit.");
+            PermitSearch.CreateMessageRow("relatedPermitsResultsBody", 4, "No related permits were found for this permit.");
           }
           else
           {
