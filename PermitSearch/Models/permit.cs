@@ -103,7 +103,7 @@ namespace PermitSearch.Models
           {
             dp.Add("@contractor_name", contractorname);
           }
-          if (contractorname.Length > 0)
+          if (companyname.Length > 0)
           {
             dp.Add("@company_name", companyname);
           }
