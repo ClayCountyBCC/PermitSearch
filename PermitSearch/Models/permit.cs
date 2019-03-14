@@ -192,8 +192,8 @@ namespace PermitSearch.Models
 
         if (streetnumber.Length > 0 | streetname.Length > 0)
         {
-          sbJoin.AppendLine("INNER JOIN permit_address PAD ON PAD.permit_number = P.permit_number");
-          sbJoin.AppendLine("INNER JOIN [address] A ON A.ID = PAD.address_id");
+          //sbJoin.AppendLine("INNER JOIN permit_address PAD ON PAD.permit_number = P.permit_number");
+          //sbJoin.AppendLine("INNER JOIN [address] A ON A.ID = PAD.address_id");
           if (streetnumber.Length > 0)
           {
             sbWhere.AppendLine("AND (A.street_number = @street_number ");
@@ -316,7 +316,9 @@ namespace PermitSearch.Models
         LEFT OUTER JOIN permit_parcel PP ON PP.permit_number = P.permit_number
         LEFT OUTER JOIN parcel PA ON PA.ID = PP.parcel_id
         LEFT OUTER JOIN permit_owner PO ON P.permit_number = PO.permit_number
-        LEFT OUTER JOIN owner O ON O.id = PO.owner_id";
+        LEFT OUTER JOIN owner O ON O.id = PO.owner_id
+        LEFT OUTER JOIN permit_address PAD ON PAD.permit_number = P.permit_number
+        LEFT OUTER JOIN [address] A ON A.ID = PAD.address_id";
       sb.AppendLine(sql);
       sb.AppendLine(GetSearchQuery(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page));
       //sb.AppendLine("ORDER BY @sortfield @sortdirection");
@@ -409,7 +411,9 @@ namespace PermitSearch.Models
         LEFT OUTER JOIN permit_parcel PP ON PP.permit_number = P.permit_number
         LEFT OUTER JOIN parcel PA ON PA.ID = PP.parcel_id
         LEFT OUTER JOIN permit_owner PO ON P.permit_number = PO.permit_number
-        LEFT OUTER JOIN owner O ON O.id = PO.owner_id";
+        LEFT OUTER JOIN owner O ON O.id = PO.owner_id
+        LEFT OUTER JOIN permit_address PAD ON PAD.permit_number = P.permit_number
+        LEFT OUTER JOIN [address] A ON A.ID = PAD.address_id";
       sb.AppendLine(sql);
       sb.AppendLine(GetSearchQuery(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page));
       return Constants.Exec_Scalar<int>("Production", sb.ToString(), dp);
