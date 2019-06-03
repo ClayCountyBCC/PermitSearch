@@ -13,6 +13,8 @@
       "Scripts/app/charge.js",
       "Scripts/app/document.js",
       "Scripts/app/hold.js",
+      "Scripts/app/permit_note.js",
+      "Scripts/app/plan_review.js",
       "Scripts/app/locationhash.js",
       "Scripts/app/app.js"
     ]

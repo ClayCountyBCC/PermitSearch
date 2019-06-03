@@ -7,6 +7,7 @@ namespace PermitSearch
   interface IPermit
   {
     permit_number: number;
+    base_id: number;
     permit_type: string;
     days_since_last_passed_inspection: number;
     address: string;
@@ -14,6 +15,8 @@ namespace PermitSearch
     void_date: any;
     co_date: any;
     is_closed: boolean;
+    close_type: string;
+    has_plans: boolean;
     passed_final_inspection: boolean;
     outstanding_hold_count: number;
     total_charges: number;
@@ -30,6 +33,7 @@ namespace PermitSearch
   export class Permit implements IPermit
   {
     public permit_number: number = 0;
+    public base_id: number = 0;
     public permit_type: string = "";
     public days_since_last_passed_inspection: number = 0;
     public address: string = "";
@@ -37,12 +41,14 @@ namespace PermitSearch
     public void_date: any;
     public co_date: any = new Date();
     public is_closed: boolean = false;
+    public close_type: string = "";
     public passed_final_inspection: boolean = false;
     public outstanding_hold_count: number = 0;
     public total_charges: number = 0;
     public paid_charges: number = 0;
     public document_count: number = 0;
     public has_related_permits: boolean = false;
+    public has_plans: boolean = false;
     public contractor_number: string = "";
     public contractor_name: string = "";
     public company_name: string = "";

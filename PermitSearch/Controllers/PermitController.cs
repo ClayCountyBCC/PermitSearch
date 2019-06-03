@@ -18,13 +18,13 @@ namespace PermitSearch.Controllers
   [RoutePrefix("API/Permit")]
   public class PermitController : ApiController
   {
-    // GET: api/Permit
-    [HttpGet]
-    [Route("PermitCard")]
-    public IHttpActionResult GetPermitCard(int permitnumber)
-    {
-      return Ok(permit.GetSpecific(permitnumber));
-    }
+    //// GET: api/Permit
+    //[HttpGet]
+    //[Route("PermitCard")]
+    //public IHttpActionResult GetPermitCard(int permitnumber)
+    //{
+    //  return Ok(permit.GetSpecific(permitnumber));
+    //}
 
     [HttpGet]
     [Route("Documents")]
@@ -32,6 +32,21 @@ namespace PermitSearch.Controllers
     {
       return Ok(document.GetDocuments(permitnumber));
     }
+
+    [HttpGet]
+    [Route("PermitNotes")]
+    public IHttpActionResult GetPermitNotes(int permitnumber)
+    {
+      return Ok(permit_note.GetPermitNotes(permitnumber));
+    }
+
+    [HttpGet]
+    [Route("PlansReview")]
+    public IHttpActionResult GetPlanReviews(int permitnumber)
+    {
+      return Ok(plan_review.GetPlanReviews(permitnumber));
+    }
+
 
     [HttpGet]
     [Route("Holds")]

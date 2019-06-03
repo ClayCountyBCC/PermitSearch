@@ -9,6 +9,9 @@ var PermitSearch;
     PermitSearch.search_results = [];
     PermitSearch.permit_documents = [];
     PermitSearch.permit_holds = [];
+    PermitSearch.permit_notes = [];
+    PermitSearch.plan_reviews = [];
+    PermitSearch.plan_reviews_tbody = null;
     PermitSearch.permit_charges = [];
     PermitSearch.selected_tab = "permit";
     PermitSearch.Menus = [
@@ -214,6 +217,7 @@ var PermitSearch;
         var doc = new DOMParser().parseFromString(html, 'text/html');
         return doc.body.textContent || "";
     }
+    PermitSearch.stripHtml = stripHtml;
     function LoadAssocPermit(permit) {
         // don't forget to do something with flood data
         Toggle_Master_Permit_Only(false);
@@ -739,6 +743,8 @@ var PermitSearch;
         PermitSearch.Document.QueryDocuments(permit.permit_number);
         PermitSearch.Hold.QueryHolds(permit.permit_number);
         PermitSearch.Charge.QueryCharges(permit.permit_number);
+        PermitSearch.PlanReview.QueryPlanReview(permit.permit_number, permit.has_plans);
+        PermitSearch.PermitNote.QueryPermitNotes(permit.permit_number);
         PermitSearch.Permit.QueryRelatedPermits(permit.permit_number);
     }
     function PopulatePermitHeading(permit) {
@@ -770,7 +776,12 @@ var PermitSearch;
         }
     }
     function PopulatePermitInformation(permit) {
-        Utilities.Set_Value("permitCompleted", permit.is_closed ? "Yes" : "No");
+        if (permit.is_closed && permit.close_type.length > 0) {
+            Utilities.Set_Value("permitCompleted", "Yes - " + permit.close_type);
+        }
+        else {
+            Utilities.Set_Value("permitCompleted", permit.is_closed ? "Yes" : "No");
+        }
         Utilities.Set_Value("permitFinalInspection", permit.passed_final_inspection ? "Yes" : "No");
         var permitInspectionButton = document.getElementById("permitInspectionSchedulerLink");
         var inspectionLink = "https://public.claycountygov.com/inspectionscheduler/#permit=" + permit.permit_number.toString();

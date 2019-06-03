@@ -338,6 +338,12 @@
               <li id="nav-permitHolds">
                 <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitHolds');">Holds</a>
               </li>
+              <li id="nav-permitNotes">
+                <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'permitNotes');">Notes</a>
+              </li>
+              <li id="nav-plansReview">
+                <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'plansReview');">Plans Review</a>
+              </li>
               <li id="nav-relatedPermits">
                 <a onclick="Utilities.Handle_Tabs('#permitTabs > ul > li', '.modal-card-body > section', 'relatedPermits');">Related Permits</a>
               </li>
@@ -455,6 +461,39 @@
                 </tr>
               </thead>
               <tbody id="holdContainer"></tbody>
+            </table>
+          </section>
+
+          <section class="hide"
+                   id="plansReview">
+            <table class="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th style="width: 15%;">Clearance Sheet</th>
+                  <th style="width: 20%;">Plan Type</th>
+                  <th style="width: 15%;">Received On</th>
+                  <th style="width: 15%;">Reviewed By</th>
+                  <th style="width: 15%;">Reviewed On</th>
+                  <th style="width: 20%;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="plansReviewContainer"></tbody>
+            </table>
+          </section>
+
+          <section class="hide"
+                   id="permitNotes">
+            <table class="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th style="width: 15%;">Permit Number</th>
+                  <th style="width: 50%;">Note</th>
+                  <th style="width: 10%;">Note Type</th>
+                  <th style="width: 15%;">Date Added</th>
+                  <th style="width: 10%;">Added By</th>
+                </tr>
+              </thead>
+              <tbody id="permitNotesContainer"></tbody>
             </table>
           </section>
 

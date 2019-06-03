@@ -17,6 +17,7 @@ namespace PermitSearch
 
     static QueryHolds(permit_number: number): void
     {
+      Hold.ResetHolds();
       let path = PermitSearch.GetPath();
       Utilities.Get<Array<Hold>>(path + "API/Permit/Holds?permitnumber=" + permit_number.toString())
         .then(function (holds: Array<Hold>)
@@ -34,7 +35,7 @@ namespace PermitSearch
 
         }, function (e)
         {
-          PermitSearch.CreateMessageRow(Hold.holds_container, 4, "There was an issue retrieving the holds for this permit.  Please try again.");
+          PermitSearch.CreateMessageRow(Hold.holds_container, 1, "There was an issue retrieving the holds for this permit.  Please try again.");
             console.log('error getting holds', e);
           });
     }
@@ -42,7 +43,7 @@ namespace PermitSearch
     static ResetHolds(): void
     {
       PermitSearch.permit_holds = [];
-      PermitSearch.CreateMessageRow(Hold.holds_container, 4, "Loading Holds...")
+      PermitSearch.CreateMessageRow(Hold.holds_container, 1, "Loading Holds...")
     }
 
     static CreateDocumentsTable(holds: Array<Hold>, container: string): void

@@ -1191,18 +1191,21 @@ var PermitSearch;
     var Permit = /** @class */ (function () {
         function Permit() {
             this.permit_number = 0;
+            this.base_id = 0;
             this.permit_type = "";
             this.days_since_last_passed_inspection = 0;
             this.address = "";
             this.issue_date = new Date();
             this.co_date = new Date();
             this.is_closed = false;
+            this.close_type = "";
             this.passed_final_inspection = false;
             this.outstanding_hold_count = 0;
             this.total_charges = 0;
             this.paid_charges = 0;
             this.document_count = 0;
             this.has_related_permits = false;
+            this.has_plans = false;
             this.contractor_number = "";
             this.contractor_name = "";
             this.company_name = "";
@@ -1501,6 +1504,7 @@ var PermitSearch;
         function Hold() {
         }
         Hold.QueryHolds = function (permit_number) {
+            Hold.ResetHolds();
             var path = PermitSearch.GetPath();
             Utilities.Get(path + "API/Permit/Holds?permitnumber=" + permit_number.toString())
                 .then(function (holds) {
@@ -1513,13 +1517,13 @@ var PermitSearch;
                     Hold.CreateDocumentsTable(holds, Hold.holds_container);
                 }
             }, function (e) {
-                PermitSearch.CreateMessageRow(Hold.holds_container, 4, "There was an issue retrieving the holds for this permit.  Please try again.");
+                PermitSearch.CreateMessageRow(Hold.holds_container, 1, "There was an issue retrieving the holds for this permit.  Please try again.");
                 console.log('error getting holds', e);
             });
         };
         Hold.ResetHolds = function () {
             PermitSearch.permit_holds = [];
-            PermitSearch.CreateMessageRow(Hold.holds_container, 4, "Loading Holds...");
+            PermitSearch.CreateMessageRow(Hold.holds_container, 1, "Loading Holds...");
         };
         Hold.CreateDocumentsTable = function (holds, container) {
             var df = document.createDocumentFragment();
@@ -1550,6 +1554,214 @@ var PermitSearch;
     PermitSearch.Hold = Hold;
 })(PermitSearch || (PermitSearch = {}));
 //# sourceMappingURL=hold.js.map
+/// <reference path="app.ts" />
+var PermitSearch;
+(function (PermitSearch) {
+    "use strict";
+    var PermitNote = /** @class */ (function () {
+        function PermitNote() {
+        }
+        PermitNote.QueryPermitNotes = function (permit_number) {
+            PermitNote.ResetPermitNotes();
+            var path = PermitSearch.GetPath();
+            Utilities.Get(path + "API/Permit/PermitNotes?permitnumber=" + permit_number.toString())
+                .then(function (notes) {
+                console.log("permit notes", notes);
+                PermitSearch.permit_notes = notes;
+                if (notes.length === 0) {
+                    PermitSearch.CreateMessageRow(PermitNote.permit_notes_container, 5, "No notes were found for this permit.");
+                }
+                else {
+                    PermitNote.CreateDocumentsTable(notes, PermitNote.permit_notes_container);
+                }
+            }, function (e) {
+                PermitSearch.CreateMessageRow(PermitNote.permit_notes_container, 5, "There was an issue retrieving the notes for this permit.  Please try again.");
+                console.log('error getting permit notes', e);
+            });
+        };
+        PermitNote.ResetPermitNotes = function () {
+            PermitSearch.permit_notes = [];
+            PermitSearch.CreateMessageRow(PermitNote.permit_notes_container, 5, "Loading Notes...");
+        };
+        PermitNote.CreateDocumentsTable = function (notes, container) {
+            var df = document.createDocumentFragment();
+            for (var _i = 0, notes_1 = notes; _i < notes_1.length; _i++) {
+                var n = notes_1[_i];
+                df.appendChild(PermitNote.CreateRow(n));
+            }
+            var tbody = document.getElementById(container);
+            Utilities.Clear_Element(tbody);
+            tbody.appendChild(df);
+        };
+        PermitNote.CreateRow = function (n) {
+            var tr = document.createElement("tr");
+            tr.appendChild(PermitNote.CreateCell(n.permit_number.toString().padStart(8, "0")));
+            tr.appendChild(PermitNote.CreateCell(PermitSearch.stripHtml(n.note)));
+            tr.appendChild(PermitNote.CreateCell(n.note_type));
+            if (new Date(n.created_on.toString()).getFullYear() < 1000) {
+                tr.appendChild(PermitNote.CreateCell(""));
+            }
+            else {
+                tr.appendChild(PermitNote.CreateCell(Utilities.Format_Date(n.created_on)));
+            }
+            tr.appendChild(PermitNote.CreateCell(n.created_by));
+            return tr;
+        };
+        PermitNote.CreateCell = function (value, className) {
+            if (className === void 0) { className = ""; }
+            var td = document.createElement("td");
+            if (className.length > 0)
+                td.classList.add(className);
+            td.appendChild(document.createTextNode(value));
+            return td;
+        };
+        PermitNote.permit_notes_container = "permitNotesContainer";
+        return PermitNote;
+    }());
+    PermitSearch.PermitNote = PermitNote;
+})(PermitSearch || (PermitSearch = {}));
+//# sourceMappingURL=permit_note.js.map
+/// <reference path="app.ts" />
+var PermitSearch;
+(function (PermitSearch) {
+    "use strict";
+    var PlanReview = /** @class */ (function () {
+        function PlanReview() {
+        }
+        PlanReview.QueryPlanReview = function (permit_number, has_plans) {
+            PlanReview.ResetPlanReview();
+            if (!has_plans) {
+                PermitSearch.CreateMessageRow(PlanReview.plans_review_container, 7, "No Plans were found for this permit.");
+                return;
+            }
+            var path = PermitSearch.GetPath();
+            Utilities.Get(path + "API/Permit/PlansReview?permitnumber=" + permit_number.toString())
+                .then(function (planreviews) {
+                console.log("plans reviews", planreviews);
+                PermitSearch.plan_reviews = planreviews;
+                if (planreviews.length === 0) {
+                    PermitSearch.CreateMessageRow(PlanReview.plans_review_container, 7, "No Plans were found for this permit.");
+                }
+                else {
+                    PlanReview.CreateTable(planreviews, PlanReview.plans_review_container);
+                }
+            }, function (e) {
+                PermitSearch.CreateMessageRow(PlanReview.plans_review_container, 7, "There was an issue retrieving the Plans for this permit.  Please try again.");
+                console.log('error getting holds', e);
+            });
+        };
+        PlanReview.ResetPlanReview = function () {
+            PermitSearch.plan_reviews = [];
+            PermitSearch.CreateMessageRow(PlanReview.plans_review_container, 7, "Loading Plans...");
+        };
+        PlanReview.CreateTable = function (planreviews, container) {
+            var df = document.createDocumentFragment();
+            var plan_id = 0;
+            for (var _i = 0, planreviews_1 = planreviews; _i < planreviews_1.length; _i++) {
+                var p = planreviews_1[_i];
+                if (p.plan_id != plan_id) {
+                    plan_id = p.plan_id;
+                    df.appendChild(PlanReview.CreateRow(p));
+                    // need to handle when there are no issues
+                    // because the plans haven't been reviewed yet.
+                    df.appendChild(PlanReview.CreateInitialIssueRow(p));
+                }
+                PermitSearch.plan_reviews_tbody.appendChild(PlanReview.CreateIssueRow(p));
+            }
+            var tbody = document.getElementById(container);
+            Utilities.Clear_Element(tbody);
+            tbody.appendChild(df);
+        };
+        PlanReview.CreateRow = function (p) {
+            var tr = document.createElement("tr");
+            tr.appendChild(PlanReview.CreateCell(p.clearance_sheet));
+            tr.appendChild(PlanReview.CreateCell(p.plan_type));
+            tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.received_date)));
+            if (new Date(p.plan_reviewed_date.toString()).getFullYear() < 1000) {
+                tr.appendChild(PlanReview.CreateCell(""));
+            }
+            else {
+                tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.plan_reviewed_date)));
+            }
+            tr.appendChild(PlanReview.CreateCell(p.plan_reviewed_by));
+            tr.appendChild(PlanReview.CreateCell(p.review_status));
+            return tr;
+        };
+        PlanReview.CreateIssueRow = function (p) {
+            var tr = document.createElement("tr");
+            if (new Date(p.issue_added_on.toString()).getFullYear() < 1000) {
+                var td = document.createElement("td");
+                td.colSpan = 5;
+                td.appendChild(document.createTextNode("No Issues have been added."));
+                tr.appendChild(td);
+            }
+            else {
+                tr.appendChild(PlanReview.CreateCell(PermitSearch.stripHtml(p.plan_review_issue)));
+                tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.issue_added_on)));
+                tr.appendChild(PlanReview.CreateCell(p.issue_added_by));
+                if (new Date(p.signed_off_on.toString()).getFullYear() < 1000) {
+                    tr.appendChild(PlanReview.CreateCell(""));
+                }
+                else {
+                    tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.signed_off_on)));
+                }
+                tr.appendChild(PlanReview.CreateCell(p.signed_off_by));
+            }
+            return tr;
+        };
+        PlanReview.CreateInitialIssueRow = function (p) {
+            var tr = document.createElement("tr");
+            tr.appendChild(PlanReview.CreateCell(""));
+            var td = document.createElement("td");
+            td.colSpan = 5;
+            td.appendChild(PlanReview.CreateIssueTable());
+            tr.appendChild(td);
+            return tr;
+        };
+        PlanReview.CreateIssueTable = function () {
+            var table = document.createElement("table");
+            table.classList.add("table");
+            table.classList.add("is-fullwidth");
+            var thead = document.createElement("thead");
+            table.appendChild(thead);
+            thead.appendChild(PlanReview.CreateIssueHeaderRow());
+            var tbody = document.createElement("tbody");
+            table.appendChild(tbody);
+            PermitSearch.plan_reviews_tbody = tbody;
+            return table;
+        };
+        PlanReview.CreateIssueHeaderRow = function () {
+            var tr = document.createElement("tr");
+            tr.appendChild(PlanReview.CreateHeaderCell("Issue", "40%"));
+            tr.appendChild(PlanReview.CreateHeaderCell("Added On", "15%"));
+            tr.appendChild(PlanReview.CreateHeaderCell("Added By", "15%"));
+            tr.appendChild(PlanReview.CreateHeaderCell("Signed Off On", "15%"));
+            tr.appendChild(PlanReview.CreateHeaderCell("Signed Off By", "15%"));
+            return tr;
+        };
+        PlanReview.CreateCell = function (value, className) {
+            if (className === void 0) { className = ""; }
+            var td = document.createElement("td");
+            if (className.length > 0)
+                td.classList.add(className);
+            td.appendChild(document.createTextNode(value));
+            return td;
+        };
+        PlanReview.CreateHeaderCell = function (value, width, className) {
+            if (className === void 0) { className = ""; }
+            var td = document.createElement("th");
+            if (className.length > 0)
+                td.classList.add(className);
+            td.style.width = width;
+            td.appendChild(document.createTextNode(value));
+            return td;
+        };
+        PlanReview.plans_review_container = "plansReviewContainer";
+        return PlanReview;
+    }());
+    PermitSearch.PlanReview = PlanReview;
+})(PermitSearch || (PermitSearch = {}));
+//# sourceMappingURL=plan_review.js.map
 /// <reference path="app.ts" />
 var PermitSearch;
 (function (PermitSearch) {
@@ -1769,6 +1981,9 @@ var PermitSearch;
     PermitSearch.search_results = [];
     PermitSearch.permit_documents = [];
     PermitSearch.permit_holds = [];
+    PermitSearch.permit_notes = [];
+    PermitSearch.plan_reviews = [];
+    PermitSearch.plan_reviews_tbody = null;
     PermitSearch.permit_charges = [];
     PermitSearch.selected_tab = "permit";
     PermitSearch.Menus = [
@@ -1974,6 +2189,7 @@ var PermitSearch;
         var doc = new DOMParser().parseFromString(html, 'text/html');
         return doc.body.textContent || "";
     }
+    PermitSearch.stripHtml = stripHtml;
     function LoadAssocPermit(permit) {
         // don't forget to do something with flood data
         Toggle_Master_Permit_Only(false);
@@ -2499,6 +2715,8 @@ var PermitSearch;
         PermitSearch.Document.QueryDocuments(permit.permit_number);
         PermitSearch.Hold.QueryHolds(permit.permit_number);
         PermitSearch.Charge.QueryCharges(permit.permit_number);
+        PermitSearch.PlanReview.QueryPlanReview(permit.permit_number, permit.has_plans);
+        PermitSearch.PermitNote.QueryPermitNotes(permit.permit_number);
         PermitSearch.Permit.QueryRelatedPermits(permit.permit_number);
     }
     function PopulatePermitHeading(permit) {
@@ -2530,7 +2748,12 @@ var PermitSearch;
         }
     }
     function PopulatePermitInformation(permit) {
-        Utilities.Set_Value("permitCompleted", permit.is_closed ? "Yes" : "No");
+        if (permit.is_closed && permit.close_type.length > 0) {
+            Utilities.Set_Value("permitCompleted", "Yes - " + permit.close_type);
+        }
+        else {
+            Utilities.Set_Value("permitCompleted", permit.is_closed ? "Yes" : "No");
+        }
         Utilities.Set_Value("permitFinalInspection", permit.passed_final_inspection ? "Yes" : "No");
         var permitInspectionButton = document.getElementById("permitInspectionSchedulerLink");
         var inspectionLink = "https://public.claycountygov.com/inspectionscheduler/#permit=" + permit.permit_number.toString();

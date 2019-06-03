@@ -13,6 +13,9 @@ namespace PermitSearch
   export let search_results: Array<Permit> = [];
   export let permit_documents: Array<Document> = [];
   export let permit_holds: Array<Hold> = [];
+  export let permit_notes: Array<PermitNote> = [];
+  export let plan_reviews: Array<PlanReview> = [];
+  export let plan_reviews_tbody: HTMLTableSectionElement = null;
   export let permit_charges: Array<Charge> = [];
   export let date_updated: any;
   export let selected_tab: string = "permit";
@@ -253,7 +256,7 @@ namespace PermitSearch
     }
   }
 
-  function stripHtml(html)
+  export function stripHtml(html)
   {
     var doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.textContent || "";
@@ -917,6 +920,8 @@ namespace PermitSearch
     Document.QueryDocuments(permit.permit_number);
     Hold.QueryHolds(permit.permit_number);
     Charge.QueryCharges(permit.permit_number);
+    PlanReview.QueryPlanReview(permit.permit_number, permit.has_plans);
+    PermitNote.QueryPermitNotes(permit.permit_number);
     Permit.QueryRelatedPermits(permit.permit_number);
   }
 
@@ -959,7 +964,15 @@ namespace PermitSearch
 
   function PopulatePermitInformation(permit: Permit)
   {
-    Utilities.Set_Value("permitCompleted", permit.is_closed ? "Yes" : "No");
+    if (permit.is_closed && permit.close_type.length > 0)
+    {
+      Utilities.Set_Value("permitCompleted", "Yes - " + permit.close_type);
+    }
+    else
+    {
+      Utilities.Set_Value("permitCompleted", permit.is_closed ? "Yes" : "No");
+    }
+    
     Utilities.Set_Value("permitFinalInspection", permit.passed_final_inspection ? "Yes" : "No");
 
     let permitInspectionButton = <HTMLAnchorElement>document.getElementById("permitInspectionSchedulerLink");

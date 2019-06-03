@@ -182,6 +182,8 @@
     <Compile Include="Models\PermitPrint\AssociatedPermit.cs" />
     <Compile Include="Models\PermitPrint\FloodData.cs" />
     <Compile Include="Models\PermitPrint\MasterPermit.cs" />
+    <Compile Include="Models\permit_note.cs" />
+    <Compile Include="Models\plan_review.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -302,6 +304,8 @@
     <TypeScriptCompile Include="Scripts\app\AssociatedPermit.ts" />
     <TypeScriptCompile Include="Scripts\app\FloodData.ts" />
     <TypeScriptCompile Include="Scripts\app\MasterPermit.ts" />
+    <TypeScriptCompile Include="Scripts\app\permit_note.ts" />
+    <TypeScriptCompile Include="Scripts\app\plan_review.ts" />
     <TypeScriptCompile Include="Scripts\app\string.ts" />
     <TypeScriptCompile Include="Scripts\app\hold.ts" />
     <TypeScriptCompile Include="Scripts\app\LocationHash.ts" />
