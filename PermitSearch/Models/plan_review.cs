@@ -11,6 +11,7 @@ namespace PermitSearch.Models
     public string clearance_sheet { get; set; } = "";
     public int plan_id { get; set; }
     public string plan_type { get; set; }
+    public string comment { get; set; }
     public DateTime received_date { get; set; }
     public DateTime plan_reviewed_date { get; set; } = DateTime.MinValue;
     public string plan_reviewed_by { get; set; } = "";
@@ -43,6 +44,7 @@ namespace PermitSearch.Models
         SELECT 
           C.clearance_sheet
           ,P.plan_id
+          ,ISNULL(P.comment, '') comment
           ,P.plan_type
           ,P.received_date
           ,P.plan_reviewed_date

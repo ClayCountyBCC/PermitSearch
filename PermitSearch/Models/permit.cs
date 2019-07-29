@@ -229,6 +229,7 @@ namespace PermitSearch.Models
       dp.Add("@permit_number", permit_number);
 
       string sql = @"
+        SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
         USE PermitSearch;
 
         WITH BasePermits AS (
@@ -292,6 +293,7 @@ namespace PermitSearch.Models
       var dp = GetDynamicParameters(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page);
       var sb = new StringBuilder();
       string sql = @"
+        SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
         SELECT
           P.permit_number,
           P.base_id,
@@ -408,6 +410,7 @@ namespace PermitSearch.Models
       var dp = GetDynamicParameters(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page);
       var sb = new StringBuilder();
       string sql = @"
+        SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
         SELECT
           COUNT(DISTINCT P.permit_number) CNT
         FROM permit P
@@ -462,6 +465,7 @@ namespace PermitSearch.Models
       param.Add("@permit_number", permit_number);
       param.Add("@permit_type", permit_type);
       var query = @"
+        SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
         USE WATSC;
 
         WITH ClearanceSheets AS (

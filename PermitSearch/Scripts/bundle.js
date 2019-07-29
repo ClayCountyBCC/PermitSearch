@@ -1677,21 +1677,41 @@ var PermitSearch;
             tr.appendChild(PlanReview.CreateCell(p.clearance_sheet));
             tr.appendChild(PlanReview.CreateCell(p.plan_type));
             tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.received_date)));
+            tr.appendChild(PlanReview.CreateCell(p.plan_reviewed_by));
             if (new Date(p.plan_reviewed_date.toString()).getFullYear() < 1000) {
                 tr.appendChild(PlanReview.CreateCell(""));
             }
             else {
                 tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.plan_reviewed_date)));
             }
-            tr.appendChild(PlanReview.CreateCell(p.plan_reviewed_by));
             tr.appendChild(PlanReview.CreateCell(p.review_status));
+            tr.appendChild(PlanReview.CreateCell(PermitSearch.stripHtml(p.comment)));
+            if (p.issue_id === -1) {
+                tr.appendChild(PlanReview.CreateCell("No Issues"));
+            }
+            else {
+                var buttonTd = document.createElement("td");
+                var link = document.createElement("a");
+                link.onclick = function () {
+                    var e = tr.nextElementSibling;
+                    if (e.style.display === "none") {
+                        e.style.display = "table-row";
+                    }
+                    else {
+                        e.style.display = "none";
+                    }
+                };
+                link.appendChild(document.createTextNode("View Issues"));
+                buttonTd.appendChild(link);
+                tr.appendChild(buttonTd);
+            }
             return tr;
         };
         PlanReview.CreateIssueRow = function (p) {
             var tr = document.createElement("tr");
             if (new Date(p.issue_added_on.toString()).getFullYear() < 1000) {
                 var td = document.createElement("td");
-                td.colSpan = 5;
+                td.colSpan = 7;
                 td.appendChild(document.createTextNode("No Issues have been added."));
                 tr.appendChild(td);
             }
@@ -1711,9 +1731,10 @@ var PermitSearch;
         };
         PlanReview.CreateInitialIssueRow = function (p) {
             var tr = document.createElement("tr");
+            tr.style.display = "none";
             tr.appendChild(PlanReview.CreateCell(""));
             var td = document.createElement("td");
-            td.colSpan = 5;
+            td.colSpan = 7;
             td.appendChild(PlanReview.CreateIssueTable());
             tr.appendChild(td);
             return tr;

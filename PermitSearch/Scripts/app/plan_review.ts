@@ -9,6 +9,7 @@ namespace PermitSearch
     clearance_sheet: string;
     plan_id: number;
     plan_type: string;
+    comment: string;
     received_date: Date;
     plan_reviewed_date: Date;
     plan_reviewed_by: string;
@@ -26,6 +27,7 @@ namespace PermitSearch
     public clearance_sheet: string;
     public plan_id: number;
     public plan_type: string;
+    public comment: string;
     public received_date: Date;
     public plan_reviewed_date: Date;
     public plan_reviewed_by: string;
@@ -102,6 +104,9 @@ namespace PermitSearch
       tr.appendChild(PlanReview.CreateCell(p.clearance_sheet));
       tr.appendChild(PlanReview.CreateCell(p.plan_type));
       tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.received_date)));
+
+      tr.appendChild(PlanReview.CreateCell(p.plan_reviewed_by));
+
       if (new Date(p.plan_reviewed_date.toString()).getFullYear() < 1000)
       {
         tr.appendChild(PlanReview.CreateCell(""));
@@ -111,8 +116,34 @@ namespace PermitSearch
         tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.plan_reviewed_date)));
       }
       
-      tr.appendChild(PlanReview.CreateCell(p.plan_reviewed_by));
-      tr.appendChild(PlanReview.CreateCell(p.review_status));      
+      
+      tr.appendChild(PlanReview.CreateCell(p.review_status));
+      tr.appendChild(PlanReview.CreateCell(PermitSearch.stripHtml(p.comment)));
+      if (p.issue_id === -1)
+      {
+        tr.appendChild(PlanReview.CreateCell("No Issues"));
+      }
+      else
+      {
+        let buttonTd = document.createElement("td");
+        let link = document.createElement("a");
+        link.onclick = function ()
+        {
+          let e = (<HTMLElement>tr.nextElementSibling);
+          if (e.style.display === "none")
+          {
+            e.style.display = "table-row";
+          }
+          else
+          {
+            e.style.display = "none";
+          }
+        }
+        link.appendChild(document.createTextNode("View Issues"))
+        buttonTd.appendChild(link);
+        tr.appendChild(buttonTd)
+      }
+
       return tr;
     }
 
@@ -122,7 +153,7 @@ namespace PermitSearch
       if (new Date(p.issue_added_on.toString()).getFullYear() < 1000)
       {
         let td = document.createElement("td");
-        td.colSpan = 5;
+        td.colSpan = 7;
         td.appendChild(document.createTextNode("No Issues have been added."));
         tr.appendChild(td);
       }
@@ -148,9 +179,10 @@ namespace PermitSearch
     static CreateInitialIssueRow(p: PlanReview): HTMLTableRowElement
     {
       let tr = document.createElement("tr");
+      tr.style.display = "none";
       tr.appendChild(PlanReview.CreateCell(""));
       let td = document.createElement("td");
-      td.colSpan = 5;
+      td.colSpan = 7;
       td.appendChild(PlanReview.CreateIssueTable());
       tr.appendChild(td);      
       return tr;
