@@ -215,8 +215,12 @@ var Utilities;
     Utilities.Format_Amount = Format_Amount;
     function Format_Date(date) {
         if (date instanceof Date) {
+            if (date.getFullYear() < 1000)
+                return '';
             return date.toLocaleDateString('en-us');
         }
+        if (new Date(date).getFullYear() < 1000)
+            return '';
         return new Date(date).toLocaleDateString('en-US');
     }
     Utilities.Format_Date = Format_Date;

@@ -107,14 +107,15 @@ namespace PermitSearch
 
       tr.appendChild(PlanReview.CreateCell(p.plan_reviewed_by));
 
-      if (new Date(p.plan_reviewed_date.toString()).getFullYear() < 1000)
-      {
-        tr.appendChild(PlanReview.CreateCell(""));
-      }
-      else
-      {
-        tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.plan_reviewed_date)));
-      }
+      tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.plan_reviewed_date)));
+      //if (new Date(p.plan_reviewed_date.toString()).getFullYear() < 1000)
+      //{
+      //  tr.appendChild(PlanReview.CreateCell(""));
+      //}
+      //else
+      //{
+        
+      //}
       
       
       tr.appendChild(PlanReview.CreateCell(p.review_status));
@@ -150,7 +151,7 @@ namespace PermitSearch
     static CreateIssueRow(p: PlanReview): HTMLTableRowElement
     {
       let tr = document.createElement("tr");
-      if (new Date(p.issue_added_on.toString()).getFullYear() < 1000)
+      if (new Date(p.issue_added_on.toString()).getFullYear() < 1000 && p.plan_review_issue.length === 0)
       {
         let td = document.createElement("td");
         td.colSpan = 7;
@@ -162,14 +163,15 @@ namespace PermitSearch
         tr.appendChild(PlanReview.CreateCell(PermitSearch.stripHtml(p.plan_review_issue)));
         tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.issue_added_on)));
         tr.appendChild(PlanReview.CreateCell(p.issue_added_by));
-        if (new Date(p.signed_off_on.toString()).getFullYear() < 1000)
-        {
-          tr.appendChild(PlanReview.CreateCell(""));
-        }
-        else
-        {
-          tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.signed_off_on)));
-        }
+        tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.signed_off_on)));
+        //if (new Date(p.signed_off_on.toString()).getFullYear() < 1000)
+        //{
+        //  tr.appendChild(PlanReview.CreateCell(""));
+        //}
+        //else
+        //{
+        //  tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.signed_off_on)));
+        //}
         tr.appendChild(PlanReview.CreateCell(p.signed_off_by));
       }
 

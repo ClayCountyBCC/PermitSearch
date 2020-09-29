@@ -1026,8 +1026,12 @@ var Utilities;
     Utilities.Format_Amount = Format_Amount;
     function Format_Date(date) {
         if (date instanceof Date) {
+            if (date.getFullYear() < 1000)
+                return '';
             return date.toLocaleDateString('en-us');
         }
+        if (new Date(date).getFullYear() < 1000)
+            return '';
         return new Date(date).toLocaleDateString('en-US');
     }
     Utilities.Format_Date = Format_Date;
@@ -1369,7 +1373,7 @@ var PermitSearch;
             this.created_on = new Date();
         }
         Document.CreateDocumentDownloadLink = function (table_number, object_id) {
-            return "//publicrecords.claycountygov.com/GetFile?t=" + table_number.toString() + "&o=" + object_id.toString();
+            return "http://publicrecords.claycountygov.com/GetFile?t=" + table_number.toString() + "&o=" + object_id.toString();
         };
         Document.QueryDocuments = function (permit_number) {
             Document.ResetDocuments();
@@ -1678,12 +1682,14 @@ var PermitSearch;
             tr.appendChild(PlanReview.CreateCell(p.plan_type));
             tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.received_date)));
             tr.appendChild(PlanReview.CreateCell(p.plan_reviewed_by));
-            if (new Date(p.plan_reviewed_date.toString()).getFullYear() < 1000) {
-                tr.appendChild(PlanReview.CreateCell(""));
-            }
-            else {
-                tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.plan_reviewed_date)));
-            }
+            tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.plan_reviewed_date)));
+            //if (new Date(p.plan_reviewed_date.toString()).getFullYear() < 1000)
+            //{
+            //  tr.appendChild(PlanReview.CreateCell(""));
+            //}
+            //else
+            //{
+            //}
             tr.appendChild(PlanReview.CreateCell(p.review_status));
             tr.appendChild(PlanReview.CreateCell(PermitSearch.stripHtml(p.comment)));
             if (p.issue_id === -1) {
@@ -1709,7 +1715,7 @@ var PermitSearch;
         };
         PlanReview.CreateIssueRow = function (p) {
             var tr = document.createElement("tr");
-            if (new Date(p.issue_added_on.toString()).getFullYear() < 1000) {
+            if (new Date(p.issue_added_on.toString()).getFullYear() < 1000 && p.plan_review_issue.length === 0) {
                 var td = document.createElement("td");
                 td.colSpan = 7;
                 td.appendChild(document.createTextNode("No Issues have been added."));
@@ -1719,12 +1725,15 @@ var PermitSearch;
                 tr.appendChild(PlanReview.CreateCell(PermitSearch.stripHtml(p.plan_review_issue)));
                 tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.issue_added_on)));
                 tr.appendChild(PlanReview.CreateCell(p.issue_added_by));
-                if (new Date(p.signed_off_on.toString()).getFullYear() < 1000) {
-                    tr.appendChild(PlanReview.CreateCell(""));
-                }
-                else {
-                    tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.signed_off_on)));
-                }
+                tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.signed_off_on)));
+                //if (new Date(p.signed_off_on.toString()).getFullYear() < 1000)
+                //{
+                //  tr.appendChild(PlanReview.CreateCell(""));
+                //}
+                //else
+                //{
+                //  tr.appendChild(PlanReview.CreateCell(Utilities.Format_Date(p.signed_off_on)));
+                //}
                 tr.appendChild(PlanReview.CreateCell(p.signed_off_by));
             }
             return tr;

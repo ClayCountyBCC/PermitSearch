@@ -59,7 +59,30 @@ namespace PermitSearch.Models
         FROM PermitSearch.dbo.plans P
         INNER JOIN ClearanceSheet C ON C.base_id = P.base_id
         LEFT OUTER JOIN plan_review_issues PRI ON P.plan_id = PRI.plan_id
-        ORDER BY P.plan_id DESC, PRI.issue_id ASC";
+        --ORDER BY P.plan_id DESC, PRI.issue_id ASC
+
+        UNION ALL
+
+        SELECT
+          CS.clearance_sheet
+          ,id + 500000
+          ,''
+          ,department + ' ISSUE'
+          ,NULL
+          ,CAST(signed_off_on AS DATE)
+          ,signed_off_by
+          ,CASE WHEN signed_off_by IS NOT NULL 
+            THEN 'Approved'
+            ELSE ''
+            END 
+          ,id + 900000
+          ,issue
+          ,NULL
+          ,NULL
+          ,signed_off_on
+          ,signed_off_by
+        FROM clearance_sheet_issues CSI
+        INNER JOIN ClearanceSheet CS ON CSI.base_id = CS.base_id";
 
       return Constants.Get_Data<plan_review>("Production", sql, dp);
     }

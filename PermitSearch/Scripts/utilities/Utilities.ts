@@ -296,8 +296,11 @@ namespace Utilities
   {
     if (date instanceof Date)
     {
+      if (date.getFullYear() < 1000) return '';
       return date.toLocaleDateString('en-us');
     }
+
+    if (new Date(date).getFullYear() < 1000) return '';      
     return new Date(date).toLocaleDateString('en-US');
   }
 
