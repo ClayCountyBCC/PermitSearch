@@ -112,7 +112,7 @@ namespace Utilities
       window.setTimeout(function (j)
       {
         Hide(e);
-      }, 30000)
+      }, 10000)
     }
   }
 

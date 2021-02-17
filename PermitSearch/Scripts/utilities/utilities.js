@@ -76,7 +76,7 @@ var Utilities;
         if (timeout == undefined || timeout === true) {
             window.setTimeout(function (j) {
                 Hide(e);
-            }, 30000);
+            }, 10000);
         }
     }
     Utilities.Error_Show = Error_Show;

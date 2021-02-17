@@ -29,7 +29,7 @@ namespace PermitSearch
 
     private static CreateDocumentDownloadLink(table_number: number, object_id: number): string
     {
-      return "https://publicrecords.claycountygov.com/GetFile?t=" + table_number.toString() + "&o=" + object_id.toString();
+      return "http://publicrecords.claycountygov.com/GetFile?t=" + table_number.toString() + "&o=" + object_id.toString();
     }
 
     public static QueryDocuments(permit_number: number): void
