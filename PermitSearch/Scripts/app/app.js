@@ -776,7 +776,7 @@ var PermitSearch;
         }
     }
     function PopulatePermitInformation(permit) {
-        if (permit.is_closed && permit.close_type.length > 0) {
+        if (permit.is_closed && permit.close_type && permit.close_type.length > 0) {
             Utilities.Set_Value("permitCompleted", "Yes - " + permit.close_type);
         }
         else {

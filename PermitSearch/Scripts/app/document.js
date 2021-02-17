@@ -12,7 +12,7 @@ var PermitSearch;
             this.created_on = new Date();
         }
         Document.CreateDocumentDownloadLink = function (table_number, object_id) {
-            return "http://publicrecords.claycountygov.com/GetFile?t=" + table_number.toString() + "&o=" + object_id.toString();
+            return "https://publicrecords.claycountygov.com/GetFile?t=" + table_number.toString() + "&o=" + object_id.toString();
         };
         Document.QueryDocuments = function (permit_number) {
             Document.ResetDocuments();

@@ -887,7 +887,7 @@ var Utilities;
         if (timeout == undefined || timeout === true) {
             window.setTimeout(function (j) {
                 Hide(e);
-            }, 10000);
+            }, 30000);
         }
     }
     Utilities.Error_Show = Error_Show;
@@ -1373,7 +1373,7 @@ var PermitSearch;
             this.created_on = new Date();
         }
         Document.CreateDocumentDownloadLink = function (table_number, object_id) {
-            return "http://publicrecords.claycountygov.com/GetFile?t=" + table_number.toString() + "&o=" + object_id.toString();
+            return "https://publicrecords.claycountygov.com/GetFile?t=" + table_number.toString() + "&o=" + object_id.toString();
         };
         Document.QueryDocuments = function (permit_number) {
             Document.ResetDocuments();
@@ -2778,7 +2778,7 @@ var PermitSearch;
         }
     }
     function PopulatePermitInformation(permit) {
-        if (permit.is_closed && permit.close_type.length > 0) {
+        if (permit.is_closed && permit.close_type && permit.close_type.length > 0) {
             Utilities.Set_Value("permitCompleted", "Yes - " + permit.close_type);
         }
         else {
