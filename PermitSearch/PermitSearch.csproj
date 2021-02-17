@@ -112,6 +112,7 @@
     <None Include="bower_components\promise-polyfill\src\finally.js" />
     <None Include="bower_components\promise-polyfill\src\index.js" />
     <None Include="bower_components\promise-polyfill\src\polyfill.js" />
+    <Content Include=".gitignore" />
     <Content Include="content\48x48 document.png" />
     <Content Include="content\favicon-16x16.png" />
     <Content Include="content\favicon-32x32.png" />
