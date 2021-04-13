@@ -9,7 +9,7 @@
   <link href="css/Utilities.min.css" rel="stylesheet" />
   <link href="css/Fontawesome/css/fontawesome-all.min.css" rel="stylesheet" />
   <link href="css/Main.css" rel="stylesheet" />-->
-  <link href="css/bundle.min.css?20190210 2121" rel="stylesheet" />
+  <link href="css/bundle.min.css?202104122025" rel="stylesheet" />
   <link rel="icon" type="image/png" sizes="32x32" href="content/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="content/favicon-16x16.png">
 </head>
@@ -153,6 +153,25 @@
 
     <section class="hide"
              id="contractorSearchOptions">
+
+      <div class="field is-horizontal">
+        <div class="field-label is-medium">
+          <label class="label">Private Provider Inspector Options</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <div class="select is-medium">
+                <select id="privateProviderOptions">
+                  <option value="contractor">Search Permits By Contractor Number Only</option>
+                  <option value="privateproviderinspector">Search Permits By Private Provider Inspector Only</option>
+                  <option value="both">Search Both Contractor Number and Private Provider Inspector Fields</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="field is-horizontal">
         <div class="field-label is-medium">
@@ -404,6 +423,9 @@
                       style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;"></fieldset>
 
             <fieldset id="contractorFieldset"
+                      style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;"></fieldset>
+
+            <fieldset id="ppicontractorFieldset"
                       style="border: 1px solid rgba(10, 10, 10, .1); border-radius: 6px; padding: 1.25rem;"></fieldset>
           </section>
 
@@ -813,7 +835,7 @@
   <script src="Scripts/app/hold.js"></script>
   <script src="Scripts/app/LocationHash.js"></script>
   <script src="Scripts/app/app.js"></script>-->
-  <script src="Scripts/bundle.min.js?20190210 2121"></script>
+  <script src="Scripts/bundle.min.js?202104122025"></script>
 
   <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function (event)

@@ -36,7 +36,7 @@ var PermitSearch;
         {
             id: "nav-contractorSearchOptions",
             title: "Search by Contractor",
-            subTitle: "Search for permits by Contractor Name, Company Name, or Contractor ID.  Enter any combination of Name, Number, or Company Name.",
+            subTitle: "Search for permits by Contractor Name, Company Name, or Contractor ID.  Enter any combination of Name, Number, or Company Name. You can also search for permits with a specific Private Provider Inspector.",
             icon: "fas fa-users",
             label: "Contractor",
             selected: false,
@@ -114,6 +114,7 @@ var PermitSearch;
         Toggle_Loading_Search_Buttons(true);
         var newHash = new PermitSearch.LocationHash("");
         newHash.tab = PermitSearch.selected_tab;
+        console.log('Search ToHash');
         location.hash = newHash.ToHash();
     }
     PermitSearch.Search = Search;
@@ -122,6 +123,7 @@ var PermitSearch;
         var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
         currentHash.permit_print = currentHash.permit_display;
         currentHash.permit_display = "";
+        console.log('CreatePrintPermitPreview ToHash');
         location.hash = currentHash.ToHash();
     }
     PermitSearch.CreatePrintPermitPreview = CreatePrintPermitPreview;
@@ -319,31 +321,40 @@ var PermitSearch;
         }
     }
     function HandleHash(event) {
+        console.log('HandleHash', location.hash.substring(1));
         Utilities.Clear_Element(document.getElementById("permitSearchError"));
         var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
+        console.log('HandleHash Set Current Hash', currentHash);
         var newHash = new PermitSearch.LocationHash(location.hash.substring(1));
         var oldHash = null;
         // if the event is null, we're loading this off of the initial
         // page load.  
+        console.log('handlehash event', event);
         if (event !== null) {
             var hash = event.oldURL.split("#");
+            console.log('handlehash event oldURL', event.oldURL);
             if (hash.length === 2) {
                 oldHash = new PermitSearch.LocationHash(hash[1]);
+                console.log('handlehash event oldHash updated', oldHash);
             }
         }
         else {
+            console.log('HandleHash UpdateInputs');
             currentHash.UpdateInputs();
         }
         if (newHash.ReadyToTogglePermitDisplay(oldHash)) {
+            console.log('newhash ready to togglepermit display', newHash);
             TogglePermitDisplay(newHash.permit_display);
             Toggle_Loading_Search_Buttons(false);
             return;
         }
         if (newHash.ReadyToTogglePermitPrint(oldHash)) {
+            console.log('newhash ready to toggle permit print', newHash);
             TogglePermitPrint(newHash.permit_print);
             return;
         }
         if (currentHash.ReadyToSearch()) {
+            console.log('Current Hash Ready To Search', currentHash);
             Query(currentHash);
         }
         else {
@@ -394,7 +405,9 @@ var PermitSearch;
         var path = GetPath();
         var permitPrint = currentHash.permit_print;
         var permitDisplay = currentHash.permit_display;
+        console.log('Query ToHash', currentHash);
         var newHash = currentHash.ToHash();
+        console.log('new hash', newHash);
         var searchHash = "?" + newHash.substring(1);
         // Get the list of permits for this search
         Utilities.Get(path + "API/Search/Permit" + searchHash)
@@ -788,6 +801,7 @@ var PermitSearch;
         permitInspectionButton.href = inspectionLink;
         Build_Property_Information_Display(permit);
         Build_Contractor_Information_Display(permit);
+        Build_PPI_Contractor_Information_Display(permit);
     }
     function Build_Property_Information_Display(permit) {
         var propertyContainer = document.getElementById("propertyFieldset");
@@ -836,6 +850,32 @@ var PermitSearch;
                 df.appendChild(Create_Field("Contractor Name", permit.contractor_name));
             if (permit.company_name.length > 0)
                 df.appendChild(Create_Field("Company Name", permit.company_name));
+        }
+        contractorContainer.appendChild(df);
+    }
+    function Build_PPI_Contractor_Information_Display(permit) {
+        var contractorContainer = document.getElementById("ppicontractorFieldset");
+        Utilities.Clear_Element(contractorContainer);
+        var df = document.createDocumentFragment();
+        var legend = document.createElement("legend");
+        legend.classList.add("label");
+        legend.appendChild(document.createTextNode("Private Provider Inspector Contractor Information"));
+        df.appendChild(legend);
+        if (permit.ppi_contractor_name.length === 0 &&
+            permit.ppi_contractor_number.length === 0 &&
+            permit.ppi_company_name.length === 0) {
+            var p = document.createElement("p");
+            p.appendChild(document.createTextNode("No Private Provider Inspector Contractor Information found."));
+            df.appendChild(p);
+        }
+        else {
+            if (permit.contractor_number.length > 0) {
+                df.appendChild(Create_Field("Private Provider Inspector Contractor Number", permit.contractor_number));
+            }
+            if (permit.ppi_contractor_name.length > 0)
+                df.appendChild(Create_Field("Private Provider Inspector Contractor Name", permit.ppi_contractor_name));
+            if (permit.ppi_company_name.length > 0)
+                df.appendChild(Create_Field("Private Provider Inspector Company Name", permit.ppi_company_name));
         }
         contractorContainer.appendChild(df);
     }
@@ -942,6 +982,7 @@ var PermitSearch;
         Utilities.Set_Value("parcelSearch", "");
         Utilities.Set_Value("ownerSearch", "");
         Utilities.Set_Value("contractorNumberSearch", "");
+        Utilities.Set_Value("privateProviderOptions", "contractor");
         Utilities.Set_Value("contractorNameSearch", "");
         Utilities.Set_Value("companyNameSearch", "");
         location.hash = "";

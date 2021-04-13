@@ -29,6 +29,9 @@ namespace PermitSearch.Models
     public string contractor_number { get; set; }
     public string contractor_name { get; set; }
     public string company_name { get; set; }
+    public string ppi_contractor_number { get; set; }
+    public string ppi_contractor_name { get; set; }
+    public string ppi_company_name { get; set; }
     public string owner_name { get; set; }
     public string parcel_number { get; set; }
     public string pin_complete { get; set; }
@@ -143,6 +146,7 @@ namespace PermitSearch.Models
     private static string GetSearchQuery(
       int permitnumber,
       string status,
+      string privateprovideroptions,
       string contractorid,
       string contractorname,
       string companyname,
@@ -178,19 +182,54 @@ namespace PermitSearch.Models
 
         if (contractorid.Length > 0 | contractorname.Length > 0 | companyname.Length > 0)
         {
+          switch (privateprovideroptions)
+          {
+            case "contractor":
+              if (contractorid.Length > 0)
+              {
+                sbWhere.AppendLine("AND C.contractor_number = @contractor_number ");
+              }
+              if (contractorname.Length > 0)
+              {
+                sbWhere.AppendLine("AND C.contractor_name LIKE '%' + @contractor_name + '%' ");
+              }
+              if (companyname.Length > 0)
+              {
+                sbWhere.AppendLine("AND C.company_name LIKE '%' + @company_name + '%' ");
+              }
+              break;
 
-          if (contractorid.Length > 0)
-          {
-            sbWhere.AppendLine("AND C.contractor_number = @contractor_number ");
+            case "privateproviderinspector":
+              if (contractorid.Length > 0)
+              {
+                sbWhere.AppendLine("AND PPIC.contractor_number = @contractor_number ");
+              }
+              if (contractorname.Length > 0)
+              {
+                sbWhere.AppendLine("AND PPIC.contractor_name LIKE '%' + @contractor_name + '%' ");
+              }
+              if (companyname.Length > 0)
+              {
+                sbWhere.AppendLine("AND PPIC.company_name LIKE '%' + @company_name + '%' ");
+              }
+              break;
+
+            case "both":
+              if (contractorid.Length > 0)
+              {
+                sbWhere.AppendLine("AND (PPIC.contractor_number = @contractor_number OR C.contractor_number = @contractor_number) ");
+              }
+              if (contractorname.Length > 0)
+              {
+                sbWhere.AppendLine("AND (PPIC.contractor_name LIKE '%' + @contractor_name + '%' OR (C.contractor_name LIKE '%' + @contractor_name + '%') ");
+              }
+              if (companyname.Length > 0)
+              {
+                sbWhere.AppendLine("AND (PPIC.company_name LIKE '%' + @company_name + '%' OR C.company_name LIKE '%' + @company_name + '%')  ");
+              }
+              break;
           }
-          if (contractorname.Length > 0)
-          {
-            sbWhere.AppendLine("AND C.contractor_name LIKE '%' + @contractor_name + '%' ");
-          }
-          if (companyname.Length > 0)
-          {
-            sbWhere.AppendLine("AND C.company_name LIKE '%' + @company_name + '%' ");
-          }
+
         }
 
         if (streetnumber.Length > 0 | streetname.Length > 0)
@@ -279,8 +318,9 @@ namespace PermitSearch.Models
     public static List<permit> Search(
       int permitnumber,
       string status,
+      string privateprovideroptions,
       string contractorid,
-      string contractorname,
+      string contractorname,      
       string companyname,
       string streetnumber,
       string streetname,
@@ -315,11 +355,16 @@ namespace PermitSearch.Models
           ISNULL(PA.pin_complete, '') pin_complete,
           ISNULL(O.owner_name, '') owner_name,
           ISNULL(P.contractor_number, '') contractor_number,
-          ISNULL(C.contractor_name, '') contractor_name,
-          ISNULL(C.company_name, '') company_name
+          COALESCE(C.contractor_name, '') contractor_name,
+          COALESCE(C.company_name, '') company_name,
+          ISNULL(PPIC.contractor_number, '') ppi_contractor_number,
+          COALESCE(PPIC.contractor_name, '') ppi_contractor_name,
+          COALESCE(PPIC.company_name, '') ppi_company_name
         FROM permit P
-        LEFT OUTER JOIN permit_contractor PC ON PC.permit_number = P.permit_number
+        LEFT OUTER JOIN permit_contractor PC ON PC.permit_number = P.permit_number        
         LEFT OUTER JOIN contractor C ON C.contractor_number = PC.contractor_number
+        LEFT OUTER JOIN permit_private_provider_inspector PPI ON P.permit_number = PPI.permit_number
+        LEFT OUTER JOIN contractor PPIC ON PPIC.contractor_number = PPI.private_provider_inspector_contractor_number
         LEFT OUTER JOIN permit_parcel PP ON PP.permit_number = P.permit_number
         LEFT OUTER JOIN parcel PA ON PA.ID = PP.parcel_id
         LEFT OUTER JOIN permit_owner PO ON P.permit_number = PO.permit_number
@@ -327,7 +372,7 @@ namespace PermitSearch.Models
         LEFT OUTER JOIN permit_address PAD ON PAD.permit_number = P.permit_number
         LEFT OUTER JOIN [address] A ON A.ID = PAD.address_id";
       sb.AppendLine(sql);
-      sb.AppendLine(GetSearchQuery(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page));
+      sb.AppendLine(GetSearchQuery(permitnumber, status, privateprovideroptions, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page));
       //sb.AppendLine("ORDER BY @sortfield @sortdirection");
       sb.AppendLine(GetOrderBy(sortfield, sortdirection));
       sb.AppendLine($"OFFSET @Page ROWS FETCH NEXT { page_size.ToString() } ROWS ONLY;");
@@ -398,6 +443,7 @@ namespace PermitSearch.Models
     public static int Count(
       int permitnumber,
       string status,
+      string privateprovideroptions,
       string contractorid,
       string contractorname,
       string companyname,
@@ -415,7 +461,9 @@ namespace PermitSearch.Models
           COUNT(DISTINCT P.permit_number) CNT
         FROM permit P
         LEFT OUTER JOIN permit_contractor PC ON PC.permit_number = P.permit_number
+        LEFT OUTER JOIN permit_private_provider_inspector PPI ON P.permit_number = PPI.permit_number      
         LEFT OUTER JOIN contractor C ON C.contractor_number = PC.contractor_number
+        LEFT OUTER JOIN contractor PPIC ON PPIC.contractor_number = PPI.private_provider_inspector_contractor_number
         LEFT OUTER JOIN permit_parcel PP ON PP.permit_number = P.permit_number
         LEFT OUTER JOIN parcel PA ON PA.ID = PP.parcel_id
         LEFT OUTER JOIN permit_owner PO ON P.permit_number = PO.permit_number
@@ -423,7 +471,7 @@ namespace PermitSearch.Models
         LEFT OUTER JOIN permit_address PAD ON PAD.permit_number = P.permit_number
         LEFT OUTER JOIN [address] A ON A.ID = PAD.address_id";
       sb.AppendLine(sql);
-      sb.AppendLine(GetSearchQuery(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page));
+      sb.AppendLine(GetSearchQuery(permitnumber, status, privateprovideroptions, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page));
       return Constants.Exec_Scalar<int>("Production", sb.ToString(), dp);
     }
 

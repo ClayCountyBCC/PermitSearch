@@ -26,6 +26,9 @@ namespace PermitSearch
     contractor_number: string;
     contractor_name: string;
     company_name: string;
+    ppi_contractor_number: string;
+    ppi_contractor_name: string;
+    ppi_company_name: string;
     owner_name: string;
     parcel_number: string;
     pin_complete: string;
@@ -52,6 +55,9 @@ namespace PermitSearch
     public contractor_number: string = "";
     public contractor_name: string = "";
     public company_name: string = "";
+    public ppi_contractor_number: string = "";
+    public ppi_contractor_name: string = "";
+    public ppi_company_name: string = "";
     public owner_name: string = "";
     public parcel_number: string = "";
     public pin_complete: string = "";

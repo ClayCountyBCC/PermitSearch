@@ -17,6 +17,7 @@ namespace PermitSearch.Controllers
     public IHttpActionResult Get(
       int permitnumber = -1,
       string status = "all",
+      string privateprovideroptions = "contractor",
       string contractorid = "",
       string contractorname = "",
       string companyname = "",
@@ -29,7 +30,7 @@ namespace PermitSearch.Controllers
       int page = 1)
     {
 
-      var permitlist = permit.Search(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page, sortfield, sortdirection);
+      var permitlist = permit.Search(permitnumber, status, privateprovideroptions, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page, sortfield, sortdirection);
       return Ok(permitlist);
 
     }
@@ -40,6 +41,7 @@ namespace PermitSearch.Controllers
     public IHttpActionResult Count(
       int permitnumber = -1,
       string status = "all",
+      string privateprovideroptions = "contractor",
       string contractorid = "",
       string contractorname = "",
       string companyname = "",
@@ -50,7 +52,7 @@ namespace PermitSearch.Controllers
       int page = 1)
     {
 
-      var count = permit.Count(permitnumber, status, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page);
+      var count = permit.Count(permitnumber, status, privateprovideroptions, contractorid, contractorname, companyname, streetnumber, streetname, owner, parcel, page);
       return Ok(count);
 
     }

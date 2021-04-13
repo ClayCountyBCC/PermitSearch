@@ -1213,6 +1213,9 @@ var PermitSearch;
             this.contractor_number = "";
             this.contractor_name = "";
             this.company_name = "";
+            this.ppi_contractor_number = "";
+            this.ppi_contractor_name = "";
+            this.ppi_company_name = "";
             this.owner_name = "";
             this.parcel_number = "";
             this.pin_complete = "";
@@ -1373,7 +1376,7 @@ var PermitSearch;
             this.created_on = new Date();
         }
         Document.CreateDocumentDownloadLink = function (table_number, object_id) {
-            return "http://publicrecords.claycountygov.com/GetFile?t=" + table_number.toString() + "&o=" + object_id.toString();
+            return "https://publicrecords.claycountygov.com/GetFile?t=" + table_number.toString() + "&o=" + object_id.toString();
         };
         Document.QueryDocuments = function (permit_number) {
             Document.ResetDocuments();
@@ -1801,6 +1804,7 @@ var PermitSearch;
             this.permit_display = "";
             this.permit_print = "";
             this.permit_status = "all";
+            this.private_provider_options = "contractor";
             this.contractor_number = "";
             this.contractor_name = "";
             this.company_name = "";
@@ -1828,6 +1832,9 @@ var PermitSearch;
                             break;
                         case "status":
                             this.permit_status = k[1];
+                            break;
+                        case "privateprovideroptions":
+                            this.private_provider_options = k[1];
                             break;
                         case "contractorid":
                             this.contractor_number = k[1];
@@ -1878,6 +1885,7 @@ var PermitSearch;
             Utilities.Set_Value("parcelSearch", this.parcel_number);
             Utilities.Set_Value("ownerSearch", this.owner_name);
             Utilities.Set_Value("contractorNumberSearch", this.contractor_number);
+            Utilities.Set_Value("privateProviderOptions", this.private_provider_options);
             Utilities.Set_Value("contractorNameSearch", this.contractor_name);
             Utilities.Set_Value("companyNameSearch", this.company_name);
         };
@@ -1889,6 +1897,8 @@ var PermitSearch;
             this.street_name = Utilities.Get_Value("streetNameSearch").trim();
             this.parcel_number = Utilities.Get_Value("parcelSearch").trim();
             this.owner_name = Utilities.Get_Value("ownerSearch").trim();
+            this.private_provider_options = Utilities.Get_Value("privateProviderOptions").trim();
+            console.log('private provider options ReadInputs', this.private_provider_options);
             this.contractor_number = Utilities.Get_Value("contractorNumberSearch").trim();
             this.contractor_name = Utilities.Get_Value("contractorNameSearch").trim();
             this.company_name = Utilities.Get_Value("companyNameSearch").trim();
@@ -1928,6 +1938,8 @@ var PermitSearch;
                     h += LocationHash.AddToHash(this.street_name, "streetname");
                     break;
                 case "contractor":
+                    h += LocationHash.AddToHash(this.private_provider_options, "privateprovideroptions");
+                    console.log('private provider options ToHash', this.private_provider_options);
                     h += LocationHash.AddToHash(this.contractor_number, "contractorid");
                     h += LocationHash.AddToHash(this.contractor_name, "contractorname");
                     h += LocationHash.AddToHash(this.company_name, "companyname");
@@ -1959,6 +1971,7 @@ var PermitSearch;
                 || (this.permit_display.length === 0 && oldHash.permit_display.length > 0)) // if they are returning from the permit print modal
              {
                 return this.permit_number === oldHash.permit_number &&
+                    this.private_provider_options === oldHash.private_provider_options &&
                     this.company_name === oldHash.company_name &&
                     this.contractor_name === oldHash.contractor_name &&
                     this.contractor_number === oldHash.contractor_number &&
@@ -1977,6 +1990,7 @@ var PermitSearch;
             if ((this.permit_print.length > 0 && oldHash.permit_print.length === 0)
                 || this.permit_print.length === 0 && oldHash.permit_print.length > 0) {
                 return this.permit_number === oldHash.permit_number &&
+                    this.private_provider_options === oldHash.private_provider_options &&
                     this.company_name === oldHash.company_name &&
                     this.contractor_name === oldHash.contractor_name &&
                     this.contractor_number === oldHash.contractor_number &&
@@ -2038,7 +2052,7 @@ var PermitSearch;
         {
             id: "nav-contractorSearchOptions",
             title: "Search by Contractor",
-            subTitle: "Search for permits by Contractor Name, Company Name, or Contractor ID.  Enter any combination of Name, Number, or Company Name.",
+            subTitle: "Search for permits by Contractor Name, Company Name, or Contractor ID.  Enter any combination of Name, Number, or Company Name. You can also search for permits with a specific Private Provider Inspector.",
             icon: "fas fa-users",
             label: "Contractor",
             selected: false,
@@ -2116,6 +2130,7 @@ var PermitSearch;
         Toggle_Loading_Search_Buttons(true);
         var newHash = new PermitSearch.LocationHash("");
         newHash.tab = PermitSearch.selected_tab;
+        console.log('Search ToHash');
         location.hash = newHash.ToHash();
     }
     PermitSearch.Search = Search;
@@ -2124,6 +2139,7 @@ var PermitSearch;
         var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
         currentHash.permit_print = currentHash.permit_display;
         currentHash.permit_display = "";
+        console.log('CreatePrintPermitPreview ToHash');
         location.hash = currentHash.ToHash();
     }
     PermitSearch.CreatePrintPermitPreview = CreatePrintPermitPreview;
@@ -2321,31 +2337,40 @@ var PermitSearch;
         }
     }
     function HandleHash(event) {
+        console.log('HandleHash', location.hash.substring(1));
         Utilities.Clear_Element(document.getElementById("permitSearchError"));
         var currentHash = new PermitSearch.LocationHash(location.hash.substring(1));
+        console.log('HandleHash Set Current Hash', currentHash);
         var newHash = new PermitSearch.LocationHash(location.hash.substring(1));
         var oldHash = null;
         // if the event is null, we're loading this off of the initial
         // page load.  
+        console.log('handlehash event', event);
         if (event !== null) {
             var hash = event.oldURL.split("#");
+            console.log('handlehash event oldURL', event.oldURL);
             if (hash.length === 2) {
                 oldHash = new PermitSearch.LocationHash(hash[1]);
+                console.log('handlehash event oldHash updated', oldHash);
             }
         }
         else {
+            console.log('HandleHash UpdateInputs');
             currentHash.UpdateInputs();
         }
         if (newHash.ReadyToTogglePermitDisplay(oldHash)) {
+            console.log('newhash ready to togglepermit display', newHash);
             TogglePermitDisplay(newHash.permit_display);
             Toggle_Loading_Search_Buttons(false);
             return;
         }
         if (newHash.ReadyToTogglePermitPrint(oldHash)) {
+            console.log('newhash ready to toggle permit print', newHash);
             TogglePermitPrint(newHash.permit_print);
             return;
         }
         if (currentHash.ReadyToSearch()) {
+            console.log('Current Hash Ready To Search', currentHash);
             Query(currentHash);
         }
         else {
@@ -2396,7 +2421,9 @@ var PermitSearch;
         var path = GetPath();
         var permitPrint = currentHash.permit_print;
         var permitDisplay = currentHash.permit_display;
+        console.log('Query ToHash', currentHash);
         var newHash = currentHash.ToHash();
+        console.log('new hash', newHash);
         var searchHash = "?" + newHash.substring(1);
         // Get the list of permits for this search
         Utilities.Get(path + "API/Search/Permit" + searchHash)
@@ -2790,6 +2817,7 @@ var PermitSearch;
         permitInspectionButton.href = inspectionLink;
         Build_Property_Information_Display(permit);
         Build_Contractor_Information_Display(permit);
+        Build_PPI_Contractor_Information_Display(permit);
     }
     function Build_Property_Information_Display(permit) {
         var propertyContainer = document.getElementById("propertyFieldset");
@@ -2838,6 +2866,32 @@ var PermitSearch;
                 df.appendChild(Create_Field("Contractor Name", permit.contractor_name));
             if (permit.company_name.length > 0)
                 df.appendChild(Create_Field("Company Name", permit.company_name));
+        }
+        contractorContainer.appendChild(df);
+    }
+    function Build_PPI_Contractor_Information_Display(permit) {
+        var contractorContainer = document.getElementById("ppicontractorFieldset");
+        Utilities.Clear_Element(contractorContainer);
+        var df = document.createDocumentFragment();
+        var legend = document.createElement("legend");
+        legend.classList.add("label");
+        legend.appendChild(document.createTextNode("Private Provider Inspector Contractor Information"));
+        df.appendChild(legend);
+        if (permit.ppi_contractor_name.length === 0 &&
+            permit.ppi_contractor_number.length === 0 &&
+            permit.ppi_company_name.length === 0) {
+            var p = document.createElement("p");
+            p.appendChild(document.createTextNode("No Private Provider Inspector Contractor Information found."));
+            df.appendChild(p);
+        }
+        else {
+            if (permit.contractor_number.length > 0) {
+                df.appendChild(Create_Field("Private Provider Inspector Contractor Number", permit.contractor_number));
+            }
+            if (permit.ppi_contractor_name.length > 0)
+                df.appendChild(Create_Field("Private Provider Inspector Contractor Name", permit.ppi_contractor_name));
+            if (permit.ppi_company_name.length > 0)
+                df.appendChild(Create_Field("Private Provider Inspector Company Name", permit.ppi_company_name));
         }
         contractorContainer.appendChild(df);
     }
@@ -2944,6 +2998,7 @@ var PermitSearch;
         Utilities.Set_Value("parcelSearch", "");
         Utilities.Set_Value("ownerSearch", "");
         Utilities.Set_Value("contractorNumberSearch", "");
+        Utilities.Set_Value("privateProviderOptions", "contractor");
         Utilities.Set_Value("contractorNameSearch", "");
         Utilities.Set_Value("companyNameSearch", "");
         location.hash = "";

@@ -7,6 +7,7 @@ var PermitSearch;
             this.permit_display = "";
             this.permit_print = "";
             this.permit_status = "all";
+            this.private_provider_options = "contractor";
             this.contractor_number = "";
             this.contractor_name = "";
             this.company_name = "";
@@ -34,6 +35,9 @@ var PermitSearch;
                             break;
                         case "status":
                             this.permit_status = k[1];
+                            break;
+                        case "privateprovideroptions":
+                            this.private_provider_options = k[1];
                             break;
                         case "contractorid":
                             this.contractor_number = k[1];
@@ -84,6 +88,7 @@ var PermitSearch;
             Utilities.Set_Value("parcelSearch", this.parcel_number);
             Utilities.Set_Value("ownerSearch", this.owner_name);
             Utilities.Set_Value("contractorNumberSearch", this.contractor_number);
+            Utilities.Set_Value("privateProviderOptions", this.private_provider_options);
             Utilities.Set_Value("contractorNameSearch", this.contractor_name);
             Utilities.Set_Value("companyNameSearch", this.company_name);
         };
@@ -95,6 +100,8 @@ var PermitSearch;
             this.street_name = Utilities.Get_Value("streetNameSearch").trim();
             this.parcel_number = Utilities.Get_Value("parcelSearch").trim();
             this.owner_name = Utilities.Get_Value("ownerSearch").trim();
+            this.private_provider_options = Utilities.Get_Value("privateProviderOptions").trim();
+            console.log('private provider options ReadInputs', this.private_provider_options);
             this.contractor_number = Utilities.Get_Value("contractorNumberSearch").trim();
             this.contractor_name = Utilities.Get_Value("contractorNameSearch").trim();
             this.company_name = Utilities.Get_Value("companyNameSearch").trim();
@@ -134,6 +141,8 @@ var PermitSearch;
                     h += LocationHash.AddToHash(this.street_name, "streetname");
                     break;
                 case "contractor":
+                    h += LocationHash.AddToHash(this.private_provider_options, "privateprovideroptions");
+                    console.log('private provider options ToHash', this.private_provider_options);
                     h += LocationHash.AddToHash(this.contractor_number, "contractorid");
                     h += LocationHash.AddToHash(this.contractor_name, "contractorname");
                     h += LocationHash.AddToHash(this.company_name, "companyname");
@@ -165,6 +174,7 @@ var PermitSearch;
                 || (this.permit_display.length === 0 && oldHash.permit_display.length > 0)) // if they are returning from the permit print modal
              {
                 return this.permit_number === oldHash.permit_number &&
+                    this.private_provider_options === oldHash.private_provider_options &&
                     this.company_name === oldHash.company_name &&
                     this.contractor_name === oldHash.contractor_name &&
                     this.contractor_number === oldHash.contractor_number &&
@@ -183,6 +193,7 @@ var PermitSearch;
             if ((this.permit_print.length > 0 && oldHash.permit_print.length === 0)
                 || this.permit_print.length === 0 && oldHash.permit_print.length > 0) {
                 return this.permit_number === oldHash.permit_number &&
+                    this.private_provider_options === oldHash.private_provider_options &&
                     this.company_name === oldHash.company_name &&
                     this.contractor_name === oldHash.contractor_name &&
                     this.contractor_number === oldHash.contractor_number &&

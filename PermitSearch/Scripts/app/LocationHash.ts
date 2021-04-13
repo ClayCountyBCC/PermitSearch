@@ -8,6 +8,7 @@ namespace PermitSearch
     permit_display: string; // this will be used to indicate that a permit should be shown on the modal.
     permit_print: string; // this will be used to indicate we should show the printable permit view.
     permit_status: string;
+    private_provider_options: string;
     contractor_number: string;
     contractor_name: string;
     company_name: string;
@@ -27,6 +28,7 @@ namespace PermitSearch
     public permit_display: string = "";
     public permit_print: string = "";
     public permit_status: string = "all";
+    public private_provider_options: string = "contractor";
     public contractor_number: string = "";
     public contractor_name: string = "";
     public company_name: string = "";
@@ -63,6 +65,10 @@ namespace PermitSearch
 
             case "status":
               this.permit_status = k[1];
+              break;
+
+            case "privateprovideroptions":
+              this.private_provider_options = k[1];
               break;
 
             case "contractorid":
@@ -127,6 +133,7 @@ namespace PermitSearch
       Utilities.Set_Value("parcelSearch", this.parcel_number);
       Utilities.Set_Value("ownerSearch", this.owner_name);
       Utilities.Set_Value("contractorNumberSearch", this.contractor_number);
+      Utilities.Set_Value("privateProviderOptions", this.private_provider_options);
       Utilities.Set_Value("contractorNameSearch", this.contractor_name);
       Utilities.Set_Value("companyNameSearch", this.company_name);
       
@@ -141,6 +148,8 @@ namespace PermitSearch
       this.street_name = Utilities.Get_Value("streetNameSearch").trim();
       this.parcel_number = Utilities.Get_Value("parcelSearch").trim();
       this.owner_name = Utilities.Get_Value("ownerSearch").trim();
+      this.private_provider_options = Utilities.Get_Value("privateProviderOptions").trim();
+      console.log('private provider options ReadInputs', this.private_provider_options);
       this.contractor_number = Utilities.Get_Value("contractorNumberSearch").trim();
       this.contractor_name = Utilities.Get_Value("contractorNameSearch").trim();
       this.company_name = Utilities.Get_Value("companyNameSearch").trim();
@@ -193,6 +202,8 @@ namespace PermitSearch
           h += LocationHash.AddToHash(this.street_name, "streetname");
           break;
         case "contractor":
+          h += LocationHash.AddToHash(this.private_provider_options, "privateprovideroptions")
+          console.log('private provider options ToHash', this.private_provider_options);
           h += LocationHash.AddToHash(this.contractor_number, "contractorid");
           h += LocationHash.AddToHash(this.contractor_name, "contractorname");
           h += LocationHash.AddToHash(this.company_name, "companyname");
@@ -229,6 +240,7 @@ namespace PermitSearch
         || (this.permit_display.length === 0 && oldHash.permit_display.length > 0)) // if they are returning from the permit print modal
       {
         return this.permit_number === oldHash.permit_number && 
+          this.private_provider_options === oldHash.private_provider_options &&
           this.company_name === oldHash.company_name &&
           this.contractor_name === oldHash.contractor_name &&
           this.contractor_number === oldHash.contractor_number &&
@@ -250,6 +262,7 @@ namespace PermitSearch
         || this.permit_print.length === 0 && oldHash.permit_print.length > 0)
       {
         return this.permit_number === oldHash.permit_number &&
+          this.private_provider_options === oldHash.private_provider_options &&
           this.company_name === oldHash.company_name &&
           this.contractor_name === oldHash.contractor_name &&
           this.contractor_number === oldHash.contractor_number &&
