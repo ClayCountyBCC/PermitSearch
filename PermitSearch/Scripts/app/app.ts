@@ -1080,7 +1080,7 @@ namespace PermitSearch
     {
       if (permit.contractor_number.length > 0)
       {
-        df.appendChild(Create_Field("Private Provider Inspector Contractor Number", permit.contractor_number));
+        df.appendChild(Create_Field("Private Provider Inspector Contractor Number", permit.ppi_contractor_number));
       }
       if (permit.ppi_contractor_name.length > 0) df.appendChild(Create_Field("Private Provider Inspector Contractor Name", permit.ppi_contractor_name));
       if (permit.ppi_company_name.length > 0) df.appendChild(Create_Field("Private Provider Inspector Company Name", permit.ppi_company_name));
