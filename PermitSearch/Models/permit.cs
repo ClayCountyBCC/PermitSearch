@@ -221,7 +221,7 @@ namespace PermitSearch.Models
               }
               if (contractorname.Length > 0)
               {
-                sbWhere.AppendLine("AND (PPIC.contractor_name LIKE '%' + @contractor_name + '%' OR (C.contractor_name LIKE '%' + @contractor_name + '%') ");
+                sbWhere.AppendLine("AND (PPIC.contractor_name LIKE '%' + @contractor_name + '%' OR C.contractor_name LIKE '%' + @contractor_name + '%') ");
               }
               if (companyname.Length > 0)
               {
